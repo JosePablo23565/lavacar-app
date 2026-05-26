@@ -3,13 +3,13 @@ import { Home } from './components/Home'
 import { AppointmentForm } from './components/AppointmentForm'
 import { AdminLogin } from './pages/AdminLogin'
 import { AdminDashboard } from './pages/AdminDashboard'
-import { ProductCatalog } from './components/ProductCatalog'
 import { Contact } from './components/Contact'
 import { Opiniones } from './components/Opiniones'
 import { useState, useEffect } from 'react'
 
 function NavBar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const [showLocationModal, setShowLocationModal] = useState(false)
   const [scrolling, setScrolling] = useState(false)
 
   // Detectar scroll para cambiar estilo del navbar
@@ -82,7 +82,7 @@ function NavBar() {
             </button>
           </div>
 
-          {/* Menú desplegable con animación - AHORA CON FONDO Y TAPA EL CONTENIDO */}
+          {/* Menú desplegable con animación */}
           <div className={`fixed top-16 left-0 right-0 bg-gradient-to-b from-blue-600 to-blue-800 shadow-2xl z-40 transition-all duration-300 ease-in-out ${
             menuAbierto ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
           }`}>
@@ -119,7 +119,6 @@ function NavBar() {
                 <span className="text-xl group-hover:scale-110 transition-transform">⭐</span>
                 <span className="font-medium">Opiniones</span>
               </a>
-<<<<<<< Updated upstream
               <a 
                 href="/login" 
                 onClick={handleMenuClick}
@@ -138,8 +137,6 @@ function NavBar() {
                 <span className="text-xl group-hover:scale-110 transition-transform">📍</span>
                 <span className="font-medium">Ubicación</span>
               </button>
-=======
->>>>>>> Stashed changes
             </div>
           </div>
         </div>
@@ -156,8 +153,7 @@ function NavBar() {
       {/* Espaciador para que el contenido no quede debajo del navbar fijo */}
       <div className="h-16"></div>
 
-<<<<<<< Updated upstream
-      {/* MODAL DE UBICACIÓN MEJORADO */}
+      {/* MODAL DE UBICACIÓN */}
       {showLocationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl transform animate-scaleIn">
@@ -194,26 +190,19 @@ function NavBar() {
                 <div className="text-2xl bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm">
                   ⏰
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Horario de atención:</p>
-                  <p className="text-gray-600">
-                    Lunes a Sábado: <span className="font-medium text-green-600">8am - 6pm</span><br />
-                    Domingos: <span className="font-medium text-green-600">9am - 2pm</span>
-                  </p>
-                </div>
               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218901,-85.2548091', '_blank')}
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition flex items-center justify-center gap-2 font-semibold shadow-md transform hover:scale-105 transition-all duration-200"
+                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition flex items-center justify-center gap-2 font-semibold shadow-md"
               >
                 🗺️ Abrir en Google Maps
               </button>
               <button
                 onClick={() => setShowLocationModal(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition font-semibold transform hover:scale-105 transition-all duration-200"
+                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition font-semibold"
               >
                 ✖️ Cerrar
               </button>
@@ -226,8 +215,6 @@ function NavBar() {
         </div>
       )}
 
-=======
->>>>>>> Stashed changes
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
