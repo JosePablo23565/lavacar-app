@@ -163,225 +163,370 @@ export function AdminDashboard() {
   const approvedTestimonials = testimonials.filter(t => t.is_approved)
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="text-xl text-gray-600">Cargando...</div>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="text-xl text-gray-300">Cargando...</div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* CABECERA */}
-        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">📋 Panel de Administración</h1>
-            <div className="flex gap-3">
-              <a 
-                href="/" 
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
-              >
-                🏠 Volver al inicio
-              </a>
-              <button 
-                onClick={handleLogout} 
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2"
-              >
-                🔒 Cerrar Sesión
-              </button>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap');
+        
+        .admin-root {
+          font-family: 'DM Sans', sans-serif;
+          background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 60%, #0a0e1a 100%);
+          min-height: 100vh;
+          padding: 1.5rem;
+        }
+        
+        .admin-card {
+          background: #111827;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          transition: all 0.3s ease;
+        }
+        
+        .admin-card:hover {
+          border-color: rgba(14, 184, 208, 0.3);
+        }
+        
+        .admin-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .admin-table th {
+          text-align: left;
+          padding: 1rem;
+          background: linear-gradient(135deg, #0f1e3a, #0a0e1a);
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 600;
+          font-size: 0.85rem;
+          letter-spacing: 0.05em;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .admin-table td {
+          padding: 1rem;
+          color: rgba(255, 255, 255, 0.8);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .admin-table tr:hover td {
+          background: rgba(14, 184, 208, 0.05);
+        }
+        
+        .badge-blue {
+          background: rgba(14, 184, 208, 0.15);
+          color: #0eb8d0;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+        
+        .badge-green {
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+        
+        .btn-primary {
+          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 10px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(14, 184, 208, 0.3);
+        }
+        
+        .btn-danger {
+          background: rgba(239, 68, 68, 0.2);
+          color: #f87171;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          padding: 0.4rem 0.8rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          transition: all 0.2s;
+        }
+        
+        .btn-danger:hover {
+          background: rgba(239, 68, 68, 0.4);
+          color: #ff9e9e;
+        }
+        
+        .btn-success {
+          background: rgba(16, 185, 129, 0.2);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          padding: 0.4rem 0.8rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          transition: all 0.2s;
+        }
+        
+        .btn-success:hover {
+          background: rgba(16, 185, 129, 0.4);
+          color: #6ee7b7;
+        }
+        
+        .search-input {
+          width: 100%;
+          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          color: white;
+          outline: none;
+          transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+          border-color: #0eb8d0;
+          box-shadow: 0 0 0 3px rgba(14, 184, 208, 0.15);
+        }
+        
+        .search-input::placeholder {
+          color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .stat-card {
+          background: #111827;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          padding: 1.25rem;
+          text-align: center;
+          transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+          border-color: rgba(14, 184, 208, 0.4);
+          transform: translateY(-3px);
+        }
+        
+        .tab-active {
+          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          color: white;
+          box-shadow: 0 4px 12px rgba(14, 184, 208, 0.3);
+        }
+        
+        .tab-inactive {
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .tab-inactive:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+        }
+      `}</style>
+
+      <div className="admin-root">
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          {/* CABECERA */}
+          <div className="admin-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', background: 'linear-gradient(135deg, #fff, #0eb8d0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                📋 Panel de Administración
+              </h1>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <a 
+                  href="/" 
+                  className="btn-primary"
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  🏠 Volver al inicio
+                </a>
+                <button 
+                  onClick={handleLogout} 
+                  className="btn-danger"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  🔒 Cerrar Sesión
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* TABS */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('citas')}
-            className={`flex-1 py-2 rounded-lg font-semibold transition ${activeTab === 'citas' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
-          >
-            📅 Citas ({appointments.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('testimonios')}
-            className={`flex-1 py-2 rounded-lg font-semibold transition ${activeTab === 'testimonios' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
-          >
-            ⭐ Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
-          </button>
-        </div>
+          {/* TABS */}
+          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            <button
+              onClick={() => setActiveTab('citas')}
+              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', fontWeight: '600', transition: 'all 0.2s', cursor: 'pointer', border: 'none' }}
+              className={activeTab === 'citas' ? 'tab-active' : 'tab-inactive'}
+            >
+              📅 Citas ({appointments.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('testimonios')}
+              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', fontWeight: '600', transition: 'all 0.2s', cursor: 'pointer', border: 'none' }}
+              className={activeTab === 'testimonios' ? 'tab-active' : 'tab-inactive'}
+            >
+              ⭐ Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
+            </button>
+          </div>
 
-        {/* CONTENIDO DE CITAS */}
-        {activeTab === 'citas' && (
-          <>
-            {/* ESTADÍSTICAS */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
-                <p className="text-3xl font-bold">{stats.total}</p>
-                <p className="text-sm opacity-90">📊 Total Citas</p>
+          {/* CONTENIDO DE CITAS */}
+          {activeTab === 'citas' && (
+            <>
+              {/* ESTADÍSTICAS */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div className="stat-card">
+                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#0eb8d0' }}>{stats.total}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>📊 Total Citas</p>
+                </div>
+                <div className="stat-card">
+                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#34d399' }}>{stats.hoy}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>📅 Citas Hoy</p>
+                </div>
+                <div className="stat-card">
+                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b' }}>{stats.proximas}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>⏳ Próximas Citas</p>
+                </div>
               </div>
-              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
-                <p className="text-3xl font-bold">{stats.hoy}</p>
-                <p className="text-sm opacity-90">📅 Citas Hoy</p>
-              </div>
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
-                <p className="text-3xl font-bold">{stats.proximas}</p>
-                <p className="text-sm opacity-90">⏳ Próximas Citas</p>
-              </div>
-            </div>
 
-            {/* BUSCADOR */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">🔍</div>
-                <input
-                  type="text"
-                  placeholder="Buscar por nombre, teléfono o vehículo..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
+              {/* BUSCADOR */}
+              <div className="admin-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(255,255,255,0.4)' }}>🔍</div>
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre, teléfono o vehículo..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* TABLA DE CITAS */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-800 to-gray-900 text-white">
-                    <tr>
-                      <th className="p-3 text-left">👤 Cliente</th>
-                      <th className="p-3 text-left">📞 Teléfono</th>
-                      <th className="p-3 text-left">🚗 Vehículo</th>
-                      <th className="p-3 text-left">🔧 Modelo</th>
-                      <th className="p-3 text-left">🛠️ Servicio</th>
-                      <th className="p-3 text-left">📅 Fecha</th>
-                      <th className="p-3 text-left">⏰ Hora</th>
-                      <th className="p-3 text-center">⚙️ Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAppointments.length === 0 ? (
+              {/* TABLA DE CITAS */}
+              <div className="admin-card" style={{ overflow: 'hidden' }}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="admin-table">
+                    <thead>
                       <tr>
-                        <td colSpan={8} className="text-center p-8 text-gray-500">No hay citas registradas</td>
+                        <th>👤 Cliente</th>
+                        <th>📞 Teléfono</th>
+                        <th>🚗 Vehículo</th>
+                        <th>🔧 Modelo</th>
+                        <th>🛠️ Servicio</th>
+                        <th>📅 Fecha</th>
+                        <th>⏰ Hora</th>
+                        <th style={{ textAlign: 'center' }}>⚙️ Acciones</th>
                       </tr>
-                    ) : (
-                      filteredAppointments.map((apt, index) => (
-                        <tr key={apt.id} className={`border-b hover:bg-gray-50 transition ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                          <td className="p-3 font-medium">{apt.customer_name}</td>
-                          <td className="p-3">{apt.customer_phone}</td>
-                          <td className="p-3">{getVehicleLabel(apt.vehicle_type)}</td>
-                          <td className="p-3">{apt.vehicle_model || '—'}</td>
-                          <td className="p-3">{getServiceLabel(apt.service_type)}</td>
-                          <td className="p-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                              {formatDateDisplay(apt.appointment_date)}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                              {convertTo12Hour(apt.appointment_time)}
-                            </span>
-                          </td>
-                          <td className="p-3 text-center">
-                            <div className="flex gap-2 justify-center">
-                              <button
-                                onClick={() => deleteAppointment(apt.id)}
-                                className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 text-sm"
-                              >
-                                Eliminar
-                              </button>
-                              <a
-                                href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.%20🚗%20${getVehicleLabel(apt.vehicle_type)}%20${apt.vehicle_model || ''}`}
-                                target="_blank"
-                                className="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 text-sm"
-                              >
-                                WhatsApp
-                              </a>
-                            </div>
-                          </td>
+                    </thead>
+                    <tbody>
+                      {filteredAppointments.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      ) : (
+                        filteredAppointments.map((apt) => (
+                          <tr key={apt.id}>
+                            <td style={{ fontWeight: '500' }}>{apt.customer_name}</td>
+                            <td>{apt.customer_phone}</td>
+                            <td>{getVehicleLabel(apt.vehicle_type)}</td>
+                            <td>{apt.vehicle_model || '—'}</td>
+                            <td>{getServiceLabel(apt.service_type)}</td>
+                            <td><span className="badge-blue">{formatDateDisplay(apt.appointment_date)}</span></td>
+                            <td><span className="badge-green">{convertTo12Hour(apt.appointment_time)}</span></td>
+                            <td style={{ textAlign: 'center' }}>
+                              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️ Eliminar</button>
+                                <a
+                                  href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`}
+                                  target="_blank"
+                                  className="btn-success"
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  💬 WhatsApp
+                                </a>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* CONTENIDO DE TESTIMONIOS */}
+          {activeTab === 'testimonios' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {/* Pendientes */}
+              <div className="admin-card" style={{ padding: '1.5rem' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#f59e0b' }}>⏳ Opiniones Pendientes ({pendingTestimonials.length})</h2>
+                {pendingTestimonials.length === 0 ? (
+                  <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '1rem' }}>No hay opiniones pendientes de aprobación</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {pendingTestimonials.map((t) => (
+                      <div key={t.id} style={{ background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px', padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <div>
+                            <p style={{ fontWeight: '600' }}>{t.customer_name}</p>
+                            <div style={{ display: 'flex', color: '#f59e0b', fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                              {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
+                            </div>
+                            <p style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>"{t.comment}"</p>
+                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: '0.5rem' }}>{formatDateLong(t.created_at)}</p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button onClick={() => approveTestimonial(t.id)} className="btn-success">✅ Aprobar</button>
+                            <button onClick={() => deleteTestimonial(t.id)} className="btn-danger">🗑️ Eliminar</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Aprobados */}
+              <div className="admin-card" style={{ padding: '1.5rem' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#34d399' }}>✅ Opiniones Aprobadas ({approvedTestimonials.length})</h2>
+                {approvedTestimonials.length === 0 ? (
+                  <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '1rem' }}>No hay opiniones aprobadas aún</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {approvedTestimonials.map((t) => (
+                      <div key={t.id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <div>
+                            <p style={{ fontWeight: '600' }}>{t.customer_name}</p>
+                            <div style={{ display: 'flex', color: '#f59e0b', fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                              {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
+                            </div>
+                            <p style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>"{t.comment}"</p>
+                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: '0.5rem' }}>{formatDateLong(t.created_at)}</p>
+                          </div>
+                          <button onClick={() => deleteTestimonial(t.id)} className="btn-danger">🗑️ Eliminar</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          </>
-        )}
-
-        {/* CONTENIDO DE TESTIMONIOS */}
-        {activeTab === 'testimonios' && (
-          <div className="space-y-6">
-            {/* Pendientes */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-orange-600">⏳ Opiniones Pendientes ({pendingTestimonials.length})</h2>
-              {pendingTestimonials.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No hay opiniones pendientes de aprobación</p>
-              ) : (
-                <div className="space-y-4">
-                  {pendingTestimonials.map((t) => (
-                    <div key={t.id} className="border rounded-lg p-4 bg-orange-50">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold">{t.customer_name}</p>
-                          <div className="flex text-yellow-500 text-sm my-1">
-                            {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
-                          </div>
-                          <p className="text-gray-600 italic">"{t.comment}"</p>
-                          <p className="text-xs text-gray-400 mt-1">{formatDateLong(t.created_at)}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => approveTestimonial(t.id)}
-                            className="bg-green-500 text-white px-4 py-1 rounded-lg hover:bg-green-600 text-sm"
-                          >
-                            ✅ Aprobar
-                          </button>
-                          <button
-                            onClick={() => deleteTestimonial(t.id)}
-                            className="bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600 text-sm"
-                          >
-                            🗑️ Eliminar
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Aprobados */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-4 text-green-600">✅ Opiniones Aprobadas ({approvedTestimonials.length})</h2>
-              {approvedTestimonials.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No hay opiniones aprobadas aún</p>
-              ) : (
-                <div className="space-y-4">
-                  {approvedTestimonials.map((t) => (
-                    <div key={t.id} className="border rounded-lg p-4 bg-gray-50">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold">{t.customer_name}</p>
-                          <div className="flex text-yellow-500 text-sm my-1">
-                            {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
-                          </div>
-                          <p className="text-gray-600 italic">"{t.comment}"</p>
-                          <p className="text-xs text-gray-400 mt-1">{formatDateLong(t.created_at)}</p>
-                        </div>
-                        <button
-                          onClick={() => deleteTestimonial(t.id)}
-                          className="bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600 text-sm"
-                        >
-                          🗑️ Eliminar
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
