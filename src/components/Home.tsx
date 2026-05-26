@@ -521,19 +521,20 @@ export function Home() {
                   No hay opiniones aún. ¡Sé el primero en opinar!
                 </div>
               ) : (
-                testimonials.map((testimonial, idx) => (
-                  <div key={testimonial.id} className="lc-review">
-                    <div className="lc-stars">{"★".repeat(testimonial.rating || 5)}</div>
-                    <div className="lc-review-text">"{testimonial.comment}"</div>
-                    <div className="lc-reviewer">
-                      <div className="lc-avatar">{testimonial.customer_name?.charAt(0) || 'C'}</div>
-                      <div>
-                        <div className="lc-rev-name">{testimonial.customer_name || 'Cliente'}</div>
-                        <div className="lc-rev-date">{new Date(testimonial.created_at).toLocaleDateString('es-CR')}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))
+                testimonials.map((testimonial) => (
+  <div key={testimonial.id} className="lc-review">
+    <div className="lc-stars">{"★".repeat(testimonial.rating || 5)}</div>
+    <div className="lc-review-text">"{testimonial.comment}"</div>
+    <div className="lc-reviewer">
+      <div className="lc-avatar">{testimonial.customer_name?.charAt(0) || 'C'}</div>
+      <div>
+        <div className="lc-rev-name">{testimonial.customer_name || 'Cliente'}</div>
+        <div className="lc-rev-date">{new Date(testimonial.created_at).toLocaleDateString('es-CR')}</div>
+      </div>
+    </div>
+  </div>
+))
+  
               )}
             </div>
             <div style={{ textAlign: 'center', marginTop: '2.5rem' }} className="lc-reveal">
