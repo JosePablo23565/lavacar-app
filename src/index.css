@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== ESTILOS GLOBALES PARA EVITAR SELECCIÓN DE TEXTO ===== */
+
+/* Deshabilitar selección de texto en toda la página */
+* {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Permitir selección SOLO en inputs y textareas */
+input, 
+textarea {
+  user-select: text;
+  cursor: text;
+}
+
+/* Cursor normal en elementos no interactivos */
+body, h1, h2, h3, h4, p, div, section, article, nav, footer, header, span {
+  cursor: default;
+}
+
+/* Cursor de mano en botones y elementos clicables */
+button, 
+a, 
+[role="button"],
+.lc-service-card,
+.lc-ql-card,
+.lc-btn-primary,
+.lc-btn-outline,
+.lc-nav-cta,
+.lc-review,
+.back-btn {
+  cursor: pointer;
+}

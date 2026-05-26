@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react'
 
 function NavBar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
-  const [showLocationModal, setShowLocationModal] = useState(false)
   const [scrolling, setScrolling] = useState(false)
 
   // Detectar scroll para cambiar estilo del navbar
@@ -127,16 +126,6 @@ function NavBar() {
                 <span className="text-xl group-hover:scale-110 transition-transform">🔐</span>
                 <span className="font-medium">Admin</span>
               </a>
-              <button 
-                onClick={() => {
-                  setShowLocationModal(true)
-                  handleMenuClick()
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">📍</span>
-                <span className="font-medium">Ubicación</span>
-              </button>
             </div>
           </div>
         </div>
@@ -152,68 +141,6 @@ function NavBar() {
 
       {/* Espaciador para que el contenido no quede debajo del navbar fijo */}
       <div className="h-16"></div>
-
-      {/* MODAL DE UBICACIÓN */}
-      {showLocationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl transform animate-scaleIn">
-            <div className="text-center mb-4">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg animate-pulse">
-                <span className="text-4xl">📍</span>
-              </div>
-            </div>
-            
-            <h3 className="text-2xl font-bold text-center text-gray-800 mb-2">
-              Nuestra Ubicación
-            </h3>
-            <p className="text-center text-gray-500 text-sm mb-6">
-              ¡Ven y conócenos! 🚗
-            </p>
-            
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm">
-                  📍
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Dirección exacta:</p>
-                  <p className="text-gray-600">
-                    Bagaces, Guanacaste<br />
-                    Costa Rica
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm">
-                  ⏰
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218901,-85.2548091', '_blank')}
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition flex items-center justify-center gap-2 font-semibold shadow-md"
-              >
-                🗺️ Abrir en Google Maps
-              </button>
-              <button
-                onClick={() => setShowLocationModal(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition font-semibold"
-              >
-                ✖️ Cerrar
-              </button>
-            </div>
-            
-            <p className="text-center text-xs text-gray-400 mt-4">
-              ¡Te esperamos con los mejores precios y calidad!
-            </p>
-          </div>
-        </div>
-      )}
 
       <style>{`
         @keyframes fadeIn {
