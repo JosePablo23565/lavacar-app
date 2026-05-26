@@ -55,21 +55,101 @@ export function Home() {
   }, [])
 
   useEffect(() => {
-    // Water drops animation
+    // ESPUMA / BURBUJAS DE JABÓN CON EFECTO IRIDISCENTE
     if (dropsRef.current) {
-      for (let i = 0; i < 18; i++) {
-        const d = document.createElement('div')
-        const size = Math.random() * 4 + 2
-        d.style.cssText = `
-          position:absolute;border-radius:50%;
-          background:rgba(14,184,208,0.5);
-          width:${size}px;height:${size}px;
-          left:${Math.random() * 100}%;
-          top:-${size}px;
-          animation:dropFall ${Math.random() * 4 + 3}s linear ${Math.random() * 8}s infinite;
-          opacity:${Math.random() * 0.4 + 0.1};
+      // Colores para el reflejo de las burbujas (efecto arcoíris)
+      const pastelColors = [
+        'rgba(255,255,255,0.9)',      // blanco
+        'rgba(200,230,255,0.7)',      // azul claro
+        'rgba(200,255,220,0.6)',      // verde menta
+        'rgba(255,220,200,0.5)',      // durazno
+        'rgba(230,200,255,0.6)',      // lila
+        'rgba(255,200,230,0.5)'       // rosa pastel
+      ]
+      
+      const highlightColors = [
+        'rgba(255,255,255,1)',
+        'rgba(200,240,255,0.9)',
+        'rgba(200,255,210,0.8)',
+        'rgba(255,235,200,0.7)'
+      ]
+      
+      // Burbujas pequeñas y medianas con efecto de brillo
+      for (let i = 0; i < 50; i++) {
+        const bubble = document.createElement('div')
+        const size = Math.random() * 20 + 8
+        const duration = Math.random() * 9 + 5
+        const delay = Math.random() * 15
+        const colorIndex = Math.floor(Math.random() * pastelColors.length)
+        const highlightIndex = Math.floor(Math.random() * highlightColors.length)
+        const rotateAngle = Math.random() * 360
+        
+        bubble.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle at ${30 + Math.random() * 40}% ${30 + Math.random() * 40}%, ${highlightColors[highlightIndex]}, ${pastelColors[colorIndex]});
+          width: ${size}px;
+          height: ${size}px;
+          left: ${Math.random() * 100}%;
+          top: -${size}px;
+          animation: bubbleRise ${duration}s linear ${delay}s infinite;
+          opacity: ${Math.random() * 0.5 + 0.4};
+          box-shadow: 0 0 ${Math.random() * 3 + 2}px rgba(255,255,255,0.6), inset 0 1px 2px rgba(255,255,255,0.5);
+          pointer-events: none;
+          transform: rotate(${rotateAngle}deg);
         `
-        dropsRef.current.appendChild(d)
+        dropsRef.current.appendChild(bubble)
+      }
+      
+      // Burbujas grandes con efecto de brillo más pronunciado
+      for (let i = 0; i < 25; i++) {
+        const bigBubble = document.createElement('div')
+        const size = Math.random() * 35 + 18
+        const duration = Math.random() * 14 + 9
+        const delay = Math.random() * 20
+        const colorIndex = Math.floor(Math.random() * pastelColors.length)
+        const highlightIndex = Math.floor(Math.random() * highlightColors.length)
+        const rotateAngle = Math.random() * 360
+        
+        bigBubble.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle at ${25 + Math.random() * 50}% ${25 + Math.random() * 50}%, ${highlightColors[highlightIndex]}, ${pastelColors[colorIndex]});
+          width: ${size}px;
+          height: ${size}px;
+          left: ${Math.random() * 100}%;
+          bottom: -${size}px;
+          animation: bubbleRise ${duration}s linear ${delay}s infinite;
+          opacity: ${Math.random() * 0.45 + 0.25};
+          box-shadow: 0 0 ${Math.random() * 6 + 3}px rgba(255,255,255,0.5), inset 0 1px 3px rgba(255,255,255,0.6);
+          pointer-events: none;
+          transform: rotate(${rotateAngle}deg);
+        `
+        dropsRef.current.appendChild(bigBubble)
+      }
+      
+      // Burbujas con efecto "arcoíris" (gradiente múltiple)
+      for (let i = 0; i < 15; i++) {
+        const rainbowBubble = document.createElement('div')
+        const size = Math.random() * 25 + 12
+        const duration = Math.random() * 11 + 6
+        const delay = Math.random() * 18
+        
+        rainbowBubble.style.cssText = `
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95), rgba(200,220,255,0.6));
+          width: ${size}px;
+          height: ${size}px;
+          left: ${Math.random() * 100}%;
+          top: -${size}px;
+          animation: bubbleRise ${duration}s linear ${delay}s infinite;
+          opacity: ${Math.random() * 0.6 + 0.3};
+          box-shadow: 0 0 5px rgba(255,255,255,0.7), inset 0 1px 3px rgba(255,255,255,0.8);
+          pointer-events: none;
+          filter: blur(0.3px);
+        `
+        dropsRef.current.appendChild(rainbowBubble)
       }
     }
 
@@ -133,6 +213,40 @@ export function Home() {
 
         .lc-root { font-family:'DM Sans',sans-serif; background:#0a0e1a; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
+
+        /* Animación de burbujas de espuma con efecto de brillo */
+        @keyframes bubbleRise {
+          0% {
+            transform: translateY(0) rotate(0deg) scale(0.9);
+            opacity: 0.7;
+          }
+          25% {
+            opacity: 1;
+            transform: translateY(-25vh) rotate(90deg) scale(1.05);
+          }
+          50% {
+            opacity: 0.8;
+            transform: translateY(-50vh) rotate(180deg) scale(1);
+          }
+          75% {
+            opacity: 0.6;
+            transform: translateY(-75vh) rotate(270deg) scale(0.95);
+          }
+          100% {
+            transform: translateY(-100vh) rotate(360deg) scale(0.9);
+            opacity: 0;
+          }
+        }
+
+        /* Efecto de brillo pulsante para burbujas */
+        @keyframes bubbleGlow {
+          0%, 100% {
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
+          }
+          50% {
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
+          }
+        }
 
         .lc-nav { position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;transition:all .3s; }
         .lc-nav.scrolled { background:rgba(10,14,26,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07); }
@@ -298,7 +412,6 @@ export function Home() {
         @keyframes lcGlowPulse { 0%,100%{opacity:.6;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.1)} }
         @keyframes lcGridMove { 0%{background-position:0 0} 100%{background-position:60px 60px} }
         @keyframes lcFloatCar { 0%,100%{transform:translateX(0) translateY(0)} 50%{transform:translateX(-10px) translateY(-15px)} }
-        @keyframes dropFall { 0%{transform:translateY(-20px);opacity:1} 100%{transform:translateY(100vh);opacity:0} }
         @keyframes lcFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes lcScrollBounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(5px)} }
         @keyframes lcFloatIcon { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
@@ -326,40 +439,6 @@ export function Home() {
           .lc-booking{padding:2.5rem 1.5rem;}
           .lc-section{padding:4rem 1.25rem;}
           .lc-hours-card{scale:0.9;}
-        }
-          /* EFECTOS HOVER MEJORADOS - FORZADOS */
-        .lc-service-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-        }
-        .lc-service-card:hover {
-          transform: translateY(-10px) scale(1.02) !important;
-          box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5) !important;
-          border-color: rgba(14,184,208,0.5) !important;
-        }
-
-        .lc-ql-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-        }
-        .lc-ql-card:hover {
-          transform: translateY(-10px) scale(1.02) !important;
-          box-shadow: 0 20px 30px -10px rgba(0,0,0,0.5) !important;
-          border-color: rgba(14,184,208,0.4) !important;
-        }
-
-        .lc-review {
-          transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-        }
-        .lc-review:hover {
-          transform: translateY(-8px) !important;
-          box-shadow: 0 15px 25px -10px rgba(0,0,0,0.4) !important;
-          border-color: rgba(14,184,208,0.3) !important;
-        }
-
-        .lc-feat-card {
-          transition: transform 0.3s ease !important;
-        }
-        .lc-feat-card:hover {
-          transform: translateY(-5px) !important;
         }
       `}</style>
 
