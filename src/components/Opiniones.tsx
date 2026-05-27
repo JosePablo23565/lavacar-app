@@ -3,10 +3,11 @@ import { supabase } from '../lib/supabase'
 
 type Opinion = {
   id: number
-  nombre: string
-  comentario: string
+  customer_name: string
+  comment: string
   rating: number
   created_at: string
+  is_approved: boolean
 }
 
 export function Opiniones() {
@@ -20,15 +21,16 @@ export function Opiniones() {
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState('')
 
-  // Cargar opiniones
+  // Cargar opiniones aprobadas
   useEffect(() => {
     fetchOpiniones()
   }, [])
 
   const fetchOpiniones = async () => {
     const { data } = await supabase
-      .from('opiniones')
+      .from('testimonials')
       .select('*')
+      .eq('is_approved', true)
       .order('created_at', { ascending: false })
     
     setOpiniones(data || [])
@@ -43,17 +45,17 @@ export function Opiniones() {
     }
     setEnviando(true)
     
-    const { error } = await supabase.from('opiniones').insert([{
-      nombre: formData.nombre,
-      comentario: formData.comentario,
+    const { error } = await supabase.from('testimonials').insert([{
+      customer_name: formData.nombre,
+      comment: formData.comentario,
       rating: formData.rating,
-      created_at: new Date().toISOString()
+      is_approved: false
     }])
 
     if (error) {
       setMensaje('Error al enviar: ' + error.message)
     } else {
-      setMensaje('¡Opinión enviada con éxito!')
+      setMensaje('¡Opinión enviada con éxito! Quedará visible tras ser aprobada.')
       setFormData({ nombre: '', comentario: '', rating: 5 })
       fetchOpiniones()
       setTimeout(() => setMensaje(''), 3000)
@@ -161,7 +163,7 @@ export function Opiniones() {
             </div>
           </div>
 
-          {/* Lista de opiniones */}
+          {/* Lista de opiniones aprobadas */}
           <div className="op-card">
             <div className="op-card-header">
               <p>OPINIONES DE CLIENTES</p>
@@ -178,8 +180,8 @@ export function Opiniones() {
                   {opiniones.map((opinion) => (
                     <div key={opinion.id} className="op-review-card">
                       <div className="op-review-stars">{"★".repeat(opinion.rating)}</div>
-                      <div className="op-review-text">"{opinion.comentario}"</div>
-                      <div className="op-review-name">{opinion.nombre}</div>
+                      <div className="op-review-text">"{opinion.comment}"</div>
+                      <div className="op-review-name">{opinion.customer_name}</div>
                       <div className="op-review-date">{new Date(opinion.created_at).toLocaleDateString('es-CR')}</div>
                     </div>
                   ))}
