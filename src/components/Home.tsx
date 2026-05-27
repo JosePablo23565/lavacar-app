@@ -8,7 +8,6 @@ export function Home() {
   const [testimonials, setTestimonials] = useState<any[]>([])
   const [loadingTestimonials, setLoadingTestimonials] = useState(true)
 
-  // Función para cargar testimonios (se puede llamar desde el evento)
   const fetchTestimonials = async () => {
     try {
       console.log('🔍 Cargando testimonios desde Supabase...')
@@ -37,12 +36,10 @@ export function Home() {
     setLoadingTestimonials(false)
   }
 
-  // Cargar testimonios al montar el componente
   useEffect(() => {
     fetchTestimonials()
   }, [])
 
-  // Escuchar eventos de actualización desde el panel de admin
   useEffect(() => {
     const handleUpdate = () => {
       console.log('🔄 Actualizando testimonios por evento')
@@ -55,26 +52,18 @@ export function Home() {
   }, [])
 
   useEffect(() => {
-    // ESPUMA / BURBUJAS DE JABÓN CON EFECTO IRIDISCENTE
+    // ESPUMA / BURBUJAS DE JABÓN
     if (dropsRef.current) {
-      // Colores para el reflejo de las burbujas (efecto arcoíris)
       const pastelColors = [
-        'rgba(255,255,255,0.9)',      // blanco
-        'rgba(200,230,255,0.7)',      // azul claro
-        'rgba(200,255,220,0.6)',      // verde menta
-        'rgba(255,220,200,0.5)',      // durazno
-        'rgba(230,200,255,0.6)',      // lila
-        'rgba(255,200,230,0.5)'       // rosa pastel
+        'rgba(255,255,255,0.9)', 'rgba(200,230,255,0.7)', 'rgba(200,255,220,0.6)',
+        'rgba(255,220,200,0.5)', 'rgba(230,200,255,0.6)', 'rgba(255,200,230,0.5)'
       ]
       
       const highlightColors = [
-        'rgba(255,255,255,1)',
-        'rgba(200,240,255,0.9)',
-        'rgba(200,255,210,0.8)',
-        'rgba(255,235,200,0.7)'
+        'rgba(255,255,255,1)', 'rgba(200,240,255,0.9)',
+        'rgba(200,255,210,0.8)', 'rgba(255,235,200,0.7)'
       ]
       
-      // Burbujas pequeñas y medianas con efecto de brillo
       for (let i = 0; i < 50; i++) {
         const bubble = document.createElement('div')
         const size = Math.random() * 20 + 8
@@ -101,7 +90,6 @@ export function Home() {
         dropsRef.current.appendChild(bubble)
       }
       
-      // Burbujas grandes con efecto de brillo más pronunciado
       for (let i = 0; i < 25; i++) {
         const bigBubble = document.createElement('div')
         const size = Math.random() * 35 + 18
@@ -128,7 +116,6 @@ export function Home() {
         dropsRef.current.appendChild(bigBubble)
       }
       
-      // Burbujas con efecto "arcoíris" (gradiente múltiple)
       for (let i = 0; i < 15; i++) {
         const rainbowBubble = document.createElement('div')
         const size = Math.random() * 25 + 12
@@ -214,38 +201,28 @@ export function Home() {
         .lc-root { font-family:'DM Sans',sans-serif; background:#0a0e1a; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
 
-        /* Animación de burbujas de espuma con efecto de brillo */
         @keyframes bubbleRise {
-          0% {
-            transform: translateY(0) rotate(0deg) scale(0.9);
-            opacity: 0.7;
-          }
-          25% {
-            opacity: 1;
-            transform: translateY(-25vh) rotate(90deg) scale(1.05);
-          }
-          50% {
-            opacity: 0.8;
-            transform: translateY(-50vh) rotate(180deg) scale(1);
-          }
-          75% {
-            opacity: 0.6;
-            transform: translateY(-75vh) rotate(270deg) scale(0.95);
-          }
-          100% {
-            transform: translateY(-100vh) rotate(360deg) scale(0.9);
-            opacity: 0;
-          }
+          0% { transform: translateY(0) rotate(0deg) scale(0.9); opacity: 0.7; }
+          25% { opacity: 1; transform: translateY(-25vh) rotate(90deg) scale(1.05); }
+          50% { opacity: 0.8; transform: translateY(-50vh) rotate(180deg) scale(1); }
+          75% { opacity: 0.6; transform: translateY(-75vh) rotate(270deg) scale(0.95); }
+          100% { transform: translateY(-100vh) rotate(360deg) scale(0.9); opacity: 0; }
         }
 
-        /* Efecto de brillo pulsante para burbujas */
-        @keyframes bubbleGlow {
-          0%, 100% {
-            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
-          }
-          50% {
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
-          }
+        @keyframes lcCarFloat { 
+          0%,100%{transform:translateY(0px) rotate(0deg)} 
+          50%{transform:translateY(-15px) rotate(2deg)} 
+        }
+        
+        @keyframes lcCarGlow { 
+          0%,100%{filter:drop-shadow(0 5px 15px rgba(14,184,208,0.3))} 
+          50%{filter:drop-shadow(0 5px 25px rgba(14,184,208,0.6))} 
+        }
+        
+        @keyframes lcLineMove { 
+          0%{transform:translateX(-10px);opacity:0} 
+          50%{opacity:1} 
+          100%{transform:translateX(10px);opacity:0} 
         }
 
         .lc-nav { position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;transition:all .3s; }
@@ -272,7 +249,7 @@ export function Home() {
         .lc-btn-primary { background:#1a6fd4;color:#fff;padding:.85rem 2rem;border-radius:10px;font-weight:500;transition:all .25s;font-size:.95rem;cursor:pointer;border:none; }
         .lc-btn-primary:hover { background:#1558aa;transform:translateY(-2px); }
         .lc-btn-outline { border:1.5px solid rgba(255,255,255,.25);color:#fff;padding:.85rem 2rem;border-radius:10px;font-weight:500;transition:all .25s;font-size:.95rem;cursor:pointer;background:transparent; }
-        .lc-btn-outline:hover { border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05); }
+        .lc-btn-outline:hover { border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05);transform:translateY(-2px); }
         .lc-scroll-ind { position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:lcFadeUp 1s .8s ease both; }
         .lc-scroll-ind span { font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.12em; }
         .lc-scroll-arrow { width:18px;height:18px;border-right:1.5px solid rgba(255,255,255,.3);border-bottom:1.5px solid rgba(255,255,255,.3);transform:rotate(45deg);animation:lcScrollBounce 2s ease-in-out infinite; }
@@ -294,101 +271,132 @@ export function Home() {
         .lc-section-title { font-size:2.2rem;font-weight:600;margin-bottom:.8rem;line-height:1.2; }
         .lc-section-sub { color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.75;max-width:520px; }
 
-        /* Servicios Grid */
-        .lc-services-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.25rem;margin-top:3rem; }
-        
-        /* Tarjetas de servicios con efecto hover mejorado */
-        .lc-service-card { 
-          background:#111827;
-          border:1px solid rgba(255,255,255,.07);
-          border-radius:16px;
-          padding:1.75rem;
-          transition:all .35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-          position:relative;
-          overflow:hidden;
-          cursor:pointer;
+        /* ========== EFECTO BURBUJA SUAVE PARA TARJETAS DE SERVICIOS ========== */
+        .lc-service-card {
+          background: linear-gradient(135deg, #111827, #0f172a);
+          border: 1px solid rgba(14, 184, 208, 0.15);
+          border-radius: 20px;
+          padding: 1.75rem;
+          transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
-        .lc-service-card::before { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,111,212,.09),transparent);opacity:0;transition:opacity .3s; }
-        .lc-service-card:hover { 
-          border-color:rgba(14,184,208,.5);
-          transform:translateY(-8px) scale(1.02);
-          box-shadow:0 20px 30px -15px rgba(0,0,0,0.5);
+        .lc-service-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at 30% 20%, rgba(14, 184, 208, 0.08), transparent);
+          opacity: 0;
+          transition: opacity 0.5s ease;
         }
-        .lc-service-card:hover::before { opacity:1; }
-        .lc-svc-icon { font-size:2.2rem;margin-bottom:1rem; }
+        .lc-service-card:hover {
+          border-color: rgba(14, 184, 208, 0.5);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 35px -10px rgba(14, 184, 208, 0.25);
+        }
+        .lc-service-card:hover::before {
+          opacity: 1;
+        }
+        .lc-service-card:hover .lc-svc-icon {
+          transform: scale(1.1) rotate(3deg);
+        }
+
+        /* ========== EFECTO BURBUJA SUAVE PARA TARJETAS EXPLORA ========== */
+        .lc-ql-card {
+          background: linear-gradient(135deg, #111827, #0f172a);
+          border: 1px solid rgba(14, 184, 208, 0.15);
+          border-radius: 20px;
+          padding: 2rem;
+          transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          cursor: pointer;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          position: relative;
+          overflow: hidden;
+        }
+        .lc-ql-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at 70% 80%, rgba(14, 184, 208, 0.08), transparent);
+          opacity: 0;
+          transition: opacity 0.5s ease;
+        }
+        .lc-ql-card:hover {
+          border-color: rgba(14, 184, 208, 0.5);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 35px -10px rgba(14, 184, 208, 0.25);
+        }
+        .lc-ql-card:hover::before {
+          opacity: 1;
+        }
+        .lc-ql-card:hover .lc-ql-icon {
+          transform: scale(1.1) rotate(3deg);
+        }
+        .lc-ql-card:hover .lc-ql-arrow {
+          transform: translateX(8px);
+          color: #0eb8d0;
+        }
+
+        .lc-service-card .lc-svc-icon {
+          font-size: 2.2rem;
+          margin-bottom: 1rem;
+          transition: transform 0.3s ease;
+        }
         .lc-svc-name { font-family:'Sora',sans-serif;font-size:1rem;font-weight:500;margin-bottom:.4rem; }
         .lc-svc-price { font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:600;color:#0eb8d0;margin-bottom:.6rem; }
         .lc-svc-desc { font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.6; }
         .lc-svc-time { display:inline-flex;align-items:center;gap:.3rem;margin-top:1rem;font-size:.74rem;color:rgba(255,255,255,.35);background:rgba(255,255,255,.05);padding:.3rem .75rem;border-radius:99px; }
 
-        .lc-booking { background:linear-gradient(135deg,#0f1e3a,#111827);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:4rem;margin:4rem auto;max-width:1100px;position:relative;overflow:hidden; }
-        .lc-booking-glow { position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(14,184,208,.08) 0%,transparent 70%);pointer-events:none; }
-        .lc-booking-grid { position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center; }
-        .lc-steps { display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem; }
-        .lc-step { display:flex;align-items:flex-start;gap:1rem; }
-        .lc-step-num { width:32px;height:32px;border-radius:50%;background:#1a6fd4;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;flex-shrink:0;font-family:'Sora',sans-serif; }
-        .lc-step-title { font-size:.9rem;font-weight:500;margin-bottom:.2rem; }
-        .lc-step-desc { font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5; }
-        .lc-booking-visual { background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem;text-align:center; }
-        .lc-big-icon { font-size:5rem;display:block;margin-bottom:1rem;animation:lcFloatIcon 3s ease-in-out infinite; }
-
-        /* Quick Links Grid - Tarjetas de EXPLORA */
-        .lc-ql-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:3rem; }
-        
-        /* Tarjetas de EXPLORA con efecto hover mejorado */
-        .lc-ql-card { 
-          background:#111827;
-          border:1px solid rgba(255,255,255,.07);
-          border-radius:18px;
-          padding:2rem;
-          color:#fff;
-          transition:all .35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-          display:flex;
-          flex-direction:column;
-          gap:.75rem;
-          position:relative;
-          overflow:hidden;
-          cursor:pointer;
-        }
-        .lc-ql-card::after { content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1a6fd4,#0eb8d0);opacity:0;transition:opacity .3s; }
-        .lc-ql-card:hover { 
-          transform:translateY(-8px) scale(1.02);
-          border-color:rgba(14,184,208,.4);
-          box-shadow:0 20px 30px -15px rgba(0,0,0,0.5);
-        }
-        .lc-ql-card:hover::after { opacity:1; }
-        .lc-ql-icon { font-size:2rem; }
-        .lc-ql-title { font-family:'Sora',sans-serif;font-size:1rem;font-weight:500; }
-        .lc-ql-desc { font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.5; }
-        .lc-ql-arrow { margin-top:auto;color:#0eb8d0;font-size:.82rem; }
-
-        .lc-feat-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:3rem; }
-        .lc-feat-card { background:#111827;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:1.5rem;transition:all .3s ease; }
-        .lc-feat-card:hover { border-color:rgba(26,111,212,.4);transform:translateY(-5px); }
-        .lc-feat-icon { font-size:1.6rem;margin-bottom:.75rem; }
-        .lc-feat-title { font-family:'Sora',sans-serif;font-size:.9rem;font-weight:500;margin-bottom:.4rem; }
-        .lc-feat-desc { font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5; }
-
-        /* Reviews Grid - Tarjetas de opiniones */
-        .lc-reviews-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-top:3rem; }
-        
-        /* Tarjetas de opiniones con efecto hover mejorado */
-        .lc-review { 
+        .lc-review {
           background:#111827;
           border:1px solid rgba(255,255,255,.07);
           border-radius:16px;
           padding:1.75rem;
-          transition:all .35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          transition:all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          cursor:pointer;
         }
-        .lc-review:hover { 
-          transform:translateY(-6px);
-          border-color:rgba(14,184,208,.3);
-          box-shadow:0 15px 25px -12px rgba(0,0,0,0.4);
+        .lc-review:hover {
+          transform:translateY(-5px);
+          border-color:rgba(14,184,208,.4);
+          box-shadow:0 20px 35px -12px rgba(14,184,208,0.2);
         }
+
+        .lc-services-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.5rem;margin-top:3rem; }
+
+        .lc-booking { background:linear-gradient(135deg,#0f1e3a,#111827);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:4rem;margin:4rem auto;max-width:1100px;position:relative;overflow:hidden; }
+        .lc-booking-glow { position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(14,184,208,.08) 0%,transparent 70%);pointer-events:none; }
+        .lc-booking-grid { position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center; }
+        .lc-steps { display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem; }
+        .lc-step { display:flex;align-items:flex-start;gap:1rem;transition:transform 0.3s ease; cursor:pointer; }
+        .lc-step:hover { transform:translateX(5px); }
+        .lc-step-num { width:32px;height:32px;border-radius:50%;background:#1a6fd4;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;flex-shrink:0;font-family:'Sora',sans-serif;transition:all 0.3s ease; }
+        .lc-step:hover .lc-step-num { transform:scale(1.1);background:#0eb8d0; }
+        .lc-step-title { font-size:.9rem;font-weight:500;margin-bottom:.2rem; }
+        .lc-step-desc { font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5; }
+        .lc-booking-visual { background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem;text-align:center;transition:all 0.3s ease; }
+        .lc-booking-visual:hover { transform:translateY(-5px);border-color:rgba(14,184,208,.3);box-shadow:0 15px 30px -10px rgba(0,0,0,0.3); }
+        .lc-big-icon { font-size:5rem;display:block;margin-bottom:1rem;animation:lcFloatIcon 3s ease-in-out infinite; }
+
+        .lc-ql-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:3rem; }
+        .lc-ql-icon { font-size:2rem;transition:transform 0.3s ease; }
+        .lc-ql-title { font-family:'Sora',sans-serif;font-size:1rem;font-weight:500; }
+        .lc-ql-desc { font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.5; }
+        .lc-ql-arrow { margin-top:auto;color:#0eb8d0;font-size:.82rem;transition:transform 0.3s ease; }
+
+        .lc-reviews-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem; }
         .lc-stars { color:#f59e0b;font-size:1rem;margin-bottom:1rem; }
         .lc-review-text { font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:1.25rem;font-style:italic; }
         .lc-reviewer { display:flex;align-items:center;gap:.75rem; }
-        .lc-avatar { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6fd4,#0eb8d0);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600; }
+        .lc-avatar { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6fd4,#0eb8d0);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600;transition:transform 0.3s ease; }
+        .lc-review:hover .lc-avatar { transform:scale(1.1); }
         .lc-rev-name { font-size:.88rem;font-weight:500; }
         .lc-rev-date { font-size:.74rem;color:rgba(255,255,255,.35); }
 
@@ -396,17 +404,14 @@ export function Home() {
         .lc-footer-logo { font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:600;margin-bottom:.4rem; }
         .lc-footer-sub { font-size:.82rem;color:rgba(255,255,255,.35);margin-bottom:2rem; }
         .lc-footer-links { display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem; }
-        .lc-footer-links button { background:none;border:none;color:rgba(255,255,255,.4);font-size:.84rem;cursor:pointer;transition:color .2s; }
-        .lc-footer-links button:hover { color:#fff; }
+        .lc-footer-links button { background:none;border:none;color:rgba(255,255,255,.4);font-size:.84rem;cursor:pointer;transition:all 0.3s ease; }
+        .lc-footer-links button:hover { color:#fff;transform:translateY(-2px); }
         .lc-footer-copy { font-size:.75rem;color:rgba(255,255,255,.18); }
 
         .lc-menu-bg { background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);padding:6rem 2rem; }
 
         .lc-reveal { opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease; }
         .lc-reveal.lc-visible { opacity:1;transform:translateY(0); }
-        .lc-d1 { transition-delay:.1s; }
-        .lc-d2 { transition-delay:.2s; }
-        .lc-d3 { transition-delay:.3s; }
 
         @keyframes lcPulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
         @keyframes lcGlowPulse { 0%,100%{opacity:.6;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.1)} }
@@ -416,26 +421,11 @@ export function Home() {
         @keyframes lcScrollBounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(5px)} }
         @keyframes lcFloatIcon { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
 
-        /* Animaciones para el CTA */
-        @keyframes lcCarFloat {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(2deg); }
-        }
-        @keyframes lcCarGlow {
-          0%, 100% { filter: drop-shadow(0 5px 15px rgba(14,184,208,0.3)); }
-          50% { filter: drop-shadow(0 5px 25px rgba(14,184,208,0.6)); }
-        }
-        @keyframes lcLineMove {
-          0% { transform: translateX(-10px); opacity: 0; }
-          50% { opacity: 1; }
-          100% { transform: translateX(10px); opacity: 0; }
-        }
-
         @media(max-width:768px) {
           .lc-nav-links,.lc-nav-cta{display:none;}
           .lc-hero h1{font-size:2.2rem;}
           .lc-stats{gap:2.5rem;padding:2rem 1.5rem;}
-          .lc-booking-grid,.lc-contact-inner{grid-template-columns:1fr;}
+          .lc-booking-grid{grid-template-columns:1fr;}
           .lc-booking{padding:2.5rem 1.5rem;}
           .lc-section{padding:4rem 1.25rem;}
           .lc-hours-card{scale:0.9;}
@@ -454,7 +444,7 @@ export function Home() {
         >
           <div className="lc-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="lc-dot" />
-            Lavacar Pro
+            Autolavado Camaro Fraterno
           </div>
           <ul className="lc-nav-links">
             <li><a href="#servicios" onClick={(e) => { e.preventDefault(); document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' }) }}>Servicios</a></li>
@@ -462,15 +452,21 @@ export function Home() {
             <li><a href="#opiniones" onClick={(e) => { e.preventDefault(); document.getElementById('opiniones')?.scrollIntoView({ behavior: 'smooth' }) }}>Opiniones</a></li>
             <li><a href="#contacto" onClick={(e) => { e.preventDefault(); document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }) }}>Contacto</a></li>
           </ul>
-          <button className="lc-nav-cta" onClick={() => navigate('/agendar')}>Agendar cita</button>
+          <button 
+            className="lc-nav-cta" 
+            onClick={() => navigate('/agendar')}
+            style={{ fontSize: '1.2rem', padding: '0.3rem 0.8rem', lineHeight: 1 }}
+          >
+            ☰
+          </button>
         </nav>
 
-          <section className="lc-hero">
+        <section className="lc-hero">
           <div className="lc-hero-bg" />
           <div className="lc-grid" />
           <div className="lc-glow" />
           <div ref={dropsRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-          <span className="lc-car-bg">🚗</span>
+          <span className="lc-car-bg">🚗💧</span>
 
           <div className="lc-hero-content" style={{ paddingBottom: '3rem' }}>
             <div className="lc-badge">
@@ -478,7 +474,7 @@ export function Home() {
               Bagaces, Guanacaste — Costa Rica
             </div>
             <h1>Tu auto <span>merece</span><br />el mejor cuidado</h1>
-            <p>Lavado profesional, encerado y limpieza de tapizado.<br />Agendá tu cita en segundos y olvidate del resto.</p>
+            <p>Lavado profesional, encerado y limpieza de tapizado.<br />Agendá tu cita en segundos.</p>
             
             <div className="lc-hours-card" style={{ marginBottom: '2rem' }}>
               <div className="lc-hours-item">
@@ -585,7 +581,6 @@ export function Home() {
           </div>
         </div>
 
-        {/* OPINIONES */}
         <section id="opiniones" style={{ padding: '6rem 2rem' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal">
@@ -601,19 +596,18 @@ export function Home() {
                 </div>
               ) : (
                 testimonials.map((testimonial) => (
-  <div key={testimonial.id} className="lc-review">
-    <div className="lc-stars">{"★".repeat(testimonial.rating || 5)}</div>
-    <div className="lc-review-text">"{testimonial.comment}"</div>
-    <div className="lc-reviewer">
-      <div className="lc-avatar">{testimonial.customer_name?.charAt(0) || 'C'}</div>
-      <div>
-        <div className="lc-rev-name">{testimonial.customer_name || 'Cliente'}</div>
-        <div className="lc-rev-date">{new Date(testimonial.created_at).toLocaleDateString('es-CR')}</div>
-      </div>
-    </div>
-  </div>
-))
-  
+                  <div key={testimonial.id} className="lc-review">
+                    <div className="lc-stars">{"★".repeat(testimonial.rating || 5)}</div>
+                    <div className="lc-review-text">"{testimonial.comment}"</div>
+                    <div className="lc-reviewer">
+                      <div className="lc-avatar">{testimonial.customer_name?.charAt(0) || 'C'}</div>
+                      <div>
+                        <div className="lc-rev-name">{testimonial.customer_name || 'Cliente'}</div>
+                        <div className="lc-rev-date">{new Date(testimonial.created_at).toLocaleDateString('es-CR')}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
             <div style={{ textAlign: 'center', marginTop: '2.5rem' }} className="lc-reveal">
@@ -647,7 +641,7 @@ export function Home() {
           </div>
         </section>
 
-                {/* CONTACTO - Responsive: en móvil se ordena verticalmente */}
+        {/* ========== SECCIÓN DE CONTACTO COMPLETA (CON MAPA Y TODO) ========== */}
         <section id="contacto" style={{ padding: '5rem 2rem', background: '#0a0e1a', borderTop: '1px solid rgba(255,255,255,.06)' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -656,41 +650,18 @@ export function Home() {
               <p className="lc-section-sub" style={{ margin: '0 auto' }}>Estamos aquí para ayudarte</p>
             </div>
             
-            {/* Grid responsive - en móvil se apila verticalmente */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-              gap: '1.5rem'
-            }}>
-              {/* Columna izquierda - Información de contacto + Mapa */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
               <div>
-                {/* Información de contacto */}
                 <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1.5rem' }}>
                   <div style={{ background: 'linear-gradient(135deg,#0f1e3a,#0a0e1a)', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
                     <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>INFORMACIÓN DE CONTACTO</p>
                   </div>
                   <div style={{ padding: '1.25rem' }}>
-                    {/* Dirección - con animación al hover */}
+                    {/* DIRECCIÓN */}
                     <div 
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.8rem', 
-                        marginBottom: '1rem',
-                        padding: '0.5rem',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        background: 'transparent'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(14,184,208,0.1)'
-                        e.currentTarget.style.transform = 'translateX(5px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.transform = 'translateX(0)'
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                       onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
                     >
                       <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
@@ -702,64 +673,48 @@ export function Home() {
                       </div>
                     </div>
                     
-                    {/* WhatsApp - con enlace funcional */}
+                    {/* WHATSAPP 1 */}
                     <a 
-                      href="https://wa.me/50612345678"
+                      href="https://wa.me/50683606680"
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.8rem', 
-                        marginBottom: '1rem',
-                        padding: '0.5rem',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        background: 'transparent',
-                        textDecoration: 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(37,211,102,0.1)'
-                        e.currentTarget.style.transform = 'translateX(5px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.transform = 'translateX(0)'
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
                       <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
                         <span style={{ fontSize: '1.1rem' }}>📱</span>
                       </div>
                       <div>
                         <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,.4)', letterSpacing: '0.04em' }}>WHATSAPP</div>
-                        <div style={{ fontSize: '0.85rem', color: '#25d366' }}>+506 1234-5678</div>
+                        <div style={{ fontSize: '0.85rem', color: '#25d366' }}>+506 8360-6680</div>
+                      </div>
+                    </a>
+
+                    {/* WHATSAPP 2 */}
+                    <a 
+                      href="https://wa.me/50689594947"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                    >
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                        <span style={{ fontSize: '1.1rem' }}>📱</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,.4)', letterSpacing: '0.04em' }}>WHATSAPP</div>
+                        <div style={{ fontSize: '0.85rem', color: '#25d366' }}>+506 8959-4947</div>
                       </div>
                     </a>
                     
-                    {/* Correo - con enlace funcional */}
+                    {/* CORREO */}
                     <a 
                       href="mailto:lavacar@gmail.com"
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.8rem', 
-                        marginBottom: '1rem',
-                        padding: '0.5rem',
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        background: 'transparent',
-                        textDecoration: 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(14,184,208,0.1)'
-                        e.currentTarget.style.transform = 'translateX(5px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.transform = 'translateX(0)'
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
                       <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
                         <span style={{ fontSize: '1.1rem' }}>✉️</span>
@@ -770,25 +725,11 @@ export function Home() {
                       </div>
                     </a>
                     
-                    {/* Horario - con animación */}
+                    {/* HORARIO */}
                     <div 
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.8rem',
-                        padding: '0.5rem',
-                        borderRadius: '12px',
-                        transition: 'all 0.3s ease',
-                        background: 'transparent'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(14,184,208,0.1)'
-                        e.currentTarget.style.transform = 'translateX(5px)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.transform = 'translateX(0)'
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.5rem', borderRadius: '12px', transition: 'all 0.3s ease', background: 'transparent' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
                       <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
                         <span style={{ fontSize: '1.1rem' }}>⏰</span>
@@ -801,24 +742,11 @@ export function Home() {
                   </div>
                 </div>
 
-                {/* Mapa - con animación al hover */}
+                {/* MAPA */}
                 <div 
-                  style={{ 
-                    background: '#111827', 
-                    border: '1px solid rgba(255,255,255,.08)', 
-                    borderRadius: '20px', 
-                    overflow: 'hidden',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-3px)'
-                    e.currentTarget.style.borderColor = 'rgba(14,184,208,0.4)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'
-                  }}
+                  style={{ background: '#111827', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease', cursor: 'pointer' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.4)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)' }}
                 >
                   <div style={{ background: 'linear-gradient(135deg,#0f1e3a,#0a0e1a)', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
                     <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>UBICACIÓN</p>
@@ -834,28 +762,10 @@ export function Home() {
                       title="Google Maps"
                     />
                     <button
-                      onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218901,-85.2548091', '_blank')}
-                      style={{ 
-                        width: '100%', 
-                        marginTop: '0.75rem', 
-                        background: 'rgba(14,184,208,.15)', 
-                        color: '#0eb8d0', 
-                        border: '1px solid rgba(14,184,208,.3)', 
-                        padding: '0.6rem', 
-                        borderRadius: '12px', 
-                        cursor: 'pointer', 
-                        fontWeight: 500, 
-                        fontSize: '0.85rem', 
-                        transition: 'all .2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(14,184,208,.25)'
-                        e.currentTarget.style.color = '#fff'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(14,184,208,.15)'
-                        e.currentTarget.style.color = '#0eb8d0'
-                      }}
+                      onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
+                      style={{ width: '100%', marginTop: '0.75rem', background: 'rgba(14,184,208,.15)', color: '#0eb8d0', border: '1px solid rgba(14,184,208,.3)', padding: '0.6rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 500, fontSize: '0.85rem', transition: 'all .2s' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,.25)'; e.currentTarget.style.color = '#fff' }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,.15)'; e.currentTarget.style.color = '#0eb8d0' }}
                     >
                       🗺️ Abrir en Google Maps
                     </button>
@@ -863,72 +773,48 @@ export function Home() {
                 </div>
               </div>
               
-              {/* Columna derecha - CTA con carro flotante */}
+              {/* CTA FINAL - BOTÓN PARA AGENDAR */}
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <div style={{ 
-                  background: 'linear-gradient(135deg, #111827, #0f172a)', 
-                  border: '1px solid rgba(14,184,208,.2)', 
-                  borderRadius: '20px', 
-                  padding: '2rem', 
-                  textAlign: 'center', 
-                  height: '100%', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  justifyContent: 'center',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 10px 30px -10px rgba(14,184,208,.1)',
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-5px)'
-                  e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(14,184,208,.2)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 10px 30px -10px rgba(14,184,208,.1)'
-                }}>
-                  
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '180px',
-                    height: '180px',
-                    background: 'radial-gradient(circle, rgba(14,184,208,.15) 0%, transparent 70%)',
-                    borderRadius: '50%',
-                    pointerEvents: 'none'
-                  }} />
-                  
-                  <div style={{ 
-                    fontSize: '6rem', 
-                    marginBottom: '1rem', 
-                    display: 'inline-block',
-                    animation: 'lcCarFloat 2s ease-in-out infinite, lcCarGlow 3s ease-in-out infinite',
-                    filter: 'drop-shadow(0 10px 15px rgba(14,184,208,0.3))',
-                    cursor: 'pointer',
-                    transition: 'animation 0.1s ease'
+                <div 
+                  style={{ 
+                    background: 'linear-gradient(135deg, #111827, #0f172a)', 
+                    border: '1px solid rgba(14,184,208,.2)', 
+                    borderRadius: '20px', 
+                    padding: '2rem', 
+                    textAlign: 'center', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 30px -10px rgba(14,184,208,.1)',
+                    transition: 'transform 0.4s ease, box-shadow 0.4s ease'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.animation = 'lcCarFloat 0.3s ease-in-out infinite, lcCarGlow 0.5s ease-in-out infinite'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.animation = 'lcCarFloat 2s ease-in-out infinite, lcCarGlow 3s ease-in-out infinite'
-                  }}>
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = '0 25px 45px -12px rgba(14,184,208,.3)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px -10px rgba(14,184,208,.1)' }}
+                >
+                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '180px', height: '180px', background: 'radial-gradient(circle, rgba(14,184,208,.15) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+                  
+                  <div 
+                    style={{ 
+                      fontSize: '6rem', 
+                      marginBottom: '1rem', 
+                      display: 'inline-block',
+                      animation: 'lcCarFloat 2s ease-in-out infinite, lcCarGlow 3s ease-in-out infinite',
+                      filter: 'drop-shadow(0 10px 15px rgba(14,184,208,0.3))',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.animation = 'lcCarFloat 0.3s ease-in-out infinite, lcCarGlow 0.5s ease-in-out infinite'; e.currentTarget.style.transform = 'scale(1.05)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.animation = 'lcCarFloat 2s ease-in-out infinite, lcCarGlow 3s ease-in-out infinite'; e.currentTarget.style.transform = 'scale(1)' }}
+                  >
                     🚗
                   </div>
                   
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} style={{
-                        width: '20px',
-                        height: '2px',
-                        background: 'linear-gradient(90deg, #0eb8d0, transparent)',
-                        animation: `lcLineMove 1.5s ease-in-out infinite`,
-                        animationDelay: `${i * 0.15}s`,
-                        opacity: 0.6
-                      }} />
+                      <div key={i} style={{ width: '20px', height: '2px', background: 'linear-gradient(90deg, #0eb8d0, transparent)', animation: `lcLineMove 1.5s ease-in-out infinite`, animationDelay: `${i * 0.15}s`, opacity: 0.6 }} />
                     ))}
                   </div>
                   
@@ -945,15 +831,7 @@ export function Home() {
                     ¿Listo para que tu auto brille?
                   </h3>
                   
-                  <p style={{ 
-                    fontSize: '0.9rem', 
-                    color: 'rgba(255,255,255,.6)', 
-                    marginBottom: '1.5rem', 
-                    lineHeight: 1.5,
-                    maxWidth: '280px',
-                    marginLeft: 'auto',
-                    marginRight: 'auto'
-                  }}>
+                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,.6)', marginBottom: '1.5rem', lineHeight: 1.5, maxWidth: '280px', marginLeft: 'auto', marginRight: 'auto' }}>
                     Agendá tu cita ahora y disfrutá un vehículo impecable.
                   </p>
                   
@@ -973,27 +851,14 @@ export function Home() {
                       overflow: 'hidden',
                       boxShadow: '0 4px 15px rgba(14,184,208,0.3)'
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.02)'
-                      e.currentTarget.style.boxShadow = '0 8px 25px rgba(14,184,208,0.5)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)'
-                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(14,184,208,0.3)'
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(14,184,208,0.6)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(14,184,208,0.3)' }}
                     onClick={() => navigate('/agendar')}
                   >
                     📅 Agendar mi cita ahora
                   </button>
                   
-                  <div style={{ 
-                    fontSize: '0.7rem', 
-                    color: 'rgba(255,255,255,.3)', 
-                    marginTop: '1rem',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '1rem'
-                  }}>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,.3)', marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                     <span>✓ Sin tarjeta</span>
                     <span>✓ Sin registro</span>
                   </div>
@@ -1003,17 +868,16 @@ export function Home() {
           </div>
         </section>
         
-        {/* FOOTER */}
         <footer className="lc-footer">
-          <div className="lc-footer-logo">🚗 Lavacar Pro</div>
-          <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica</div>
+          <div className="lc-footer-logo">Autolavado y Servicios Camaro Fraterno</div>
+          <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica | 📞 8360-6680 | 8959-4947</div>
           <div className="lc-footer-links">
             <button onClick={() => navigate('/agendar')}>Agendar</button>
             <button onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}>Servicios</button>
             <button onClick={() => navigate('/contacto')}>Contacto</button>
             <button onClick={() => navigate('/opiniones')}>Opiniones</button>
           </div>
-          <div className="lc-footer-copy">© {new Date().getFullYear()} Lavacar Pro · Todos los derechos reservados</div>
+          <div className="lc-footer-copy">© {new Date().getFullYear()} Autolavado Camaro Fraterno · Todos los derechos reservados</div>
         </footer>
       </div>
     </>

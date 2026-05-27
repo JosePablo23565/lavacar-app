@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Home } from './components/Home'
 import { AppointmentForm } from './components/AppointmentForm'
 import { AdminLogin } from './pages/AdminLogin'
@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react'
 function NavBar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [scrolling, setScrolling] = useState(false)
-  const [activeLink, setActiveLink] = useState('')
+  const location = useLocation()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,15 +25,6 @@ function NavBar() {
   }, [])
 
   useEffect(() => {
-    const currentPath = window.location.pathname
-    setActiveLink(currentPath)
-  }, [])
-
-  const handleMenuClick = () => {
-    setMenuAbierto(false)
-  }
-
-  useEffect(() => {
     if (menuAbierto) {
       document.body.style.overflow = 'hidden'
     } else {
@@ -44,6 +35,10 @@ function NavBar() {
     }
   }, [menuAbierto])
 
+  const cerrarMenu = () => {
+    setMenuAbierto(false)
+  }
+
   const navLinks = [
     { path: '/', name: 'Inicio', icon: '🏠' },
     { path: '/agendar', name: 'Agendar', icon: '📅' },
@@ -53,8 +48,8 @@ function NavBar() {
   ]
 
   const isActive = (path: string) => {
-    if (path === '/' && activeLink === '/') return true
-    if (path !== '/' && activeLink.startsWith(path)) return true
+    if (path === '/' && location.pathname === '/') return true
+    if (path !== '/' && location.pathname.startsWith(path)) return true
     return false
   }
 
@@ -62,6 +57,13 @@ function NavBar() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+        /* Ocultar cualquier navbar antiguo que pueda existir */
+        header:not(.navbar-modern), 
+        nav:not(.navbar-modern),
+        .old-navbar {
+          display: none !important;
+        }
 
         .navbar-modern {
           position: fixed;
@@ -98,6 +100,7 @@ function NavBar() {
           align-items: center;
           gap: 0.5rem;
           cursor: pointer;
+          text-decoration: none;
           position: relative;
           z-index: 101;
         }
@@ -136,6 +139,7 @@ function NavBar() {
           50% { opacity: 0.5; transform: scale(1.3); }
         }
 
+        /* Botón de 3 rayitas que se convierte en X */
         .menu-btn {
           width: 48px;
           height: 48px;
@@ -173,30 +177,33 @@ function NavBar() {
           transition: all 0.3s ease;
         }
 
+        /* Tres rayitas */
         .menu-icon span:nth-child(1) {
-          top: 6px;
+          top: 4px;
         }
 
         .menu-icon span:nth-child(2) {
-          top: 14px;
+          top: 11px;
         }
 
         .menu-icon span:nth-child(3) {
-          top: 22px;
+          top: 18px;
         }
 
+        /* Cuando está abierto se convierten en X */
         .menu-icon.open span:nth-child(1) {
           transform: rotate(45deg);
-          top: 14px;
+          top: 11px;
         }
 
         .menu-icon.open span:nth-child(2) {
           opacity: 0;
+          transform: translateX(-10px);
         }
 
         .menu-icon.open span:nth-child(3) {
           transform: rotate(-45deg);
-          top: 14px;
+          top: 11px;
         }
 
         .menu-overlay {
@@ -215,6 +222,7 @@ function NavBar() {
           visibility: visible;
         }
 
+        /* Menú que sale desde la DERECHA */
         .nav-menu {
           position: fixed;
           top: 0;
@@ -260,7 +268,7 @@ function NavBar() {
         .nav-link:hover {
           background: rgba(14, 184, 208, 0.1);
           color: #fff;
-          transform: translateX(5px);
+          transform: translateX(-5px);
         }
 
         .nav-link.active {
@@ -297,13 +305,13 @@ function NavBar() {
 
       <nav className={`navbar-modern ${scrolling ? 'scrolled' : ''}`}>
         <div className="navbar-container">
-          <div className="navbar-logo" onClick={() => window.location.href = '/'}>
-            <div className="navbar-logo-icon">🚗</div>
+          <Link to="/" className="navbar-logo" onClick={cerrarMenu}>
             <div className="navbar-logo-text">
-              Lavacar<span className="navbar-logo-dot"></span>
+              Autolavado Camaro Fraterno<span className="navbar-logo-dot"></span>
             </div>
-          </div>
+          </Link>
 
+          {/* Botón de 3 rayitas que se convierte en X */}
           <button className="menu-btn" onClick={() => setMenuAbierto(!menuAbierto)}>
             <div className={`menu-icon ${menuAbierto ? 'open' : ''}`}>
               <span></span>
@@ -315,21 +323,21 @@ function NavBar() {
       </nav>
 
       {/* Overlay para cerrar el menú al hacer clic fuera */}
-      <div className={`menu-overlay ${menuAbierto ? 'open' : ''}`} onClick={() => setMenuAbierto(false)} />
+      <div className={`menu-overlay ${menuAbierto ? 'open' : ''}`} onClick={cerrarMenu} />
 
-      {/* Menú lateral - SIN botón de cerrar */}
+      {/* Menú lateral que sale DESDE LA DERECHA */}
       <div className={`nav-menu ${menuAbierto ? 'open' : ''}`}>
         <div className="nav-links">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.path}
-              href={link.path}
+              to={link.path}
               className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
-              onClick={handleMenuClick}
+              onClick={cerrarMenu}
             >
               <span className="nav-link-icon">{link.icon}</span>
               <span>{link.name}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
@@ -344,25 +352,34 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={
+            <>
+              <NavBar />
+              <Home />
+            </>
+          } />
+          
           <Route path="/agendar" element={
             <>
               <NavBar />
               <AppointmentForm />
             </>
           } />
+          
           <Route path="/contacto" element={
             <>
               <NavBar />
               <Contact />
             </>
           } />
+          
           <Route path="/opiniones" element={
             <>
               <NavBar />
               <Opiniones />
             </>
           } />
+          
           <Route path="/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>

@@ -44,7 +44,6 @@ export function Contact() {
           z-index: 2;
         }
 
-        /* Header */
         .ct-header {
           text-align: center;
           margin-bottom: 3rem;
@@ -89,7 +88,6 @@ export function Contact() {
           font-size: 0.95rem;
         }
 
-        /* Grid */
         .ct-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -97,7 +95,6 @@ export function Contact() {
           margin-bottom: 2rem;
         }
 
-        /* Tarjetas */
         .ct-card {
           background: #111827;
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -130,7 +127,6 @@ export function Contact() {
           padding: 1.5rem;
         }
 
-        /* Items de contacto */
         .ct-item {
           display: flex;
           align-items: center;
@@ -185,11 +181,15 @@ export function Contact() {
         .ct-wa-btn {
           color: #25d366;
           text-decoration: none;
-          transition: opacity 0.2s;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
         }
 
         .ct-wa-btn:hover {
           opacity: 0.8;
+          transform: translateX(3px);
         }
 
         .ct-badge {
@@ -202,7 +202,19 @@ export function Contact() {
           margin-left: 0.5rem;
         }
 
-        /* Mapa */
+        .ct-wa-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.3rem;
+        }
+
+        .ct-wa-number {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
         .ct-iframe {
           border-radius: 16px;
           overflow: hidden;
@@ -217,7 +229,6 @@ export function Contact() {
           border: 0;
         }
 
-        /* Botón Maps */
         .ct-maps-btn {
           width: 100%;
           background: rgba(14, 184, 208, 0.15);
@@ -241,7 +252,6 @@ export function Contact() {
           transform: translateY(-2px);
         }
 
-        /* CTA simplificado - fondo oscuro */
         .ct-cta-card {
           background: #0a0e1a;
           border: 1px solid rgba(14, 184, 208, 0.15);
@@ -305,7 +315,6 @@ export function Contact() {
 
       <div className="ct-root">
         <div className="ct-inner">
-          {/* Header */}
           <div className="ct-header">
             <div className="ct-icon-circle">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,6 +332,7 @@ export function Contact() {
                 <p>INFORMACIÓN DE CONTACTO</p>
               </div>
               <div className="ct-items">
+                {/* Dirección */}
                 <div className="ct-item" onClick={() => window.open('https://maps.google.com/?q=Bagaces+Guanacaste+Costa+Rica', '_blank')}>
                   <div className="ct-item-icon">📍</div>
                   <div>
@@ -330,25 +340,47 @@ export function Contact() {
                     <div className="ct-item-value">Bagaces, Guanacaste, Costa Rica</div>
                   </div>
                 </div>
+
+                {/* WhatsApp - Número 1 */}
                 <div className="ct-item">
                   <div className="ct-item-icon">📱</div>
                   <div>
-                    <div className="ct-item-label">WHATSAPP</div>
+                    <div className="ct-item-label">WHATSAPP 1</div>
                     <div className="ct-item-value">
-                      <a href="https://wa.me/50612345678" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">+506 1234-5678</a>
-                      <span className="ct-badge">WhatsApp</span>
+                      <a href="https://wa.me/50683606680" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">
+                        +506 8360-6680
+                        <span className="ct-badge">WhatsApp</span>
+                      </a>
                     </div>
                   </div>
                 </div>
+
+                {/* WhatsApp - Número 2 */}
+                <div className="ct-item">
+                  <div className="ct-item-icon">📱</div>
+                  <div>
+                    <div className="ct-item-label">WHATSAPP 2</div>
+                    <div className="ct-item-value">
+                      <a href="https://wa.me/50689594947" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">
+                        +506 8959-4947
+                        <span className="ct-badge">WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Correo */}
                 <div className="ct-item">
                   <div className="ct-item-icon">✉️</div>
                   <div>
                     <div className="ct-item-label">CORREO</div>
                     <div className="ct-item-value">
-                      <a href="mailto:lavacar@gmail.com" style={{ color: '#0eb8d0', textDecoration: 'none' }}>lavacar@gmail.com</a>
+                      <a href="mailto:camarofraterno@gmail.com" style={{ color: '#0eb8d0', textDecoration: 'none' }}>camarofraterno@gmail.com</a>
                     </div>
                   </div>
                 </div>
+
+                {/* Horario */}
                 <div className="ct-item">
                   <div className="ct-item-icon">⏰</div>
                   <div>
@@ -378,7 +410,7 @@ export function Contact() {
                 </div>
                 <button
                   className="ct-maps-btn"
-                  onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218901,-85.2548091', '_blank')}
+                  onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
                 >
                   Abrir en Google Maps
                 </button>
@@ -386,7 +418,7 @@ export function Contact() {
             </div>
           </div>
 
-          {/* CTA final - Simplificado con fondo oscuro */}
+          {/* CTA final */}
           <div className="ct-cta-card">
             <h3 className="ct-cta-title">¿Listo para que tu auto brille?</h3>
             <button 
