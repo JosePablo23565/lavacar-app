@@ -112,6 +112,7 @@ export function Home() {
         .lc-root { font-family:'DM Sans',sans-serif; background:#0a0e1a; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
 
+        /* ANIMACIONES ORIGINALES */
         @keyframes lcCarFloat { 
           0%,100%{transform:translateY(0px) rotate(0deg)} 
           50%{transform:translateY(-15px) rotate(2deg)} 
@@ -128,50 +129,145 @@ export function Home() {
           100%{transform:translateX(10px);opacity:0} 
         }
 
-        .lc-nav { position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;transition:all .3s; }
-        .lc-nav.scrolled { background:rgba(10,14,26,.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07); }
+        /* NAVBAR - LIQUID GLASS */
+        .lc-nav { 
+          position:fixed; top:0; left:0; right:0; z-index:100; padding:1rem 2rem;
+          display:flex; justify-content:space-between; align-items:center;
+          transition:all 0.3s ease;
+          background: rgba(10, 14, 26, 0.4);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(14, 184, 208, 0.1);
+        }
+        .lc-nav.scrolled { 
+          background: rgba(10, 14, 26, 0.8);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
+        }
         .lc-logo { font-family:'Sora',sans-serif;font-size:1.25rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:.5rem;cursor:pointer; }
         .lc-dot { width:9px;height:9px;border-radius:50%;background:#0eb8d0;animation:lcPulseDot 2s infinite; }
         .lc-nav-links { display:flex;gap:2rem;list-style:none; }
         .lc-nav-links a { color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;letter-spacing:.02em;transition:color .2s; }
-        .lc-nav-links a:hover { color:#fff; }
-        .lc-nav-cta { background:#1a6fd4;color:#fff;padding:.5rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:500;cursor:pointer;border:none;transition:background .2s; }
-        .lc-nav-cta:hover { background:#1558aa; }
+        .lc-nav-links a:hover { color:#0eb8d0; }
+        .lc-nav-cta { 
+          background: rgba(14, 184, 208, 0.15);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          color:#fff;
+          padding:.5rem 1.2rem;
+          border-radius:40px;
+          font-size:.85rem;
+          font-weight:500;
+          cursor:pointer;
+          transition:all .2s;
+        }
+        .lc-nav-cta:hover { background: rgba(14, 184, 208, 0.25); border-color: rgba(14, 184, 208, 0.5); transform: translateY(-2px); }
 
-        .lc-hero { min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden; }
-        .lc-hero-bg { position:absolute;inset:0;background:linear-gradient(135deg,#0a0e1a 0%,#0f1e3a 50%,#0a1628 100%); }
-        .lc-grid { position:absolute;inset:0;background-image:linear-gradient(rgba(26,111,212,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(26,111,212,.12) 1px,transparent 1px);background-size:60px 60px;animation:lcGridMove 20s linear infinite; }
-        .lc-glow { position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(14,184,208,.15) 0%,transparent 70%);animation:lcGlowPulse 4s ease-in-out infinite; }
-        .lc-car-bg { position:absolute;bottom:0;right:-2%;font-size:300px;line-height:1;opacity:.1;animation:lcFloatCar 6s ease-in-out infinite;pointer-events:none; }
+        /* HERO CON PARALLAX Y FONDO PERSONALIZADO */
+        .lc-hero {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        /* IMAGEN DE FONDO CON EFECTO PARALLAX */
+        .parallax-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 120%;
+          background-image: url('/fondo-hero.jpg');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          will-change: transform;
+          z-index: 0;
+          transform: translateY(0);
+          transition: transform 0.1s ease-out;
+        }
+
+        /* CAPA OSCURA SOBRE LA IMAGEN */
+        .hero-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.55);
+          z-index: 1;
+        }
+
+        /* ELIMINADO .lc-grid - YA NO HAY RAYAS AZULES */
+        .lc-glow { position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(14,184,208,.1) 0%,transparent 70%);animation:lcGlowPulse 4s ease-in-out infinite;z-index:1;pointer-events:none; }
+        .lc-car-bg { position:absolute;bottom:0;right:-2%;font-size:300px;line-height:1;opacity:.05;animation:lcFloatCar 6s ease-in-out infinite;pointer-events:none;z-index:1; }
         .lc-hero-content { position:relative;z-index:2;text-align:center;padding:2rem;max-width:850px; }
         .lc-badge { display:inline-block;background:rgba(14,184,208,.12);border:1px solid rgba(14,184,208,.3);color:#0eb8d0;padding:.4rem 1rem;border-radius:999px;font-size:.8rem;margin-bottom:1.5rem;animation:lcFadeUp .8s ease both; }
         .lc-hero h1 { font-size:clamp(2.5rem,6vw,4.5rem);font-weight:600;line-height:1.1;margin-bottom:1.2rem;animation:lcFadeUp .8s .15s ease both; }
         .lc-hero h1 span { color:#0eb8d0; }
         .lc-hero p { font-size:1.05rem;color:rgba(255,255,255,.6);margin-bottom:2rem;line-height:1.75;animation:lcFadeUp .8s .3s ease both; }
         .lc-hero-btns { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:lcFadeUp .8s .45s ease both; }
-        .lc-btn-primary { background:#1a6fd4;color:#fff;padding:.85rem 2rem;border-radius:10px;font-weight:500;transition:all .25s;font-size:.95rem;cursor:pointer;border:none; }
-        .lc-btn-primary:hover { background:#1558aa;transform:translateY(-2px); }
-        .lc-btn-outline { border:1.5px solid rgba(255,255,255,.25);color:#fff;padding:.85rem 2rem;border-radius:10px;font-weight:500;transition:all .25s;font-size:.95rem;cursor:pointer;background:transparent; }
-        .lc-btn-outline:hover { border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05);transform:translateY(-2px); }
-        .lc-hours-card { background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:0.8rem 1.5rem;display:inline-flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem;margin-bottom:1rem;animation:lcFadeUp .8s .4s ease both; }
-        .lc-hours-item { display:flex;align-items:center;gap:0.5rem; }
+        
+        /* BOTONES LIQUID GLASS MÁS TRANSPARENTES */
+        .lc-btn-primary { 
+          background: rgba(14, 184, 208, 0.1); 
+          backdrop-filter: blur(8px); 
+          border: 1px solid rgba(14, 184, 208, 0.3); 
+          color:#fff; 
+          padding:.85rem 2rem; 
+          border-radius:40px; 
+          font-weight:500; 
+          transition:all .3s; 
+          cursor:pointer; 
+        }
+        .lc-btn-primary:hover { 
+          background: rgba(14, 184, 208, 0.2); 
+          border-color: rgba(14, 184, 208, 0.5); 
+          transform:translateY(-2px); 
+        }
+        
+        .lc-btn-outline { 
+          background: rgba(255, 255, 255, 0.03); 
+          backdrop-filter: blur(8px); 
+          border: 1px solid rgba(255, 255, 255, 0.15); 
+          color:#fff; 
+          padding:.85rem 2rem; 
+          border-radius:40px; 
+          font-weight:400; 
+          transition:all .3s; 
+          cursor:pointer; 
+        }
+        .lc-btn-outline:hover { 
+          background: rgba(255, 255, 255, 0.08); 
+          border-color: rgba(255, 255, 255, 0.3); 
+          transform:translateY(-2px); 
+        }
+        
+        .lc-hours-card { background:rgba(255,255,255,0.05); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.8rem 1.5rem; display:inline-flex; align-items:center; gap:1.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.5rem; margin-bottom:1rem; animation:lcFadeUp .8s .4s ease both; }
+        .lc-hours-item { display:flex; align-items:center; gap:0.5rem; }
         .lc-hours-icon { font-size:1.3rem; }
-        .lc-hours-label { font-size:0.65rem;color:rgba(255,255,255,0.5);letter-spacing:1px; }
-        .lc-hours-value { font-size:0.85rem;font-weight:600; }
-        .lc-hours-divider { width:1px;height:25px;background:rgba(255,255,255,0.2); }
+        .lc-hours-label { font-size:0.65rem; color:rgba(255,255,255,0.5); letter-spacing:1px; }
+        .lc-hours-value { font-size:0.85rem; font-weight:600; }
+        .lc-hours-divider { width:1px; height:25px; background:rgba(255,255,255,0.2); }
 
-        .lc-stats { background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);padding:2.5rem 4rem;display:flex;justify-content:center;gap:5rem;flex-wrap:wrap; }
+        /* STATS - LIQUID GLASS */
+        .lc-stats { background:rgba(255,255,255,.03); backdrop-filter: blur(8px); border-top:1px solid rgba(255,255,255,.07); border-bottom:1px solid rgba(255,255,255,.07); padding:2.5rem 4rem; display:flex; justify-content:center; gap:5rem; flex-wrap:wrap; }
         .lc-stat { text-align:center; }
         .lc-stat-num { font-family:'Sora',sans-serif;font-size:2rem;font-weight:600;color:#0eb8d0; }
         .lc-stat-label { font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.25rem;letter-spacing:.06em; }
 
-        .lc-section { padding:6rem 2rem;max-width:1100px;margin:0 auto; }
+        /* SECCIONES */
+        .lc-section { padding:6rem 2rem; max-width:1100px; margin:0 auto; position:relative; z-index:2; }
         .lc-tag { display:inline-block;background:rgba(14,184,208,.1);color:#0eb8d0;padding:.3rem .9rem;border-radius:6px;font-size:.75rem;margin-bottom:1rem;letter-spacing:.06em; }
         .lc-section-title { font-size:2.2rem;font-weight:600;margin-bottom:.8rem;line-height:1.2; }
         .lc-section-sub { color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.75;max-width:520px; }
 
+        /* TARJETAS DE SERVICIOS */
         .lc-service-card {
-          background: linear-gradient(135deg, #111827, #0f172a);
+          background: rgba(17, 24, 39, 0.7);
+          backdrop-filter: blur(12px);
           border: 1px solid rgba(14, 184, 208, 0.15);
           border-radius: 20px;
           padding: 1.75rem;
@@ -188,137 +284,102 @@ export function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: radial-gradient(circle at 30% 20%, rgba(14, 184, 208, 0.08), transparent);
+          background: radial-gradient(circle at 30% 20%, rgba(14, 184, 208, 0.1), transparent);
           opacity: 0;
           transition: opacity 0.5s ease;
         }
         .lc-service-card:hover {
-          border-color: rgba(14, 184, 208, 0.5);
-          transform: translateY(-8px);
-          box-shadow: 0 20px 35px -10px rgba(14, 184, 208, 0.25);
+          border-color: rgba(14, 184, 208, 0.6);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 25px 40px -15px rgba(14, 184, 208, 0.3);
         }
-        .lc-service-card:hover::before {
-          opacity: 1;
-        }
-        .lc-service-card:hover .lc-svc-icon {
-          transform: scale(1.1) rotate(3deg);
-        }
+        .lc-service-card:hover::before { opacity: 1; }
+        .lc-service-card:hover .lc-svc-icon { transform: scale(1.1) rotate(3deg); }
 
+        .lc-services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1.5rem; margin-top:3rem; }
+        .lc-svc-icon { font-size:2.2rem; margin-bottom:1rem; transition:transform 0.3s ease; }
+        .lc-svc-name { font-family:'Sora',sans-serif; font-size:1rem; font-weight:500; margin-bottom:.4rem; }
+        .lc-svc-price { font-family:'Sora',sans-serif; font-size:1.5rem; font-weight:600; color:#0eb8d0; margin-bottom:.6rem; }
+        .lc-svc-desc { font-size:.84rem; color:rgba(255,255,255,.5); line-height:1.6; }
+        .lc-svc-time { display:inline-flex; align-items:center; gap:.3rem; margin-top:1rem; font-size:.74rem; color:rgba(255,255,255,.35); background:rgba(255,255,255,.05); padding:.3rem .75rem; border-radius:99px; }
+
+        /* BOOKING - LIQUID GLASS */
+        .lc-booking { background:rgba(17, 24, 39, 0.4); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.07); border-radius:24px; padding:4rem; margin:4rem auto; max-width:1100px; position:relative; overflow:hidden; z-index:2; }
+        .lc-booking-glow { position:absolute; top:-30%; right:-10%; width:400px; height:400px; background:radial-gradient(circle,rgba(14,184,208,.08) 0%,transparent 70%); pointer-events:none; }
+        .lc-booking-grid { position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+        .lc-steps { display:flex; flex-direction:column; gap:1.25rem; margin-top:2rem; }
+        .lc-step { display:flex; align-items:flex-start; gap:1rem; transition:transform 0.3s ease; cursor:pointer; }
+        .lc-step:hover { transform:translateX(5px); }
+        .lc-step-num { width:32px; height:32px; border-radius:50%; background:rgba(14,184,208,0.2); border:1px solid rgba(14,184,208,0.4); display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:600; color:#0eb8d0; transition:all 0.3s ease; }
+        .lc-step:hover .lc-step-num { transform:scale(1.1); background:rgba(14,184,208,0.4); }
+        .lc-step-title { font-size:.9rem; font-weight:500; margin-bottom:.2rem; }
+        .lc-step-desc { font-size:.8rem; color:rgba(255,255,255,.45); line-height:1.5; }
+        .lc-booking-visual { background:rgba(255,255,255,.03); border-radius:16px; padding:2rem; text-align:center; transition:all 0.3s ease; }
+        .lc-booking-visual:hover { transform:translateY(-5px); border-color:rgba(14,184,208,.3); }
+        .lc-big-icon { font-size:5rem; display:block; margin-bottom:1rem; animation:lcFloatIcon 3s ease-in-out infinite; }
+
+        /* QUICK LINKS - LIQUID GLASS */
         .lc-ql-card {
-          background: linear-gradient(135deg, #111827, #0f172a);
+          background: rgba(17, 24, 39, 0.7);
+          backdrop-filter: blur(12px);
           border: 1px solid rgba(14, 184, 208, 0.15);
           border-radius: 20px;
           padding: 2rem;
           transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
           cursor: pointer;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-          position: relative;
-          overflow: hidden;
-        }
-        .lc-ql-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: radial-gradient(circle at 70% 80%, rgba(14, 184, 208, 0.08), transparent);
-          opacity: 0;
-          transition: opacity 0.5s ease;
         }
         .lc-ql-card:hover {
-          border-color: rgba(14, 184, 208, 0.5);
+          border-color: rgba(14, 184, 208, 0.6);
           transform: translateY(-8px);
-          box-shadow: 0 20px 35px -10px rgba(14, 184, 208, 0.25);
+          box-shadow: 0 20px 35px -10px rgba(14, 184, 208, 0.3);
         }
-        .lc-ql-card:hover::before {
-          opacity: 1;
-        }
-        .lc-ql-card:hover .lc-ql-icon {
-          transform: scale(1.1) rotate(3deg);
-        }
-        .lc-ql-card:hover .lc-ql-arrow {
-          transform: translateX(8px);
-          color: #0eb8d0;
-        }
+        .lc-ql-card:hover .lc-ql-icon { transform: scale(1.1) rotate(3deg); }
+        .lc-ql-card:hover .lc-ql-arrow { transform: translateX(8px); color: #0eb8d0; }
+        .lc-ql-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; margin-top:3rem; }
+        .lc-ql-icon { font-size:2rem; transition:transform 0.3s ease; }
+        .lc-ql-title { font-family:'Sora',sans-serif; font-size:1rem; font-weight:500; }
+        .lc-ql-desc { font-size:.82rem; color:rgba(255,255,255,.45); line-height:1.5; }
+        .lc-ql-arrow { margin-top:auto; color:#0eb8d0; font-size:.82rem; transition:transform 0.3s ease; }
 
-        .lc-service-card .lc-svc-icon {
-          font-size: 2.2rem;
-          margin-bottom: 1rem;
-          transition: transform 0.3s ease;
-        }
-        .lc-svc-name { font-family:'Sora',sans-serif;font-size:1rem;font-weight:500;margin-bottom:.4rem; }
-        .lc-svc-price { font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:600;color:#0eb8d0;margin-bottom:.6rem; }
-        .lc-svc-desc { font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.6; }
-        .lc-svc-time { display:inline-flex;align-items:center;gap:.3rem;margin-top:1rem;font-size:.74rem;color:rgba(255,255,255,.35);background:rgba(255,255,255,.05);padding:.3rem .75rem;border-radius:99px; }
-
-        .lc-review {
-          background:#111827;
-          border:1px solid rgba(255,255,255,.07);
-          border-radius:16px;
-          padding:1.75rem;
-          transition:all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-          cursor:pointer;
-        }
-        .lc-review:hover {
-          transform:translateY(-5px);
-          border-color:rgba(14,184,208,.4);
-          box-shadow:0 20px 35px -12px rgba(14,184,208,0.2);
-        }
-
-        .lc-services-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.5rem;margin-top:3rem; }
-
-        .lc-booking { background:linear-gradient(135deg,#0f1e3a,#111827);border:1px solid rgba(255,255,255,.07);border-radius:24px;padding:4rem;margin:4rem auto;max-width:1100px;position:relative;overflow:hidden; }
-        .lc-booking-glow { position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(14,184,208,.08) 0%,transparent 70%);pointer-events:none; }
-        .lc-booking-grid { position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center; }
-        .lc-steps { display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem; }
-        .lc-step { display:flex;align-items:flex-start;gap:1rem;transition:transform 0.3s ease; cursor:pointer; }
-        .lc-step:hover { transform:translateX(5px); }
-        .lc-step-num { width:32px;height:32px;border-radius:50%;background:#1a6fd4;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;flex-shrink:0;font-family:'Sora',sans-serif;transition:all 0.3s ease; }
-        .lc-step:hover .lc-step-num { transform:scale(1.1);background:#0eb8d0; }
-        .lc-step-title { font-size:.9rem;font-weight:500;margin-bottom:.2rem; }
-        .lc-step-desc { font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.5; }
-        .lc-booking-visual { background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem;text-align:center;transition:all 0.3s ease; }
-        .lc-booking-visual:hover { transform:translateY(-5px);border-color:rgba(14,184,208,.3);box-shadow:0 15px 30px -10px rgba(0,0,0,0.3); }
-        .lc-big-icon { font-size:5rem;display:block;margin-bottom:1rem;animation:lcFloatIcon 3s ease-in-out infinite; }
-
-        .lc-ql-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:3rem; }
-        .lc-ql-icon { font-size:2rem;transition:transform 0.3s ease; }
-        .lc-ql-title { font-family:'Sora',sans-serif;font-size:1rem;font-weight:500; }
-        .lc-ql-desc { font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.5; }
-        .lc-ql-arrow { margin-top:auto;color:#0eb8d0;font-size:.82rem;transition:transform 0.3s ease; }
-
-        .lc-reviews-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem; }
-        .lc-stars { color:#f59e0b;font-size:1rem;margin-bottom:1rem; }
-        .lc-review-text { font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:1.25rem;font-style:italic; }
-        .lc-reviewer { display:flex;align-items:center;gap:.75rem; }
-        .lc-avatar { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6fd4,#0eb8d0);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600;transition:transform 0.3s ease; }
+        /* REVIEWS */
+        .lc-reviews-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:3rem; }
+        .lc-review { background:rgba(17, 24, 39, 0.6); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:1.75rem; transition:all 0.4s ease; cursor:pointer; }
+        .lc-review:hover { transform:translateY(-5px); border-color:rgba(14,184,208,.4); box-shadow:0 20px 35px -12px rgba(14,184,208,0.2); }
+        .lc-stars { color:#f59e0b; font-size:1rem; margin-bottom:1rem; }
+        .lc-review-text { font-size:.88rem; color:rgba(255,255,255,.6); line-height:1.7; margin-bottom:1.25rem; font-style:italic; }
+        .lc-reviewer { display:flex; align-items:center; gap:.75rem; }
+        .lc-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#1a6fd4,#0eb8d0); display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:600; transition:transform 0.3s ease; }
         .lc-review:hover .lc-avatar { transform:scale(1.1); }
-        .lc-rev-name { font-size:.88rem;font-weight:500; }
-        .lc-rev-date { font-size:.74rem;color:rgba(255,255,255,.35); }
+        .lc-rev-name { font-size:.88rem; font-weight:500; }
+        .lc-rev-date { font-size:.74rem; color:rgba(255,255,255,.35); }
 
-        .lc-footer { background:#060a14;border-top:1px solid rgba(255,255,255,.06);padding:3rem 2rem;text-align:center; }
-        .lc-footer-logo { font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:600;margin-bottom:.4rem; }
-        .lc-footer-sub { font-size:.82rem;color:rgba(255,255,255,.35);margin-bottom:2rem; }
-        .lc-footer-links { display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem; }
-        .lc-footer-links button { background:none;border:none;color:rgba(255,255,255,.4);font-size:.84rem;cursor:pointer;transition:all 0.3s ease; }
-        .lc-footer-links button:hover { color:#fff;transform:translateY(-2px); }
-        .lc-footer-copy { font-size:.75rem;color:rgba(255,255,255,.18); }
+        /* FOOTER */
+        .lc-footer { background:rgba(6, 10, 20, 0.8); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.06); padding:3rem 2rem; text-align:center; }
+        .lc-footer-logo { font-family:'Sora',sans-serif; font-size:1.4rem; font-weight:600; margin-bottom:.4rem; }
+        .lc-footer-sub { font-size:.82rem; color:rgba(255,255,255,.35); margin-bottom:2rem; }
+        .lc-footer-links { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .lc-footer-links button { background:none; border:none; color:rgba(255,255,255,.4); font-size:.84rem; cursor:pointer; transition:all 0.3s ease; }
+        .lc-footer-links button:hover { color:#0eb8d0; transform:translateY(-2px); }
+        .lc-footer-copy { font-size:.75rem; color:rgba(255,255,255,.18); }
 
-        .lc-menu-bg { background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);padding:6rem 2rem; }
+        .lc-menu-bg { background:rgba(255,255,255,.02); border-top:1px solid rgba(255,255,255,.06); padding:6rem 2rem; position:relative; z-index:2; }
 
-        .lc-reveal { opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease; }
-        .lc-reveal.lc-visible { opacity:1;transform:translateY(0); }
+        /* CONTACTO */
+        #contacto { position:relative; z-index:2; }
+
+        /* ANIMACIONES SCROLL */
+        .lc-reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+        .lc-reveal.lc-visible { opacity:1; transform:translateY(0); }
 
         @keyframes lcPulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
         @keyframes lcGlowPulse { 0%,100%{opacity:.6;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.1)} }
-        @keyframes lcGridMove { 0%{background-position:0 0} 100%{background-position:60px 60px} }
         @keyframes lcFloatCar { 0%,100%{transform:translateX(0) translateY(0)} 50%{transform:translateX(-10px) translateY(-15px)} }
         @keyframes lcFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes lcFloatIcon { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
 
         @media(max-width:768px) {
-          .lc-nav-links,.lc-nav-cta{display:none;}
+          .lc-nav-links { display:none; }
           .lc-hero h1{font-size:2.2rem;}
           .lc-stats{gap:2.5rem;padding:2rem 1.5rem;}
           .lc-booking-grid{grid-template-columns:1fr;}
@@ -329,6 +390,7 @@ export function Home() {
       `}</style>
 
       <div className="lc-root">
+        {/* NAVBAR */}
         <nav
           className="lc-nav"
           id="lc-navbar"
@@ -348,25 +410,20 @@ export function Home() {
             <li><a href="#opiniones" onClick={(e) => { e.preventDefault(); document.getElementById('opiniones')?.scrollIntoView({ behavior: 'smooth' }) }}>Opiniones</a></li>
             <li><a href="#contacto" onClick={(e) => { e.preventDefault(); document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }) }}>Contacto</a></li>
           </ul>
-          <button 
-            className="lc-nav-cta" 
-            onClick={() => navigate('/agendar')}
-            style={{ fontSize: '1.2rem', padding: '0.3rem 0.8rem', lineHeight: 1 }}
-          >
+          <button className="lc-nav-cta" onClick={() => navigate('/agendar')}>
             ☰
           </button>
         </nav>
 
-        <section className="lc-hero">
-          <div className="lc-hero-bg" />
-          <div className="lc-grid" />
+        {/* HERO CON PARALLAX - SIN RAYAS AZULES */}
+        <section className="lc-hero" id="hero-section">
+          <div className="parallax-bg" id="hero-parallax-bg"></div>
+          <div className="hero-overlay"></div>
           <div className="lc-glow" />
           <span className="lc-car-bg"></span>
 
           <div className="lc-hero-content" style={{ paddingBottom: '3rem' }}>
-            <div className="lc-badge">
-              Bagaces, Guanacaste — Costa Rica
-            </div>
+            <div className="lc-badge">Bagaces, Guanacaste — Costa Rica</div>
             <h1>Tu auto <span>merece</span><br />el mejor cuidado</h1>
             <p>Lavado profesional, encerado y limpieza de tapizado.<br />Agendá tu cita en segundos.</p>
             
@@ -395,6 +452,7 @@ export function Home() {
           </div>
         </section>
 
+        {/* STATS */}
         <div className="lc-stats">
           <div className="lc-stat">
             <div className="lc-stat-num" id="counter-clientes">0</div>
@@ -414,6 +472,7 @@ export function Home() {
           </div>
         </div>
 
+        {/* SERVICIOS */}
         <section id="servicios">
           <div className="lc-section">
             <div className="lc-reveal">
@@ -440,6 +499,7 @@ export function Home() {
           </div>
         </section>
 
+        {/* BOOKING */}
         <div className="lc-booking">
           <div className="lc-booking-glow" />
           <div className="lc-booking-grid">
@@ -470,6 +530,7 @@ export function Home() {
           </div>
         </div>
 
+        {/* OPINIONES */}
         <section id="opiniones" style={{ padding: '6rem 2rem' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal">
@@ -480,9 +541,7 @@ export function Home() {
               {loadingTestimonials ? (
                 <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '2rem' }}>Cargando opiniones...</div>
               ) : testimonials.length === 0 ? (
-                <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '2rem', color: 'rgba(255,255,255,.5)' }}>
-                  No hay opiniones aún. ¡Sé el primero en opinar!
-                </div>
+                <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '2rem', color: 'rgba(255,255,255,.5)' }}>No hay opiniones aún. ¡Sé el primero en opinar!</div>
               ) : (
                 testimonials.map((testimonial) => (
                   <div key={testimonial.id} className="lc-review">
@@ -505,6 +564,7 @@ export function Home() {
           </div>
         </section>
 
+        {/* QUICK LINKS (EXPLORA) */}
         <section className="lc-menu-bg" id="nosotros">
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal">
@@ -530,7 +590,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* SECCIÓN DE CONTACTO */}
+        {/* CONTACTO - COMPLETO CON MAPA */}
         <section id="contacto" style={{ padding: '5rem 2rem', background: '#0a0e1a', borderTop: '1px solid rgba(255,255,255,.06)' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -541,7 +601,7 @@ export function Home() {
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
               <div>
-                <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+                <div style={{ background: 'rgba(17, 24, 39, 0.7)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1.5rem' }}>
                   <div style={{ background: 'linear-gradient(135deg,#0f1e3a,#0a0e1a)', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
                     <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>INFORMACIÓN DE CONTACTO</p>
                   </div>
@@ -553,7 +613,7 @@ export function Home() {
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                       onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: '1.1rem' }}>📍</span>
                       </div>
                       <div>
@@ -571,7 +631,7 @@ export function Home() {
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: '1.1rem' }}>📱</span>
                       </div>
                       <div>
@@ -589,7 +649,7 @@ export function Home() {
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(37,211,102,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: '1.1rem' }}>📱</span>
                       </div>
                       <div>
@@ -605,7 +665,7 @@ export function Home() {
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: '1.1rem' }}>✉️</span>
                       </div>
                       <div>
@@ -620,7 +680,7 @@ export function Home() {
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.1)'; e.currentTarget.style.transform = 'translateX(5px)' }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s ease' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(14,184,208,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontSize: '1.1rem' }}>⏰</span>
                       </div>
                       <div>
@@ -631,9 +691,9 @@ export function Home() {
                   </div>
                 </div>
 
-                {/* MAPA */}
+                {/* GOOGLE MAPS */}
                 <div 
-                  style={{ background: '#111827', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease', cursor: 'pointer' }}
+                  style={{ background: 'rgba(17, 24, 39, 0.7)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,.08)', borderRadius: '20px', overflow: 'hidden', transition: 'all 0.3s ease', cursor: 'pointer' }}
                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.4)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)' }}
                 >
@@ -666,7 +726,8 @@ export function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div 
                   style={{ 
-                    background: 'linear-gradient(135deg, #111827, #0f172a)', 
+                    background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.7), rgba(15, 23, 42, 0.8))', 
+                    backdropFilter: 'blur(12px)',
                     border: '1px solid rgba(14,184,208,.2)', 
                     borderRadius: '20px', 
                     padding: '2rem', 
@@ -757,6 +818,7 @@ export function Home() {
           </div>
         </section>
         
+        {/* FOOTER */}
         <footer className="lc-footer">
           <div className="lc-footer-logo">Autolavado y Servicios Camaro Fraterno</div>
           <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica | 📞 8360-6680 | 8959-4947</div>
@@ -769,6 +831,23 @@ export function Home() {
           <div className="lc-footer-copy">© {new Date().getFullYear()} Autolavado Camaro Fraterno · Todos los derechos reservados</div>
         </footer>
       </div>
+
+      {/* SCRIPT PARA EL EFECTO PARALLAX */}
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          // Efecto parallax para el HERO
+          const heroSection = document.getElementById('hero-section');
+          const parallaxBg = document.getElementById('hero-parallax-bg');
+          
+          if (heroSection && parallaxBg) {
+            window.addEventListener('scroll', () => {
+              const scrolled = window.scrollY;
+              const rate = scrolled * 0.35;
+              parallaxBg.style.transform = 'translateY(' + rate + 'px)';
+            });
+          }
+        `
+      }} />
     </>
   )
 }
