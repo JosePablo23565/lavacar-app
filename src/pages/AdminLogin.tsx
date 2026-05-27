@@ -7,6 +7,7 @@ export function AdminLogin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [focusedField, setFocusedField] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -44,45 +45,55 @@ export function AdminLogin() {
           overflow: hidden;
         }
         
-        /* Burbujas decorativas */
+        /* Burbujas decorativas de fondo */
         .login-root::before {
           content: '';
           position: absolute;
-          width: 300px;
-          height: 300px;
-          background: radial-gradient(circle, rgba(14,184,208,0.1) 0%, transparent 70%);
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(14,184,208,0.08) 0%, transparent 70%);
           border-radius: 50%;
-          top: -150px;
+          top: -200px;
           right: -150px;
+          animation: float 8s ease-in-out infinite;
         }
         
         .login-root::after {
           content: '';
           position: absolute;
-          width: 250px;
-          height: 250px;
-          background: radial-gradient(circle, rgba(26,111,212,0.08) 0%, transparent 70%);
+          width: 350px;
+          height: 350px;
+          background: radial-gradient(circle, rgba(26,111,212,0.06) 0%, transparent 70%);
           border-radius: 50%;
-          bottom: -100px;
+          bottom: -150px;
           left: -100px;
+          animation: float 10s ease-in-out infinite reverse;
         }
         
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        /* Tarjeta de login */
         .login-card {
-          background: rgba(17, 24, 39, 0.95);
-          backdrop-filter: blur(10px);
+          background: rgba(17, 24, 39, 0.98);
+          backdrop-filter: blur(12px);
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 28px;
+          border-radius: 32px;
           padding: 2.5rem;
           width: 100%;
-          max-width: 420px;
+          max-width: 440px;
           position: relative;
           z-index: 10;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          transition: transform 0.3s ease;
+          transition: all 0.3s ease;
         }
         
         .login-card:hover {
           transform: translateY(-5px);
+          border-color: rgba(14, 184, 208, 0.2);
+          box-shadow: 0 30px 60px -15px rgba(14, 184, 208, 0.15);
         }
         
         /* Botón de regreso */
@@ -103,7 +114,6 @@ export function AdminLogin() {
           cursor: pointer;
           transition: all 0.3s ease;
           z-index: 20;
-          text-decoration: none;
           font-family: 'DM Sans', sans-serif;
         }
         
@@ -114,16 +124,29 @@ export function AdminLogin() {
           transform: translateX(-3px);
         }
         
+        /* Icono decorativo */
         .login-icon {
-          width: 70px;
-          height: 70px;
+          width: 80px;
+          height: 80px;
           background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem;
-          box-shadow: 0 8px 20px rgba(14, 184, 208, 0.3);
+          box-shadow: 0 10px 25px -5px rgba(14, 184, 208, 0.3);
+          transition: all 0.3s ease;
+        }
+        
+        .login-icon:hover {
+          transform: scale(1.05);
+          box-shadow: 0 15px 35px -5px rgba(14, 184, 208, 0.4);
+        }
+        
+        .login-icon svg {
+          width: 40px;
+          height: 40px;
+          color: white;
         }
         
         .login-title {
@@ -131,7 +154,10 @@ export function AdminLogin() {
           font-size: 1.8rem;
           font-weight: 700;
           text-align: center;
-          color: #fff;
+          background: linear-gradient(135deg, #fff, #0eb8d0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           margin-bottom: 0.5rem;
         }
         
@@ -142,25 +168,32 @@ export function AdminLogin() {
           margin-bottom: 2rem;
         }
         
+        /* Campos de formulario */
         .input-group {
-          margin-bottom: 1.25rem;
+          margin-bottom: 1.5rem;
         }
         
         .input-label {
           display: block;
-          font-size: 0.75rem;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.5);
           margin-bottom: 0.5rem;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          transition: color 0.2s ease;
+        }
+        
+        .input-label.active {
+          color: #0eb8d0;
         }
         
         .input-field {
           width: 100%;
-          padding: 0.85rem 1rem;
+          padding: 0.9rem 1rem;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 14px;
+          border-radius: 16px;
           color: #fff;
           font-size: 0.9rem;
           font-family: 'DM Sans', sans-serif;
@@ -178,20 +211,37 @@ export function AdminLogin() {
           color: rgba(255, 255, 255, 0.3);
         }
         
+        /* Botón de login */
         .login-btn {
           width: 100%;
-          padding: 0.9rem;
+          padding: 1rem;
           background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
           color: #fff;
           border: none;
-          border-radius: 14px;
-          font-size: 0.95rem;
+          border-radius: 16px;
+          font-size: 1rem;
           font-weight: 600;
           font-family: 'Sora', sans-serif;
           cursor: pointer;
           transition: all 0.3s ease;
           margin-top: 0.5rem;
-          box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .login-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s ease;
+        }
+        
+        .login-btn:hover:not(:disabled)::before {
+          left: 100%;
         }
         
         .login-btn:hover:not(:disabled) {
@@ -204,31 +254,54 @@ export function AdminLogin() {
           cursor: not-allowed;
         }
         
+        /* Mensaje de error */
         .error-message {
           background: rgba(239, 68, 68, 0.1);
           border: 1px solid rgba(239, 68, 68, 0.3);
           color: #f87171;
-          padding: 0.75rem;
-          border-radius: 12px;
+          padding: 0.85rem;
+          border-radius: 14px;
           font-size: 0.85rem;
           text-align: center;
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
+          animation: shake 0.3s ease;
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
         }
         
         /* Carro decorativo flotante */
         .login-car {
           position: absolute;
-          bottom: 20px;
-          right: 20px;
-          font-size: 80px;
-          opacity: 0.06;
+          bottom: 30px;
+          right: 30px;
+          font-size: 100px;
+          opacity: 0.05;
           pointer-events: none;
           animation: floatCar 6s ease-in-out infinite;
+          filter: drop-shadow(0 0 10px rgba(14,184,208,0.3));
         }
         
         @keyframes floatCar {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(2deg); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(3deg); }
+        }
+        
+        /* Spinner de carga */
+        .spinner {
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
         
         @media (max-width: 480px) {
@@ -244,6 +317,19 @@ export function AdminLogin() {
           .login-title {
             font-size: 1.5rem;
           }
+          .login-icon {
+            width: 65px;
+            height: 65px;
+          }
+          .login-icon svg {
+            width: 32px;
+            height: 32px;
+          }
+          .login-car {
+            font-size: 70px;
+            bottom: 15px;
+            right: 15px;
+          }
         }
       `}</style>
 
@@ -253,12 +339,14 @@ export function AdminLogin() {
           ← Volver al inicio
         </button>
         
-        {/* Carro decorativo */}
+        {/* Carro decorativo flotante */}
         <div className="login-car">🚗</div>
 
         <div className="login-card">
           <div className="login-icon">
-            <span style={{ fontSize: '2rem' }}>🔐</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
           
           <h1 className="login-title">Panel Admin</h1>
@@ -268,24 +356,32 @@ export function AdminLogin() {
           
           <form onSubmit={handleLogin}>
             <div className="input-group">
-              <label className="input-label">CORREO ELECTRÓNICO</label>
+              <label className={`input-label ${focusedField === 'email' ? 'active' : ''}`}>
+                CORREO ELECTRÓNICO
+              </label>
               <input
                 type="email"
                 placeholder="admin@lavacar.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
                 className="input-field"
                 required
               />
             </div>
             
             <div className="input-group">
-              <label className="input-label">CONTRASEÑA</label>
+              <label className={`input-label ${focusedField === 'password' ? 'active' : ''}`}>
+                CONTRASEÑA
+              </label>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
                 className="input-field"
                 required
               />
@@ -297,14 +393,13 @@ export function AdminLogin() {
               className="login-btn"
             >
               {loading ? (
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                  <div className="spinner" />
                   Ingresando...
                 </span>
-              ) : '🔐 Ingresar'}
+              ) : (
+                '🔐 Ingresar'
+              )}
             </button>
           </form>
         </div>

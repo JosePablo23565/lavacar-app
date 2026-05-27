@@ -10,8 +10,8 @@ import { useState, useEffect } from 'react'
 function NavBar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [scrolling, setScrolling] = useState(false)
+  const [activeLink, setActiveLink] = useState('')
 
-  // Detectar scroll para cambiar estilo del navbar
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -24,12 +24,15 @@ function NavBar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Cerrar menú al hacer clic en un enlace
+  useEffect(() => {
+    const currentPath = window.location.pathname
+    setActiveLink(currentPath)
+  }, [])
+
   const handleMenuClick = () => {
     setMenuAbierto(false)
   }
 
-  // Prevenir scroll cuando el menú está abierto
   useEffect(() => {
     if (menuAbierto) {
       document.body.style.overflow = 'hidden'
@@ -41,130 +44,297 @@ function NavBar() {
     }
   }, [menuAbierto])
 
+  const navLinks = [
+    { path: '/', name: 'Inicio', icon: '🏠' },
+    { path: '/agendar', name: 'Agendar', icon: '📅' },
+    { path: '/contacto', name: 'Contacto', icon: '📞' },
+    { path: '/opiniones', name: 'Opiniones', icon: '⭐' },
+    { path: '/login', name: 'Admin', icon: '🔐' },
+  ]
+
+  const isActive = (path: string) => {
+    if (path === '/' && activeLink === '/') return true
+    if (path !== '/' && activeLink.startsWith(path)) return true
+    return false
+  }
+
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolling 
-          ? 'bg-gradient-to-r from-blue-600 to-blue-800 shadow-xl backdrop-blur-sm bg-opacity-95' 
-          : 'bg-gradient-to-r from-blue-500 to-blue-700 shadow-lg'
-      }`}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo con animación */}
-            <div className="flex items-center space-x-2 group cursor-pointer">
-              <div className="text-3xl transform transition-transform duration-300 group-hover:scale-110">
-                🚗
-              </div>
-              <div className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Lavacar
-              </div>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+        .navbar-modern {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 100;
+          padding: 0.75rem 2rem;
+          transition: all 0.3s ease;
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        .navbar-modern.scrolled {
+          background: rgba(10, 14, 26, 0.95);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar-modern:not(.scrolled) {
+          background: transparent;
+        }
+
+        .navbar-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .navbar-logo {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          position: relative;
+          z-index: 101;
+        }
+
+        .navbar-logo-icon {
+          font-size: 2rem;
+          transition: transform 0.3s ease;
+        }
+
+        .navbar-logo:hover .navbar-logo-icon {
+          transform: scale(1.1) rotate(-5deg);
+        }
+
+        .navbar-logo-text {
+          font-family: 'Sora', sans-serif;
+          font-size: 1.3rem;
+          font-weight: 700;
+          background: linear-gradient(135deg, #fff, #0eb8d0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .navbar-logo-dot {
+          width: 8px;
+          height: 8px;
+          background: #0eb8d0;
+          border-radius: 50%;
+          display: inline-block;
+          margin-left: 2px;
+          animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .menu-btn {
+          width: 48px;
+          height: 48px;
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          position: relative;
+          z-index: 101;
+        }
+
+        .menu-btn:hover {
+          background: rgba(14, 184, 208, 0.2);
+          border-color: rgba(14, 184, 208, 0.4);
+          transform: scale(1.02);
+        }
+
+        .menu-icon {
+          position: relative;
+          width: 24px;
+          height: 24px;
+        }
+
+        .menu-icon span {
+          position: absolute;
+          width: 24px;
+          height: 2px;
+          background: white;
+          border-radius: 2px;
+          transition: all 0.3s ease;
+        }
+
+        .menu-icon span:nth-child(1) {
+          top: 6px;
+        }
+
+        .menu-icon span:nth-child(2) {
+          top: 14px;
+        }
+
+        .menu-icon span:nth-child(3) {
+          top: 22px;
+        }
+
+        .menu-icon.open span:nth-child(1) {
+          transform: rotate(45deg);
+          top: 14px;
+        }
+
+        .menu-icon.open span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .menu-icon.open span:nth-child(3) {
+          transform: rotate(-45deg);
+          top: 14px;
+        }
+
+        .menu-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.85);
+          backdrop-filter: blur(8px);
+          z-index: 98;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+        }
+
+        .menu-overlay.open {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .nav-menu {
+          position: fixed;
+          top: 0;
+          right: 0;
+          width: 100%;
+          max-width: 300px;
+          height: 100vh;
+          background: linear-gradient(135deg, #0f1e3a, #0a0e1a);
+          z-index: 99;
+          transform: translateX(100%);
+          transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          padding: 2rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          border-left: 1px solid rgba(14, 184, 208, 0.2);
+          box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-menu.open {
+          transform: translateX(0);
+        }
+
+        .nav-links {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .nav-link {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.9rem 1.2rem;
+          border-radius: 14px;
+          color: rgba(255, 255, 255, 0.7);
+          text-decoration: none;
+          font-size: 1rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+          background: rgba(14, 184, 208, 0.1);
+          color: #fff;
+          transform: translateX(5px);
+        }
+
+        .nav-link.active {
+          background: rgba(14, 184, 208, 0.15);
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          color: #0eb8d0;
+        }
+
+        .nav-link-icon {
+          font-size: 1.2rem;
+          width: 28px;
+        }
+
+        .navbar-spacer {
+          height: 80px;
+        }
+
+        @media (max-width: 768px) {
+          .navbar-modern {
+            padding: 0.5rem 1rem;
+          }
+          .navbar-logo-text {
+            font-size: 1rem;
+          }
+          .navbar-logo-icon {
+            font-size: 1.6rem;
+          }
+          .nav-menu {
+            max-width: 280px;
+            padding: 1.5rem;
+          }
+        }
+      `}</style>
+
+      <nav className={`navbar-modern ${scrolling ? 'scrolled' : ''}`}>
+        <div className="navbar-container">
+          <div className="navbar-logo" onClick={() => window.location.href = '/'}>
+            <div className="navbar-logo-icon">🚗</div>
+            <div className="navbar-logo-text">
+              Lavacar<span className="navbar-logo-dot"></span>
             </div>
-            
-            {/* Botón de menú hamburguesa con animación */}
-            <button 
-              onClick={() => setMenuAbierto(!menuAbierto)}
-              className="relative w-10 h-10 rounded-lg hover:bg-white/20 focus:outline-none transition-all duration-300 transform hover:scale-105"
-            >
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="space-y-1.5">
-                  <span className={`block w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                    menuAbierto ? 'rotate-45 translate-y-2' : ''
-                  }`}></span>
-                  <span className={`block w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                    menuAbierto ? 'opacity-0' : ''
-                  }`}></span>
-                  <span className={`block w-6 h-0.5 bg-white rounded-full transition-all duration-300 ${
-                    menuAbierto ? '-rotate-45 -translate-y-2' : ''
-                  }`}></span>
-                </div>
-              </div>
-            </button>
           </div>
 
-          {/* Menú desplegable con animación */}
-          <div className={`fixed top-16 left-0 right-0 bg-gradient-to-b from-blue-600 to-blue-800 shadow-2xl z-40 transition-all duration-300 ease-in-out ${
-            menuAbierto ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
-          }`}>
-            <div className="py-4 space-y-1 max-w-6xl mx-auto px-4">
-              <a 
-                href="/" 
-                onClick={handleMenuClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">🏠</span>
-                <span className="font-medium">Inicio</span>
-              </a>
-              <a 
-                href="/agendar" 
-                onClick={handleMenuClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">📅</span>
-                <span className="font-medium">Agendar Cita</span>
-              </a>
-              <a 
-                href="/contacto" 
-                onClick={handleMenuClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">📞</span>
-                <span className="font-medium">Contacto</span>
-              </a>
-              <a 
-                href="/opiniones" 
-                onClick={handleMenuClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">⭐</span>
-                <span className="font-medium">Opiniones</span>
-              </a>
-              <a 
-                href="/login" 
-                onClick={handleMenuClick}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition-all duration-200 transform hover:translate-x-1 group"
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">🔐</span>
-                <span className="font-medium">Admin</span>
-              </a>
+          <button className="menu-btn" onClick={() => setMenuAbierto(!menuAbierto)}>
+            <div className={`menu-icon ${menuAbierto ? 'open' : ''}`}>
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
-          </div>
+          </button>
         </div>
       </nav>
 
-      {/* Fondo oscuro que tapa el contenido cuando el menú está abierto */}
-      <div 
-        className={`fixed inset-0 bg-black bg-opacity-50 z-35 transition-all duration-300 ${
-          menuAbierto ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
-        onClick={() => setMenuAbierto(false)}
-      />
+      {/* Overlay para cerrar el menú al hacer clic fuera */}
+      <div className={`menu-overlay ${menuAbierto ? 'open' : ''}`} onClick={() => setMenuAbierto(false)} />
 
-      {/* Espaciador para que el contenido no quede debajo del navbar fijo */}
-      <div className="h-16"></div>
+      {/* Menú lateral - SIN botón de cerrar */}
+      <div className={`nav-menu ${menuAbierto ? 'open' : ''}`}>
+        <div className="nav-links">
+          {navLinks.map((link) => (
+            <a
+              key={link.path}
+              href={link.path}
+              className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
+              onClick={handleMenuClick}
+            >
+              <span className="nav-link-icon">{link.icon}</span>
+              <span>{link.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
 
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.9); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        .animate-scaleIn {
-          animation: scaleIn 0.2s ease-out;
-        }
-        .animate-pulse {
-          animation: pulse 2s infinite;
-        }
-      `}</style>
+      <div className="navbar-spacer"></div>
     </>
   )
 }
@@ -172,12 +342,9 @@ function NavBar() {
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen">
         <Routes>
-          {/* Home como página principal */}
           <Route path="/" element={<Home />} />
-          
-          {/* Rutas con NavBar */}
           <Route path="/agendar" element={
             <>
               <NavBar />
