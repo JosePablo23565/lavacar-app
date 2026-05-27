@@ -4,13 +4,12 @@ import { supabase } from '../lib/supabase'
 
 export function Home() {
   const navigate = useNavigate()
-  const dropsRef = useRef<HTMLDivElement>(null)
   const [testimonials, setTestimonials] = useState<any[]>([])
   const [loadingTestimonials, setLoadingTestimonials] = useState(true)
 
   const fetchTestimonials = async () => {
     try {
-      console.log('🔍 Cargando testimonios desde Supabase...')
+      console.log('Cargando testimonios desde Supabase...')
       
       const { data, error } = await supabase
         .from('testimonials')
@@ -20,17 +19,17 @@ export function Home() {
         .limit(3)
       
       if (error) {
-        console.error('❌ Error cargando testimonios:', error)
+        console.error('Error cargando testimonios:', error)
         setTestimonials([])
       } else if (data && data.length > 0) {
-        console.log('✅ Testimonios cargados en Home:', data)
+        console.log('Testimonios cargados en Home:', data)
         setTestimonials(data)
       } else {
-        console.log('⚠️ No hay testimonios aprobados en Supabase')
+        console.log('No hay testimonios aprobados en Supabase')
         setTestimonials([])
       }
     } catch (err) {
-      console.error('❌ Error inesperado:', err)
+      console.error('Error inesperado:', err)
       setTestimonials([])
     }
     setLoadingTestimonials(false)
@@ -42,7 +41,7 @@ export function Home() {
 
   useEffect(() => {
     const handleUpdate = () => {
-      console.log('🔄 Actualizando testimonios por evento')
+      console.log('Actualizando testimonios por evento')
       setLoadingTestimonials(true)
       fetchTestimonials()
     }
@@ -52,94 +51,6 @@ export function Home() {
   }, [])
 
   useEffect(() => {
-    // ESPUMA / BURBUJAS DE JABÓN
-    if (dropsRef.current) {
-      const pastelColors = [
-        'rgba(255,255,255,0.9)', 'rgba(200,230,255,0.7)', 'rgba(200,255,220,0.6)',
-        'rgba(255,220,200,0.5)', 'rgba(230,200,255,0.6)', 'rgba(255,200,230,0.5)'
-      ]
-      
-      const highlightColors = [
-        'rgba(255,255,255,1)', 'rgba(200,240,255,0.9)',
-        'rgba(200,255,210,0.8)', 'rgba(255,235,200,0.7)'
-      ]
-      
-      for (let i = 0; i < 50; i++) {
-        const bubble = document.createElement('div')
-        const size = Math.random() * 20 + 8
-        const duration = Math.random() * 9 + 5
-        const delay = Math.random() * 15
-        const colorIndex = Math.floor(Math.random() * pastelColors.length)
-        const highlightIndex = Math.floor(Math.random() * highlightColors.length)
-        const rotateAngle = Math.random() * 360
-        
-        bubble.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle at ${30 + Math.random() * 40}% ${30 + Math.random() * 40}%, ${highlightColors[highlightIndex]}, ${pastelColors[colorIndex]});
-          width: ${size}px;
-          height: ${size}px;
-          left: ${Math.random() * 100}%;
-          top: -${size}px;
-          animation: bubbleRise ${duration}s linear ${delay}s infinite;
-          opacity: ${Math.random() * 0.5 + 0.4};
-          box-shadow: 0 0 ${Math.random() * 3 + 2}px rgba(255,255,255,0.6), inset 0 1px 2px rgba(255,255,255,0.5);
-          pointer-events: none;
-          transform: rotate(${rotateAngle}deg);
-        `
-        dropsRef.current.appendChild(bubble)
-      }
-      
-      for (let i = 0; i < 25; i++) {
-        const bigBubble = document.createElement('div')
-        const size = Math.random() * 35 + 18
-        const duration = Math.random() * 14 + 9
-        const delay = Math.random() * 20
-        const colorIndex = Math.floor(Math.random() * pastelColors.length)
-        const highlightIndex = Math.floor(Math.random() * highlightColors.length)
-        const rotateAngle = Math.random() * 360
-        
-        bigBubble.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle at ${25 + Math.random() * 50}% ${25 + Math.random() * 50}%, ${highlightColors[highlightIndex]}, ${pastelColors[colorIndex]});
-          width: ${size}px;
-          height: ${size}px;
-          left: ${Math.random() * 100}%;
-          bottom: -${size}px;
-          animation: bubbleRise ${duration}s linear ${delay}s infinite;
-          opacity: ${Math.random() * 0.45 + 0.25};
-          box-shadow: 0 0 ${Math.random() * 6 + 3}px rgba(255,255,255,0.5), inset 0 1px 3px rgba(255,255,255,0.6);
-          pointer-events: none;
-          transform: rotate(${rotateAngle}deg);
-        `
-        dropsRef.current.appendChild(bigBubble)
-      }
-      
-      for (let i = 0; i < 15; i++) {
-        const rainbowBubble = document.createElement('div')
-        const size = Math.random() * 25 + 12
-        const duration = Math.random() * 11 + 6
-        const delay = Math.random() * 18
-        
-        rainbowBubble.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95), rgba(200,220,255,0.6));
-          width: ${size}px;
-          height: ${size}px;
-          left: ${Math.random() * 100}%;
-          top: -${size}px;
-          animation: bubbleRise ${duration}s linear ${delay}s infinite;
-          opacity: ${Math.random() * 0.6 + 0.3};
-          box-shadow: 0 0 5px rgba(255,255,255,0.7), inset 0 1px 3px rgba(255,255,255,0.8);
-          pointer-events: none;
-          filter: blur(0.3px);
-        `
-        dropsRef.current.appendChild(rainbowBubble)
-      }
-    }
-
     // Contadores
     const counters = [
       { id: 'counter-clientes', target: 500, suffix: '+' },
@@ -201,14 +112,6 @@ export function Home() {
         .lc-root { font-family:'DM Sans',sans-serif; background:#0a0e1a; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
 
-        @keyframes bubbleRise {
-          0% { transform: translateY(0) rotate(0deg) scale(0.9); opacity: 0.7; }
-          25% { opacity: 1; transform: translateY(-25vh) rotate(90deg) scale(1.05); }
-          50% { opacity: 0.8; transform: translateY(-50vh) rotate(180deg) scale(1); }
-          75% { opacity: 0.6; transform: translateY(-75vh) rotate(270deg) scale(0.95); }
-          100% { transform: translateY(-100vh) rotate(360deg) scale(0.9); opacity: 0; }
-        }
-
         @keyframes lcCarFloat { 
           0%,100%{transform:translateY(0px) rotate(0deg)} 
           50%{transform:translateY(-15px) rotate(2deg)} 
@@ -241,7 +144,7 @@ export function Home() {
         .lc-glow { position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(14,184,208,.15) 0%,transparent 70%);animation:lcGlowPulse 4s ease-in-out infinite; }
         .lc-car-bg { position:absolute;bottom:0;right:-2%;font-size:300px;line-height:1;opacity:.1;animation:lcFloatCar 6s ease-in-out infinite;pointer-events:none; }
         .lc-hero-content { position:relative;z-index:2;text-align:center;padding:2rem;max-width:850px; }
-        .lc-badge { display:inline-flex;align-items:center;gap:.5rem;background:rgba(14,184,208,.12);border:1px solid rgba(14,184,208,.3);color:#0eb8d0;padding:.4rem 1rem;border-radius:999px;font-size:.8rem;margin-bottom:1.5rem;animation:lcFadeUp .8s ease both; }
+        .lc-badge { display:inline-block;background:rgba(14,184,208,.12);border:1px solid rgba(14,184,208,.3);color:#0eb8d0;padding:.4rem 1rem;border-radius:999px;font-size:.8rem;margin-bottom:1.5rem;animation:lcFadeUp .8s ease both; }
         .lc-hero h1 { font-size:clamp(2.5rem,6vw,4.5rem);font-weight:600;line-height:1.1;margin-bottom:1.2rem;animation:lcFadeUp .8s .15s ease both; }
         .lc-hero h1 span { color:#0eb8d0; }
         .lc-hero p { font-size:1.05rem;color:rgba(255,255,255,.6);margin-bottom:2rem;line-height:1.75;animation:lcFadeUp .8s .3s ease both; }
@@ -250,10 +153,6 @@ export function Home() {
         .lc-btn-primary:hover { background:#1558aa;transform:translateY(-2px); }
         .lc-btn-outline { border:1.5px solid rgba(255,255,255,.25);color:#fff;padding:.85rem 2rem;border-radius:10px;font-weight:500;transition:all .25s;font-size:.95rem;cursor:pointer;background:transparent; }
         .lc-btn-outline:hover { border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05);transform:translateY(-2px); }
-        .lc-scroll-ind { position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:lcFadeUp 1s .8s ease both; }
-        .lc-scroll-ind span { font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.12em; }
-        .lc-scroll-arrow { width:18px;height:18px;border-right:1.5px solid rgba(255,255,255,.3);border-bottom:1.5px solid rgba(255,255,255,.3);transform:rotate(45deg);animation:lcScrollBounce 2s ease-in-out infinite; }
-
         .lc-hours-card { background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:0.8rem 1.5rem;display:inline-flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem;margin-bottom:1rem;animation:lcFadeUp .8s .4s ease both; }
         .lc-hours-item { display:flex;align-items:center;gap:0.5rem; }
         .lc-hours-icon { font-size:1.3rem; }
@@ -271,7 +170,6 @@ export function Home() {
         .lc-section-title { font-size:2.2rem;font-weight:600;margin-bottom:.8rem;line-height:1.2; }
         .lc-section-sub { color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.75;max-width:520px; }
 
-        /* ========== EFECTO BURBUJA SUAVE PARA TARJETAS DE SERVICIOS ========== */
         .lc-service-card {
           background: linear-gradient(135deg, #111827, #0f172a);
           border: 1px solid rgba(14, 184, 208, 0.15);
@@ -306,7 +204,6 @@ export function Home() {
           transform: scale(1.1) rotate(3deg);
         }
 
-        /* ========== EFECTO BURBUJA SUAVE PARA TARJETAS EXPLORA ========== */
         .lc-ql-card {
           background: linear-gradient(135deg, #111827, #0f172a);
           border: 1px solid rgba(14, 184, 208, 0.15);
@@ -418,7 +315,6 @@ export function Home() {
         @keyframes lcGridMove { 0%{background-position:0 0} 100%{background-position:60px 60px} }
         @keyframes lcFloatCar { 0%,100%{transform:translateX(0) translateY(0)} 50%{transform:translateX(-10px) translateY(-15px)} }
         @keyframes lcFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes lcScrollBounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(5px)} }
         @keyframes lcFloatIcon { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
 
         @media(max-width:768px) {
@@ -465,12 +361,10 @@ export function Home() {
           <div className="lc-hero-bg" />
           <div className="lc-grid" />
           <div className="lc-glow" />
-          <div ref={dropsRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-          <span className="lc-car-bg">🚗💧</span>
+          <span className="lc-car-bg"></span>
 
           <div className="lc-hero-content" style={{ paddingBottom: '3rem' }}>
             <div className="lc-badge">
-              <div className="lc-dot" style={{ width: 7, height: 7 }} />
               Bagaces, Guanacaste — Costa Rica
             </div>
             <h1>Tu auto <span>merece</span><br />el mejor cuidado</h1>
@@ -498,11 +392,6 @@ export function Home() {
               <button className="lc-btn-primary" onClick={() => navigate('/agendar')}>Agendar mi cita ahora</button>
               <button className="lc-btn-outline" onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}>Ver servicios</button>
             </div>
-          </div>
-
-          <div className="lc-scroll-ind" style={{ bottom: '0.5rem' }}>
-            <span>DESLIZAR</span>
-            <div className="lc-scroll-arrow" />
           </div>
         </section>
 
@@ -641,7 +530,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* ========== SECCIÓN DE CONTACTO COMPLETA (CON MAPA Y TODO) ========== */}
+        {/* SECCIÓN DE CONTACTO */}
         <section id="contacto" style={{ padding: '5rem 2rem', background: '#0a0e1a', borderTop: '1px solid rgba(255,255,255,.06)' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -773,7 +662,7 @@ export function Home() {
                 </div>
               </div>
               
-              {/* CTA FINAL - BOTÓN PARA AGENDAR */}
+              {/* CTA FINAL */}
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div 
                   style={{ 
