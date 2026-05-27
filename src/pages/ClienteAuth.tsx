@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 
 export function ClienteAuth() {
   const navigate = useNavigate()
-  const [isLogin, setIsLogin] = useState(true) // true = login, false = registro
+  const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isFlipping, setIsFlipping] = useState(false)
@@ -230,13 +230,14 @@ export function ClienteAuth() {
           font-size: 0.8rem;
         }
 
-        /* Botón principal */
+        /* ========== BOTÓN LIQUID GLASS CELESTE ========== */
         .auth-btn {
           width: 100%;
-          padding: 0.65rem;
-          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          padding: 0.7rem;
+          background: rgba(14, 184, 208, 0.15);
+          backdrop-filter: blur(8px);
           color: #fff;
-          border: none;
+          border: 1px solid rgba(14, 184, 208, 0.4);
           border-radius: 40px;
           font-size: 0.85rem;
           font-weight: 600;
@@ -245,11 +246,14 @@ export function ClienteAuth() {
           transition: all 0.3s ease;
           margin-top: 0.5rem;
           margin-bottom: 0.8rem;
+          box-shadow: 0 4px 12px rgba(14, 184, 208, 0.1);
         }
 
         .auth-btn:hover:not(:disabled) {
+          background: rgba(14, 184, 208, 0.25);
+          border-color: rgba(14, 184, 208, 0.6);
           transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(14, 184, 208, 0.35);
+          box-shadow: 0 8px 20px rgba(14, 184, 208, 0.25);
         }
 
         .auth-btn:disabled {
@@ -293,7 +297,7 @@ export function ClienteAuth() {
           padding: 0 0.8rem;
         }
 
-        /* Botón Google */
+        /* Botón Google - TRANSPARENTE (sin color celeste) */
         .google-btn {
           width: 100%;
           display: flex;
@@ -301,9 +305,9 @@ export function ClienteAuth() {
           justify-content: center;
           gap: 0.6rem;
           background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 40px;
-          padding: 0.55rem;
+          padding: 0.6rem;
           cursor: pointer;
           transition: all 0.3s ease;
           color: rgba(255, 255, 255, 0.85);
@@ -313,7 +317,8 @@ export function ClienteAuth() {
 
         .google-btn:hover {
           background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(14, 184, 208, 0.4);
+          border-color: rgba(255, 255, 255, 0.35);
+          transform: translateY(-1px);
         }
 
         /* Enlace para cambiar entre login/registro */
@@ -331,9 +336,11 @@ export function ClienteAuth() {
           cursor: pointer;
           font-weight: 500;
           font-size: 0.7rem;
+          transition: color 0.2s;
         }
 
         .switch-link button:hover {
+          color: #fff;
           text-decoration: underline;
         }
 
@@ -354,7 +361,7 @@ export function ClienteAuth() {
           width: 16px;
           height: 16px;
           border: 2px solid rgba(255,255,255,0.3);
-          border-top-color: white;
+          border-top-color: #0eb8d0;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
           display: inline-block;
@@ -379,7 +386,7 @@ export function ClienteAuth() {
             font-size: 0.8rem;
           }
           .auth-btn {
-            padding: 0.55rem;
+            padding: 0.6rem;
             font-size: 0.8rem;
           }
         }
@@ -397,10 +404,10 @@ export function ClienteAuth() {
 
               <form onSubmit={handleLogin}>
                 <div className="input-group">
-                  <label>Correo electrónico</label>
+                  <label>Gmail</label>
                   <input
-                    type="gmail"
-                    placeholder="cliente@gmail.com"
+                    type="email"
+                    placeholder="tucorreo@gmail.com"
                     className="input-field"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -468,10 +475,10 @@ export function ClienteAuth() {
                 </div>
 
                 <div className="input-group">
-                  <label>Correo electrónico</label>
+                  <label>Gmail</label>
                   <input
-                    type="gmail"
-                    placeholder="cliente@gmail.com"
+                    type="email"
+                    placeholder="tucorreo@gmail.com"
                     className="input-field"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
