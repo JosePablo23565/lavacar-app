@@ -22,12 +22,12 @@ export function CompleteProfile() {
         if (user.user_metadata?.nombre) {
           setNombre(user.user_metadata.nombre)
         }
-        // Verificar si ya tiene perfil completo
+        // Verificar si ya tiene perfil completo (usando maybeSingle)
         const { data: perfil } = await supabase
           .from('perfiles')
           .select('*')
           .eq('id', user.id)
-          .single()
+          .maybeSingle()
         
         if (perfil && perfil.nombre && perfil.telefono) {
           // Ya tiene todos los datos, redirigir al home
@@ -73,24 +73,28 @@ export function CompleteProfile() {
 
       if (updateError) throw updateError
 
-      // 2. Verificar si ya existe perfil
-      const { data: existingProfile } = await supabase
+      // 2. Verificar si ya existe perfil (usando maybeSingle)
+      const { data: existingProfile, error: selectError } = await supabase
         .from('perfiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (existingProfile) {
         // Actualizar perfil existente
-        await supabase
+        const { error: updateProfileError } = await supabase
           .from('perfiles')
           .update({ nombre, telefono, email })
           .eq('id', userId)
+        
+        if (updateProfileError) throw updateProfileError
       } else {
         // Crear nuevo perfil
-        await supabase
+        const { error: insertError } = await supabase
           .from('perfiles')
           .insert([{ id: userId, nombre, telefono, email }])
+        
+        if (insertError) throw insertError
       }
 
       navigate('/')
