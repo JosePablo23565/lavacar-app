@@ -7,6 +7,7 @@ type Perfil = {
   telefono: string
   email?: string
   created_at: string
+  is_admin?: boolean  // ← Agregar esta línea
 }
 
 type AuthContextType = {

@@ -33,16 +33,30 @@ export function AdminDashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    checkUser()
-    fetchAppointments()
-    fetchTestimonials()
+    checkAdminAndFetch()
   }, [])
 
-  const checkUser = async () => {
+  const checkAdminAndFetch = async () => {
     const { data: { user } } = await supabase.auth.getUser()
+    
     if (!user) {
-      navigate('/login')
+      navigate('/acceder')
+      return
     }
+
+    const { data: perfil, error: perfilError } = await supabase
+      .from('perfiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+
+    if (perfilError || !perfil?.is_admin) {
+      navigate('/')
+      return
+    }
+
+    fetchAppointments()
+    fetchTestimonials()
   }
 
   const fetchAppointments = async () => {
@@ -115,7 +129,7 @@ export function AdminDashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    navigate('/login')
+    navigate('/acceder')
   }
 
   const getServiceLabel = (type: string) => {
@@ -368,25 +382,13 @@ export function AdminDashboard() {
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           {/* CABECERA */}
           <div className="admin-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', background: 'linear-gradient(135deg, #fff, #0eb8d0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Panel de Administración
               </h1>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <a 
-                  href="/" 
-                  className="btn-primary"
-                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                  Volver al inicio
-                </a>
-                <button 
-                  onClick={handleLogout} 
-                  className="btn-danger"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                  Cerrar Sesión
-                </button>
+                <a href="/" className="btn-primary" style={{ textDecoration: 'none' }}>← Volver al inicio</a>
+                <button onClick={handleLogout} className="btn-danger">🚪 Cerrar Sesión</button>
               </div>
             </div>
           </div>
@@ -532,7 +534,7 @@ export function AdminDashboard() {
                                 </a>
                               </div>
                             </td>
-                           </tr>
+                          </tr>
                         ))
                       )}
                     </tbody>
@@ -542,10 +544,9 @@ export function AdminDashboard() {
             </>
           )}
 
-          {/* CONTENIDO DE TESTIMONIOS - Estilo tarjetas como en citas */}
+          {/* CONTENIDO DE TESTIMONIOS */}
           {activeTab === 'testimonios' && (
             <div className="space-y-6">
-              {/* Pendientes */}
               <div className="admin-card" style={{ padding: '1.5rem' }}>
                 <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#94a3b8', letterSpacing: '0.05em' }}>
                   Opiniones Pendientes ({pendingTestimonials.length})
@@ -578,7 +579,6 @@ export function AdminDashboard() {
                 )}
               </div>
 
-              {/* Aprobados */}
               <div className="admin-card" style={{ padding: '1.5rem' }}>
                 <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#94a3b8', letterSpacing: '0.05em' }}>
                   Opiniones Aprobadas ({approvedTestimonials.length})

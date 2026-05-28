@@ -2,13 +2,13 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react
 import { AuthProvider } from './context/AuthContext'
 import { Home } from './components/Home'
 import { AppointmentForm } from './components/AppointmentForm'
-import { AdminLogin } from './pages/AdminLogin'
 import { AdminDashboard } from './pages/AdminDashboard'
 import { Contact } from './components/Contact'
 import { Opiniones } from './components/Opiniones'
+import { ClienteLogin } from './pages/ClienteLogin'
+import { ClienteRegistro } from './pages/ClienteRegistro'
 import { useState, useEffect } from 'react'
 import { useAuth } from './context/AuthContext'
-import { ClienteAuth } from './pages/ClienteAuth'
 
 // Componente para rutas protegidas
 function RutaProtegida({ children }: { children: React.ReactNode }) {
@@ -76,6 +76,9 @@ function NavBar() {
     if (path !== '/' && location.pathname.startsWith(path)) return true
     return false
   }
+
+  // Verificar si el usuario es admin
+  const isAdmin = perfil?.is_admin === true
 
   return (
     <>
@@ -366,10 +369,13 @@ function NavBar() {
                 <span className="nav-link-icon">👤</span>
                 <span>Hola, {perfil?.nombre || user.email?.split('@')[0]}</span>
               </div>
-              <Link to="/login" className="nav-link" onClick={cerrarMenu}>
-                <span className="nav-link-icon">👑</span>
-                <span>Admin</span>
-              </Link>
+              {/* Solo mostrar Admin si el usuario tiene permisos */}
+              {isAdmin && (
+                <Link to="/admin" className="nav-link" onClick={cerrarMenu}>
+                  <span className="nav-link-icon">👑</span>
+                  <span>Admin</span>
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="nav-link"
@@ -432,9 +438,8 @@ function App() {
             } />
             
             {/* Rutas públicas */}
-            <Route path="/acceder" element={<ClienteAuth />} />
-            <Route path="/registro" element={<Navigate to="/acceder" replace />} />
-            <Route path="/login" element={<AdminLogin />} />
+            <Route path="/acceder" element={<ClienteLogin />} />
+            <Route path="/registro" element={<ClienteRegistro />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </div>

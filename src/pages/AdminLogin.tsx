@@ -15,16 +15,32 @@ export function AdminLogin() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
     if (error) {
       setError('❌ Credenciales incorrectas')
-    } else {
-      navigate('/admin')
+      setLoading(false)
+      return
     }
+
+    // Verificar si el usuario es administrador
+    const { data: perfil, error: perfilError } = await supabase
+      .from('perfiles')
+      .select('is_admin')
+      .eq('id', data.user.id)
+      .single()
+
+    if (perfilError || !perfil?.is_admin) {
+      setError('❌ No tienes permisos de administrador')
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
+    }
+
+    navigate('/admin')
     setLoading(false)
   }
 
@@ -45,7 +61,6 @@ export function AdminLogin() {
           overflow: hidden;
         }
         
-        /* Burbujas decorativas de fondo */
         .login-root::before {
           content: '';
           position: absolute;
@@ -75,7 +90,6 @@ export function AdminLogin() {
           50% { transform: translateY(-20px); }
         }
         
-        /* Tarjeta de login */
         .login-card {
           background: rgba(17, 24, 39, 0.98);
           backdrop-filter: blur(12px);
@@ -96,7 +110,6 @@ export function AdminLogin() {
           box-shadow: 0 30px 60px -15px rgba(14, 184, 208, 0.15);
         }
         
-        /* Botón de regreso */
         .back-btn {
           position: fixed;
           top: 2rem;
@@ -124,7 +137,6 @@ export function AdminLogin() {
           transform: translateX(-3px);
         }
         
-        /* Icono decorativo */
         .login-icon {
           width: 80px;
           height: 80px;
@@ -168,7 +180,6 @@ export function AdminLogin() {
           margin-bottom: 2rem;
         }
         
-        /* Campos de formulario */
         .input-group {
           margin-bottom: 1.5rem;
         }
@@ -211,7 +222,6 @@ export function AdminLogin() {
           color: rgba(255, 255, 255, 0.3);
         }
         
-        /* Botón de login */
         .login-btn {
           width: 100%;
           padding: 1rem;
@@ -254,7 +264,6 @@ export function AdminLogin() {
           cursor: not-allowed;
         }
         
-        /* Mensaje de error */
         .error-message {
           background: rgba(239, 68, 68, 0.1);
           border: 1px solid rgba(239, 68, 68, 0.3);
@@ -273,7 +282,6 @@ export function AdminLogin() {
           75% { transform: translateX(5px); }
         }
         
-        /* Carro decorativo flotante */
         .login-car {
           position: absolute;
           bottom: 30px;
@@ -290,7 +298,6 @@ export function AdminLogin() {
           50% { transform: translateY(-20px) rotate(3deg); }
         }
         
-        /* Spinner de carga */
         .spinner {
           width: 18px;
           height: 18px;
@@ -334,12 +341,10 @@ export function AdminLogin() {
       `}</style>
 
       <div className="login-root">
-        {/* Botón de regresar */}
         <button className="back-btn" onClick={() => navigate('/')}>
           ← Volver al inicio
         </button>
         
-        {/* Carro decorativo flotante */}
         <div className="login-car">🚗</div>
 
         <div className="login-card">
