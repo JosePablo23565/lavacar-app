@@ -14,7 +14,7 @@ export function ClienteAuth() {
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
-  // Registro state (con teléfono validado)
+  // Registro state
   const [regNombre, setRegNombre] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regTelefono, setRegTelefono] = useState('')
@@ -39,7 +39,6 @@ export function ClienteAuth() {
     setLoading(false)
   }
 
-  // Validación de teléfono: solo números, máximo 8 dígitos
   const handleTelefonoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     const onlyNumbers = value.replace(/[^0-9]/g, '')
@@ -83,15 +82,15 @@ export function ClienteAuth() {
     if (error) {
       setError(error.message)
     } else if (data.user) {
-      await supabase.from('perfiles').insert([
-        { id: data.user.id, nombre: regNombre, telefono: regTelefono }
+      await supabase.from('perfiles').upsert([
+        { id: data.user.id, nombre: regNombre, telefono: regTelefono, email: regEmail }
       ])
       navigate('/')
     }
     setLoading(false)
   }
 
-  // Función para iniciar sesión con Google
+  // Función para iniciar sesión con Google - SIMPLE, sin redirección a completar perfil
   const signInWithGoogle = async () => {
     setError('')
     setGoogleLoading(true)
@@ -99,7 +98,7 @@ export function ClienteAuth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-         redirectTo: `${window.location.origin}/auth/callback` 
+        redirectTo: `${window.location.origin}/`
       }
     })
     
@@ -141,7 +140,6 @@ export function ClienteAuth() {
           overflow: hidden;
         }
 
-        /* FONDO CON TU IMAGEN */
         .auth-page::before {
           content: '';
           position: absolute;
@@ -156,7 +154,6 @@ export function ClienteAuth() {
           z-index: 0;
         }
 
-        /* CAPA OSCURA SUTIL */
         .auth-page::after {
           content: '';
           position: absolute;
@@ -168,7 +165,6 @@ export function ClienteAuth() {
           z-index: 0;
         }
 
-        /* TARJETA LIQUID GLASS */
         .liquid-glass-card {
           position: relative;
           z-index: 10;
@@ -176,16 +172,11 @@ export function ClienteAuth() {
           max-width: 340px;
           margin: 1rem;
           padding: 1.4rem 1.2rem;
-          
           background: rgba(255, 255, 255, 0.04);
           backdrop-filter: blur(10px);
           border-radius: 28px;
-          
           border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 
-            0 8px 32px 0 rgba(0, 0, 0, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08);
-          
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -195,7 +186,6 @@ export function ClienteAuth() {
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
         }
 
-        /* Contenedor de los formularios con animación */
         .form-container {
           transition: opacity 0.2s ease, transform 0.2s ease;
         }
@@ -210,7 +200,6 @@ export function ClienteAuth() {
           transform: translateY(0);
         }
 
-        /* Títulos */
         .auth-title {
           font-size: 1.4rem;
           font-weight: 600;
@@ -227,7 +216,6 @@ export function ClienteAuth() {
           margin-bottom: 1rem;
         }
 
-        /* Inputs */
         .input-group {
           margin-bottom: 0.7rem;
         }
@@ -265,7 +253,6 @@ export function ClienteAuth() {
           font-size: 0.8rem;
         }
 
-        /* ========== BOTÓN LIQUID GLASS CELESTE ========== */
         .auth-btn {
           width: 100%;
           padding: 0.7rem;
@@ -296,7 +283,6 @@ export function ClienteAuth() {
           cursor: not-allowed;
         }
 
-        /* Enlace olvidaste contraseña (solo login) */
         .forgot-link {
           display: block;
           text-align: right;
@@ -311,7 +297,6 @@ export function ClienteAuth() {
           color: #0eb8d0;
         }
 
-        /* Separador */
         .divider {
           display: flex;
           align-items: center;
@@ -332,7 +317,6 @@ export function ClienteAuth() {
           padding: 0 0.8rem;
         }
 
-        /* Botón Google - TRANSPARENTE (sin color celeste) */
         .google-btn {
           width: 100%;
           display: flex;
@@ -356,7 +340,6 @@ export function ClienteAuth() {
           transform: translateY(-1px);
         }
 
-        /* Enlace para cambiar entre login/registro */
         .switch-link {
           text-align: center;
           margin-top: 0.6rem;
@@ -379,7 +362,6 @@ export function ClienteAuth() {
           text-decoration: underline;
         }
 
-        /* Error */
         .error-message {
           background: rgba(239, 68, 68, 0.1);
           border: 1px solid rgba(239, 68, 68, 0.2);
@@ -391,7 +373,6 @@ export function ClienteAuth() {
           margin-bottom: 0.8rem;
         }
 
-        /* Spinner */
         .spinner {
           width: 16px;
           height: 16px;
@@ -406,7 +387,6 @@ export function ClienteAuth() {
           to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
           .liquid-glass-card {
             max-width: 300px;
@@ -430,7 +410,6 @@ export function ClienteAuth() {
       <div className="liquid-glass-card">
         <div className={`form-container ${isFlipping ? 'fade-out' : 'fade-in'}`}>
           {isLogin ? (
-            // FORMULARIO DE LOGIN
             <>
               <h1 className="auth-title">Bienvenido</h1>
               <p className="auth-subtitle">Acceso para clientes registrados</p>
@@ -500,7 +479,6 @@ export function ClienteAuth() {
               </form>
             </>
           ) : (
-            // FORMULARIO DE REGISTRO (CON TELÉFONO VALIDADO)
             <>
               <h1 className="auth-title">Crear cuenta</h1>
               <p className="auth-subtitle">Regístrate para comenzar</p>
@@ -543,7 +521,7 @@ export function ClienteAuth() {
                     maxLength={8}
                   />
                   <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.2rem' }}>
-                    Solo números, 8 dígitos
+                    Solo números, 8 dígitos (opcional)
                   </div>
                 </div>
 
