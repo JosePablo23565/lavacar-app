@@ -493,7 +493,7 @@ export function Home() {
           background-image: url('/fondo-opiniones.jpg');
           background-size: cover;
           background-position: center;
-          background-attachment: fixed;
+          background-attachment: scroll;  /* ← CAMBIADO */
           z-index: 0;
         }
 
@@ -786,7 +786,7 @@ export function Home() {
             backgroundImage: 'url("/fondo-contacto.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',  /* ← CAMBIADO */
             position: 'relative',
             borderTop: '1px solid rgba(255,255,255,.06)'
           }}>
