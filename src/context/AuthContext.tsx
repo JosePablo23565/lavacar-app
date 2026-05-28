@@ -5,6 +5,7 @@ type Perfil = {
   id: string
   nombre: string
   telefono: string
+  email?: string
   created_at: string
 }
 
@@ -25,11 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Obtener sesión inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (window.location.pathname === '/auth/callback') {
-        setLoading(false)
-        return
-      }
       setUser(session?.user ?? null)
       if (session?.user) {
         fetchPerfil(session.user.id)
@@ -37,8 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     })
 
+    // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (window.location.pathname === '/auth/callback') return
       setUser(session?.user ?? null)
       if (session?.user) {
         fetchPerfil(session.user.id)
@@ -52,11 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const fetchPerfil = async (userId: string) => {
+    // Usar maybeSingle para evitar error 406 si no existe el perfil
     const { data } = await supabase
       .from('perfiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
+    
     setPerfil(data)
   }
 
@@ -70,8 +70,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     if (!error && data.user) {
-      await supabase.from('perfiles').insert([
-        { id: data.user.id, nombre, telefono }
+      await supabase.from('perfiles').upsert([
+        { id: data.user.id, nombre, telefono, email }
       ])
     }
 
