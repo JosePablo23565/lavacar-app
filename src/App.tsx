@@ -6,12 +6,9 @@ import { AdminLogin } from './pages/AdminLogin'
 import { AdminDashboard } from './pages/AdminDashboard'
 import { Contact } from './components/Contact'
 import { Opiniones } from './components/Opiniones'
-import { ClienteLogin } from './pages/ClienteLogin'
-import { ClienteRegistro } from './pages/ClienteRegistro'
 import { useState, useEffect } from 'react'
 import { useAuth } from './context/AuthContext'
-import { CompleteProfile } from './pages/CompleteProfile'
-import { AuthCallback } from './pages/AuthCallback'
+import { ClienteAuth } from './pages/ClienteAuth'
 
 // Componente para rutas protegidas
 function RutaProtegida({ children }: { children: React.ReactNode }) {
@@ -435,12 +432,10 @@ function App() {
             } />
             
             {/* Rutas públicas */}
-            <Route path="/acceder" element={<ClienteLogin />} />
-            <Route path="/registro" element={<ClienteRegistro />} />
+            <Route path="/acceder" element={<ClienteAuth />} />
+            <Route path="/registro" element={<Navigate to="/acceder" replace />} />
             <Route path="/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/completar-perfil" element={<CompleteProfile />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
           </Routes>
         </div>
       </AuthProvider>
