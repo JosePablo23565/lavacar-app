@@ -157,7 +157,7 @@ export function AppointmentForm() {
 
   const selectedService = services.find((s) => s.value === formData.service_type)
 
-  const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'long' })
+  const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
   // Función para determinar si una fecha está deshabilitada (pasada)
