@@ -199,7 +199,7 @@ function NavBar() {
           position: fixed;
           top: 75px;
           right: 24px;
-          width: 280px;
+          width: 320
           background: rgba(15, 20, 35, 0.35);
           backdrop-filter: blur(24px) saturate(180%);
           border-radius: 32px;
@@ -368,7 +368,7 @@ function NavBar() {
           .nav-menu {
             top: 68px;
             right: 12px;
-            width: 260px;
+            width: 300
           }
           .nav-menu::before {
             right: 18px;

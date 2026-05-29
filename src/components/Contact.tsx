@@ -2,13 +2,13 @@ export function Contact() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
         .ct-root {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 60%, #0a0e1a 100%);
+          background: linear-gradient(135deg, #0a0e1a 0%, #0a1225 50%, #0a0e1a 100%);
           padding: 3rem 1.5rem;
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           position: relative;
           overflow-x: hidden;
         }
@@ -20,7 +20,7 @@ export function Contact() {
           right: -20%;
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(14,184,208,0.08) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(14,184,208,0.06) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -32,7 +32,7 @@ export function Contact() {
           left: -10%;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(26,111,212,0.06) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(14,184,208,0.04) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -52,18 +52,23 @@ export function Contact() {
         .ct-icon-circle {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.2rem;
-          box-shadow: 0 10px 25px -5px rgba(14, 184, 208, 0.3);
-          transition: transform 0.3s ease;
+          box-shadow: 0 10px 25px rgba(14, 184, 208, 0.2);
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .ct-icon-circle:hover {
           transform: scale(1.05);
+          box-shadow: 0 15px 35px rgba(14, 184, 208, 0.3);
+        }
+
+        .ct-icon-circle:active {
+          transform: scale(0.95);
         }
 
         .ct-icon-circle svg {
@@ -95,80 +100,89 @@ export function Contact() {
           margin-bottom: 2rem;
         }
 
+        /* LIQUID GLASS CARDS */
         .ct-card {
-          background: #111827;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 24px;
+          background: rgba(15, 20, 35, 0.35);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 28px;
           overflow: hidden;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .ct-card:hover {
-          transform: translateY(-4px);
+          transform: translateY(-6px);
           border-color: rgba(14, 184, 208, 0.3);
-          box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
         }
 
         .ct-card-header {
-          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          background: linear-gradient(135deg, rgba(14, 184, 208, 0.15), rgba(14, 184, 208, 0.05));
           padding: 1rem 1.5rem;
           text-align: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .ct-card-header p {
-          font-size: 0.8rem;
-          color: rgba(255, 255, 255, 0.9);
-          letter-spacing: 0.08em;
+          font-size: 0.75rem;
+          color: #0eb8d0;
+          letter-spacing: 0.1em;
           font-weight: 600;
           text-transform: uppercase;
+          margin: 0;
         }
 
         .ct-items {
           padding: 1.5rem;
         }
 
+        /* ITEMS CON EFECTO BURBUJA */
         .ct-item {
           display: flex;
           align-items: center;
           gap: 1rem;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 18px;
           padding: 1rem;
           margin-bottom: 1rem;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
           cursor: pointer;
         }
 
         .ct-item:hover {
           background: rgba(14, 184, 208, 0.08);
           border-color: rgba(14, 184, 208, 0.3);
-          transform: translateX(5px);
+          transform: translateX(6px);
+        }
+
+        .ct-item:active {
+          transform: scale(0.98);
         }
 
         .ct-item-icon {
-          width: 44px;
-          height: 44px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.05);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.3rem;
+          font-size: 1.2rem;
           flex-shrink: 0;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .ct-item:hover .ct-item-icon {
-          background: rgba(14, 184, 208, 0.2);
-          transform: scale(1.05);
+          background: rgba(14, 184, 208, 0.15);
+          transform: scale(1.08);
         }
 
         .ct-item-label {
           font-size: 0.7rem;
           color: rgba(255, 255, 255, 0.5);
           margin-bottom: 0.2rem;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
@@ -192,37 +206,36 @@ export function Contact() {
           transform: translateX(3px);
         }
 
+        .ct-wa-btn:active {
+          transform: scale(0.97);
+        }
+
         .ct-badge {
-          background: rgba(37, 211, 102, 0.15);
-          color: #25d366;
-          border: 1px solid rgba(37, 211, 102, 0.3);
+          background: rgba(14, 184, 208, 0.12);
+          color: #0eb8d0;
+          border: 1px solid rgba(14, 184, 208, 0.2);
           padding: 0.2rem 0.6rem;
-          border-radius: 20px;
+          border-radius: 30px;
           font-size: 0.65rem;
           margin-left: 0.5rem;
+          font-weight: 500;
         }
 
-        .ct-wa-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
-        }
-
-        .ct-wa-number {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-
+        /* MAP SECTION */
         .ct-iframe {
-          border-radius: 16px;
+          border-radius: 18px;
           overflow: hidden;
           margin-bottom: 1rem;
           border: 1px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
         }
 
-        iframe {
+        .ct-iframe:hover {
+          border-color: rgba(14, 184, 208, 0.3);
+          transform: scale(1.01);
+        }
+
+        .ct-iframe iframe {
           display: block;
           width: 100%;
           height: 200px;
@@ -231,11 +244,11 @@ export function Contact() {
 
         .ct-maps-btn {
           width: 100%;
-          background: rgba(14, 184, 208, 0.15);
+          background: rgba(14, 184, 208, 0.12);
           color: #0eb8d0;
-          border: 1px solid rgba(14, 184, 208, 0.3);
+          border: 1px solid rgba(14, 184, 208, 0.25);
           padding: 0.85rem;
-          border-radius: 14px;
+          border-radius: 16px;
           font-size: 0.85rem;
           font-weight: 500;
           cursor: pointer;
@@ -243,29 +256,38 @@ export function Contact() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          transition: all 0.2s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          font-family: 'Inter', sans-serif;
         }
 
         .ct-maps-btn:hover {
-          background: rgba(14, 184, 208, 0.25);
+          background: rgba(14, 184, 208, 0.2);
           color: #fff;
-          transform: translateY(-2px);
+          transform: translateY(-3px);
+          border-color: rgba(14, 184, 208, 0.4);
+          box-shadow: 0 8px 20px rgba(14, 184, 208, 0.2);
         }
 
+        .ct-maps-btn:active {
+          transform: scale(0.97);
+        }
+
+        /* CTA CARD LIQUID GLASS */
         .ct-cta-card {
-          background: #0a0e1a;
-          border: 1px solid rgba(14, 184, 208, 0.15);
-          border-radius: 24px;
+          background: rgba(15, 20, 35, 0.35);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 28px;
           padding: 2rem;
           text-align: center;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
           margin-top: 1.5rem;
         }
 
         .ct-cta-card:hover {
-          transform: translateY(-4px);
+          transform: translateY(-6px);
           border-color: rgba(14, 184, 208, 0.3);
-          box-shadow: 0 20px 40px -10px rgba(14, 184, 208, 0.1);
+          box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
         }
 
         .ct-cta-title {
@@ -277,28 +299,69 @@ export function Contact() {
         }
 
         .ct-cta-button {
-          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
           color: #fff;
           border: none;
-          padding: 0.8rem 2rem;
-          border-radius: 14px;
+          padding: 0.9rem 2.2rem;
+          border-radius: 50px;
           font-size: 0.9rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
+          font-family: 'Sora', sans-serif;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .ct-cta-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .ct-cta-button:hover::before {
+          left: 100%;
         }
 
         .ct-cta-button:hover {
-          transform: scale(1.02);
-          box-shadow: 0 8px 25px rgba(14, 184, 208, 0.4);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(14, 184, 208, 0.4);
+        }
+
+        .ct-cta-button:active {
+          transform: scale(0.97);
+        }
+
+        /* LINKS */
+        a {
+          text-decoration: none;
+        }
+
+        .ct-email-link {
+          color: #0eb8d0;
+          transition: all 0.2s ease;
+        }
+
+        .ct-email-link:hover {
+          color: #fff;
+          text-decoration: underline;
         }
 
         @media (max-width: 768px) {
+          .ct-root {
+            padding: 2rem 1rem;
+          }
           .ct-grid {
             grid-template-columns: 1fr;
+            gap: 1rem;
           }
           .ct-title {
             font-size: 1.8rem;
@@ -307,8 +370,24 @@ export function Contact() {
             width: 65px;
             height: 65px;
           }
+          .ct-icon-circle svg {
+            width: 32px;
+            height: 32px;
+          }
           .ct-cta-title {
             font-size: 1.1rem;
+          }
+          .ct-cta-button {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+          }
+          .ct-item {
+            padding: 0.8rem;
+          }
+          .ct-item-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
           }
         }
       `}</style>
@@ -322,7 +401,7 @@ export function Contact() {
               </svg>
             </div>
             <h1 className="ct-title">Contacto</h1>
-            <p className="ct-sub">Estamos aquí para ayudarte</p>
+            <p className="ct-sub">Estamos aquí para ayudarle</p>
           </div>
 
           <div className="ct-grid">
@@ -375,7 +454,7 @@ export function Contact() {
                   <div>
                     <div className="ct-item-label">CORREO</div>
                     <div className="ct-item-value">
-                      <a href="mailto:camarofraterno@gmail.com" style={{ color: '#0eb8d0', textDecoration: 'none' }}>camarofraterno@gmail.com</a>
+                      <a href="mailto:camarofraterno@gmail.com" className="ct-email-link">camarofraterno@gmail.com</a>
                     </div>
                   </div>
                 </div>
@@ -420,7 +499,7 @@ export function Contact() {
 
           {/* CTA final */}
           <div className="ct-cta-card">
-            <h3 className="ct-cta-title">¿Listo para que tu auto brille?</h3>
+            <h3 className="ct-cta-title">¿Listo para que su auto brille?</h3>
             <button 
               className="ct-cta-button"
               onClick={() => window.location.href = '/agendar'}
