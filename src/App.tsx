@@ -33,42 +33,29 @@ function NavBar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolling(true)
-      } else {
-        setScrolling(false)
-      }
+      setScrolling(window.scrollY > 50)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
-    if (menuAbierto) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-    return () => {
-      document.body.style.overflow = 'auto'
-    }
+    document.body.style.overflow = menuAbierto ? 'hidden' : 'auto'
+    return () => { document.body.style.overflow = 'auto' }
   }, [menuAbierto])
 
-  const cerrarMenu = () => {
-    setMenuAbierto(false)
-  }
+  const cerrarMenu = () => setMenuAbierto(false)
 
   const handleLogout = async () => {
     await signOut()
     cerrarMenu()
   }
 
-  // Links base (siempre visibles)
   const navLinks = [
-    { path: '/', name: 'Inicio'},
-    { path: '/agendar', name: 'Agendar'},
-    { path: '/contacto', name: 'Contacto'},
-    { path: '/opiniones', name: 'Opiniones'},
+    { path: '/', name: 'Inicio' },
+    { path: '/agendar', name: 'Agendar' },
+    { path: '/contacto', name: 'Contacto' },
+    { path: '/opiniones', name: 'Opiniones' },
   ]
 
   const isActive = (path: string) => {
@@ -77,19 +64,14 @@ function NavBar() {
     return false
   }
 
-  // Verificar si el usuario es admin
   const isAdmin = perfil?.is_admin === true
+  const userEmail = user?.email || 'usuario'
+  const userInitial = userEmail.charAt(0).toUpperCase()
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
-
-        header:not(.navbar-modern), 
-        nav:not(.navbar-modern),
-        .old-navbar {
-          display: none !important;
-        }
 
         .navbar-modern {
           position: fixed;
@@ -100,17 +82,16 @@ function NavBar() {
           padding: 0.75rem 2rem;
           transition: all 0.3s ease;
           font-family: 'DM Sans', sans-serif;
+          background: rgba(10, 14, 26, 0.3);
+          backdrop-filter: blur(12px);
+          /* ELIMINÉ EL border-bottom DE AQUÍ */
         }
 
         .navbar-modern.scrolled {
-          background: rgba(10, 14, 26, 0.95);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .navbar-modern:not(.scrolled) {
-          background: transparent;
+          background: rgba(10, 14, 26, 0.85);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(14, 184, 208, 0.3);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .navbar-container {
@@ -131,15 +112,6 @@ function NavBar() {
           z-index: 101;
         }
 
-        .navbar-logo-icon {
-          font-size: 2rem;
-          transition: transform 0.3s ease;
-        }
-
-        .navbar-logo:hover .navbar-logo-icon {
-          transform: scale(1.1) rotate(-5deg);
-        }
-
         .navbar-logo-text {
           font-family: 'Sora', sans-serif;
           font-size: 1.3rem;
@@ -150,27 +122,12 @@ function NavBar() {
           background-clip: text;
         }
 
-        .navbar-logo-dot {
-          width: 8px;
-          height: 8px;
-          background: #0eb8d0;
-          border-radius: 50%;
-          display: inline-block;
-          margin-left: 2px;
-          animation: pulseDot 2s infinite;
-        }
-
-        @keyframes pulseDot {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.3); }
-        }
-
         .menu-btn {
           width: 48px;
           height: 48px;
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(255, 255, 255, 0.08);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 16px;
           cursor: pointer;
           display: flex;
@@ -182,8 +139,8 @@ function NavBar() {
         }
 
         .menu-btn:hover {
-          background: rgba(14, 184, 208, 0.2);
-          border-color: rgba(14, 184, 208, 0.4);
+          background: rgba(14, 184, 208, 0.25);
+          border-color: rgba(14, 184, 208, 0.5);
           transform: scale(1.02);
         }
 
@@ -224,8 +181,8 @@ function NavBar() {
         .menu-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.85);
-          backdrop-filter: blur(8px);
+          background: rgba(0, 0, 0, 0.05);
+          backdrop-filter: blur(2px);
           z-index: 98;
           opacity: 0;
           visibility: hidden;
@@ -237,63 +194,164 @@ function NavBar() {
           visibility: visible;
         }
 
+        /* MENÚ LIQUID GLASS CON EFECTO REBOTE */
         .nav-menu {
           position: fixed;
-          top: 0;
-          right: 0;
-          width: 100%;
-          max-width: 300px;
-          height: 100vh;
-          background: linear-gradient(135deg, #0f1e3a, #0a0e1a);
+          top: 75px;
+          right: 24px;
+          width: 280px;
+          background: rgba(15, 20, 35, 0.35);
+          backdrop-filter: blur(24px) saturate(180%);
+          border-radius: 32px;
           z-index: 99;
-          transform: translateX(100%);
-          transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-          padding: 2rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          border-left: 1px solid rgba(14, 184, 208, 0.2);
-          box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+          opacity: 0;
+          visibility: hidden;
+          transform: scale(0.3) translateY(-50px);
+          transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 30px 50px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          overflow: hidden;
         }
 
         .nav-menu.open {
-          transform: translateX(0);
+          opacity: 1;
+          visibility: visible;
+          transform: scale(1) translateY(0);
+        }
+
+        .nav-menu::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          right: 24px;
+          width: 20px;
+          height: 20px;
+          background: rgba(15, 20, 35, 0.35);
+          backdrop-filter: blur(24px) saturate(180%);
+          transform: rotate(45deg);
+          border-left: 1px solid rgba(255, 255, 255, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 6px;
+          z-index: -1;
+        }
+
+        .nav-menu::after {
+          content: '';
+          position: absolute;
+          top: -10px;
+          right: 24px;
+          width: 20px;
+          height: 20px;
+          background: rgba(0, 0, 0, 0.15);
+          filter: blur(8px);
+          transform: rotate(45deg);
+          z-index: -2;
+        }
+
+        .menu-user-profile {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 20px 20px 16px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.02);
+        }
+
+        .user-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: white;
+          box-shadow: 0 4px 12px rgba(14, 184, 208, 0.3);
+        }
+
+        .user-info {
+          flex: 1;
+        }
+
+        .user-email {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.8);
+          word-break: break-all;
+        }
+
+        .user-badge {
+          font-size: 0.65rem;
+          color: #0eb8d0;
+          margin-top: 4px;
         }
 
         .nav-links {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 4px;
+          padding: 12px 14px 16px;
         }
 
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          padding: 0.9rem 1.2rem;
+          gap: 12px;
+          padding: 12px 16px;
           border-radius: 14px;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(255, 255, 255, 0.8);
           text-decoration: none;
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 500;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .nav-link::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(14, 184, 208, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .nav-link:hover::before {
+          left: 100%;
         }
 
         .nav-link:hover {
-          background: rgba(14, 184, 208, 0.1);
-          color: #fff;
-          transform: translateX(-5px);
+          background: rgba(14, 184, 208, 0.15);
+          color: #0eb8d0;
+          transform: translateX(4px);
         }
 
         .nav-link.active {
-          background: rgba(14, 184, 208, 0.15);
-          border: 1px solid rgba(14, 184, 208, 0.3);
+          background: rgba(14, 184, 208, 0.2);
           color: #0eb8d0;
+          border: 1px solid rgba(14, 184, 208, 0.3);
         }
 
-        .nav-link-icon {
-          font-size: 1.2rem;
-          width: 28px;
+        .logout-btn {
+          width: 100%;
+          text-align: left;
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin-top: 8px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          padding-top: 14px;
+          border-radius: 0;
+        }
+
+        .logout-btn:hover {
+          background: rgba(255, 77, 79, 0.15);
+          color: #ff6b6b;
+          transform: translateX(4px);
         }
 
         .navbar-spacer {
@@ -307,12 +365,30 @@ function NavBar() {
           .navbar-logo-text {
             font-size: 1rem;
           }
-          .navbar-logo-icon {
-            font-size: 1.6rem;
-          }
           .nav-menu {
-            max-width: 280px;
-            padding: 1.5rem;
+            top: 68px;
+            right: 12px;
+            width: 260px;
+          }
+          .nav-menu::before {
+            right: 18px;
+            width: 18px;
+            height: 18px;
+            top: -9px;
+          }
+          .nav-menu::after {
+            right: 18px;
+            width: 18px;
+            height: 18px;
+            top: -9px;
+          }
+          .user-avatar {
+            width: 42px;
+            height: 42px;
+            font-size: 1rem;
+          }
+          .user-email {
+            font-size: 0.7rem;
           }
         }
       `}</style>
@@ -325,7 +401,14 @@ function NavBar() {
             </div>
           </Link>
 
-          <button className="menu-btn" onClick={() => setMenuAbierto(!menuAbierto)}>
+          <button 
+            className="menu-btn" 
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setMenuAbierto(!menuAbierto)
+            }}
+          >
             <div className={`menu-icon ${menuAbierto ? 'open' : ''}`}>
               <span></span>
               <span></span>
@@ -338,6 +421,16 @@ function NavBar() {
       <div className={`menu-overlay ${menuAbierto ? 'open' : ''}`} onClick={cerrarMenu} />
 
       <div className={`nav-menu ${menuAbierto ? 'open' : ''}`}>
+        <div className="menu-user-profile">
+          <div className="user-avatar">
+            {userInitial}
+          </div>
+          <div className="user-info">
+            <div className="user-email">{userEmail}</div>
+            {isAdmin && <div className="user-badge">Administrador</div>}
+          </div>
+        </div>
+
         <div className="nav-links">
           {navLinks.map((link) => (
             <Link
@@ -350,36 +443,18 @@ function NavBar() {
             </Link>
           ))}
 
-          {/* Links condicionales según autenticación */}
-          {!user ? (
-            <>
-              <Link to="/acceder" className="nav-link" onClick={cerrarMenu}>
-                <span>Acceder</span>
-              </Link>
-              <Link to="/registro" className="nav-link" onClick={cerrarMenu}>
-                <span>Registrarse</span>
-              </Link>
-            </>
-          ) : (
-            <>
-              <div className="nav-link" style={{ cursor: 'default', background: 'rgba(14,184,208,0.1)' }}>
-                <span>Hola, {perfil?.nombre || user.email?.split('@')[0]}</span>
-              </div>
-              {/* Solo mostrar Admin si el usuario tiene permisos */}
-              {isAdmin && (
-                <Link to="/admin" className="nav-link" onClick={cerrarMenu}>
-                  <span>Admin</span>
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="nav-link"
-                style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                <span>Cerrar Sesión</span>
-              </button>
-            </>
+          {isAdmin && (
+            <Link to="/admin" className="nav-link" onClick={cerrarMenu}>
+              <span>Admin</span>
+            </Link>
           )}
+
+          <button
+            onClick={handleLogout}
+            className="nav-link logout-btn"
+          >
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
       </div>
 
@@ -393,45 +468,32 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <div className="min-h-screen">
+          <NavBar />
           <Routes>
-            {/* Rutas protegidas (requieren login) */}
             <Route path="/" element={
               <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Home />
-                </>
+                <Home />
               </RutaProtegida>
             } />
             
             <Route path="/agendar" element={
               <RutaProtegida>
-                <>
-                  <NavBar />
-                  <AppointmentForm />
-                </>
+                <AppointmentForm />
               </RutaProtegida>
             } />
             
             <Route path="/contacto" element={
               <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Contact />
-                </>
+                <Contact />
               </RutaProtegida>
             } />
             
             <Route path="/opiniones" element={
               <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Opiniones />
-                </>
+                <Opiniones />
               </RutaProtegida>
             } />
             
-            {/* Rutas públicas */}
             <Route path="/acceder" element={<ClienteLogin />} />
             <Route path="/registro" element={<ClienteRegistro />} />
             <Route path="/admin" element={<AdminDashboard />} />

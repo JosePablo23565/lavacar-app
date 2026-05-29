@@ -71,7 +71,6 @@ export function Home() {
   useEffect(() => {
     const counters = [
       { id: 'counter-clientes', target: 500, suffix: '+' },
-      { id: 'counter-servicios', target: 4, suffix: '' },
       { id: 'counter-anos', target: 3, suffix: '' }
     ]
 
@@ -179,38 +178,6 @@ export function Home() {
           100%{transform:translateX(10px);opacity:0} 
         }
 
-        .lc-nav { 
-          position:fixed; top:0; left:0; right:0; z-index:100; padding:1rem 2rem;
-          display:flex; justify-content:space-between; align-items:center;
-          transition:all 0.3s ease;
-          background: rgba(10, 14, 26, 0.4);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(14, 184, 208, 0.1);
-        }
-        .lc-nav.scrolled { 
-          background: rgba(10, 14, 26, 0.8);
-          backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
-        }
-        .lc-logo { font-family:'Sora',sans-serif;font-size:1.25rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:.5rem;cursor:pointer; }
-        .lc-dot { width:9px;height:9px;border-radius:50%;background:#0eb8d0;animation:lcPulseDot 2s infinite; }
-        .lc-nav-links { display:flex;gap:2rem;list-style:none; }
-        .lc-nav-links a { color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;letter-spacing:.02em;transition:color .2s; }
-        .lc-nav-links a:hover { color:#0eb8d0; }
-        .lc-nav-cta { 
-          background: rgba(14, 184, 208, 0.15);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(14, 184, 208, 0.3);
-          color:#fff;
-          padding:.5rem 1.2rem;
-          border-radius:40px;
-          font-size:.85rem;
-          font-weight:500;
-          cursor:pointer;
-          transition:all .2s;
-        }
-        .lc-nav-cta:hover { background: rgba(14, 184, 208, 0.25); border-color: rgba(14, 184, 208, 0.5); transform: translateY(-2px); }
-
         .lc-hero {
           min-height: 100vh;
           display: flex;
@@ -296,17 +263,114 @@ export function Home() {
         .lc-hours-value { font-size:0.85rem; font-weight:600; }
         .lc-hours-divider { width:1px; height:25px; background:rgba(255,255,255,0.2); }
 
-        .lc-stats { background:rgba(255,255,255,.03); backdrop-filter: blur(8px); border-top:1px solid rgba(255,255,255,.07); border-bottom:1px solid rgba(255,255,255,.07); padding:2.5rem 4rem; display:flex; justify-content:center; gap:5rem; flex-wrap:wrap; }
-        .lc-stat { text-align:center; }
-        .lc-stat-num { font-family:'Sora',sans-serif;font-size:2rem;font-weight:600;color:#0eb8d0; }
-        .lc-stat-label { font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.25rem;letter-spacing:.06em; }
+        .lc-stats { 
+          background: rgba(10, 14, 26, 0.6);
+          backdrop-filter: blur(8px); 
+          padding: 1rem 1.5rem; 
+          display: flex; 
+          justify-content: space-between; 
+          align-items: center;
+          gap: 0.5rem; 
+          flex-wrap: wrap;
+          max-width: 95%;
+          margin: 0 auto;
+          border-radius: 50px;
+          margin-top: -25px;
+          position: relative;
+          z-index: 10;
+          border: 1px solid rgba(14,184,208,.15);
+        }
+
+        .lc-stat { 
+          text-align: center;
+          padding: 0 0.5rem;
+          position: relative;
+          flex: 1;
+        }
+
+        .lc-stat:not(:last-child)::after {
+          content: '';
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 1px;
+          height: 25px;
+          background: rgba(255,255,255,.1);
+        }
+
+        .lc-stat-num { 
+          font-family:'Sora',sans-serif;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #0eb8d0;
+          line-height: 1;
+        }
+
+        .lc-stat-label { 
+          font-size: 0.55rem;
+          color: rgba(255,255,255,.5);
+          margin-top: 0.25rem;
+          letter-spacing: 0.03em;
+          font-weight: 500;
+          white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+          .lc-stats {
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            margin-top: -20px;
+            gap: 0.25rem;
+            max-width: 98%;
+          }
+          
+          .lc-stat {
+            padding: 0 0.25rem;
+          }
+          
+          .lc-stat:not(:last-child)::after {
+            height: 20px;
+          }
+          
+          .lc-stat-num { 
+            font-size: 1rem;
+          }
+          
+          .lc-stat-label { 
+            font-size: 0.45rem;
+            white-space: nowrap;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .lc-stats {
+            padding: 0.5rem 0.8rem;
+            gap: 0.15rem;
+          }
+          
+          .lc-stat {
+            padding: 0 0.15rem;
+          }
+          
+          .lc-stat-num { 
+            font-size: 0.85rem;
+          }
+          
+          .lc-stat-label { 
+            font-size: 0.4rem;
+          }
+          
+          .lc-stat:not(:last-child)::after {
+            height: 15px;
+          }
+        }
 
         .lc-section { padding:6rem 2rem; max-width:1100px; margin:0 auto; position:relative; z-index:2; }
         .lc-tag { display:inline-block;background:rgba(14,184,208,.1);color:#0eb8d0;padding:.3rem .9rem;border-radius:6px;font-size:.75rem;margin-bottom:1rem;letter-spacing:.06em; }
         .lc-section-title { font-size:2.2rem;font-weight:600;margin-bottom:.8rem;line-height:1.2; }
         .lc-section-sub { color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.75;max-width:520px; }
 
-        /* Fondo de la sección de servicios con slideshow */
         .services-section {
           position: relative;
           overflow: hidden;
@@ -355,7 +419,6 @@ export function Home() {
           margin: 0 auto;
         }
 
-        /* TARJETAS DE SERVICIOS MÁS ANGOSTAS */
         .lc-service-card {
           background-size: cover;
           background-position: center;
@@ -403,7 +466,6 @@ export function Home() {
           transform: translateY(-6px) scale(1.02);
         }
 
-        /* GRID CON TARJETAS ESTRECHAS */
         .lc-services-grid { 
           display: grid; 
           grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
@@ -451,7 +513,6 @@ export function Home() {
           width: fit-content; 
         }
 
-        /* Responsive para móvil */
         @media (max-width: 768px) {
           .services-section .lc-section {
             max-width: 100%;
@@ -477,7 +538,6 @@ export function Home() {
           .lc-svc-time { font-size: 0.65rem; }
         }
         
-        /* ========== SECCIÓN DE OPINIONES REDISEÑADA ========== */
         .opiniones-section {
           position: relative;
           padding: 5rem 2rem;
@@ -493,7 +553,7 @@ export function Home() {
           background-image: url('/fondo-opiniones.jpg');
           background-size: cover;
           background-position: center;
-          background-attachment: scroll;  /* ← CAMBIADO */
+          background-attachment: scroll;
           z-index: 0;
         }
 
@@ -590,13 +650,87 @@ export function Home() {
           color: rgba(255, 255, 255, 0.5);
         }
 
-        .lc-footer { background:rgba(6, 10, 20, 0.8); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.06); padding:3rem 2rem; text-align:center; }
-        .lc-footer-logo { font-family:'Sora',sans-serif; font-size:1.4rem; font-weight:600; margin-bottom:.4rem; }
-        .lc-footer-sub { font-size:.82rem; color:rgba(255,255,255,.35); margin-bottom:2rem; }
-        .lc-footer-links { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.5rem; }
-        .lc-footer-links button { background:none; border:none; color:rgba(255,255,255,.4); font-size:.84rem; cursor:pointer; transition:all 0.3s ease; }
-        .lc-footer-links button:hover { color:#0eb8d0; transform:translateY(-2px); }
-        .lc-footer-copy { font-size:.75rem; color:rgba(255,255,255,.18); }
+        .lc-footer { 
+          background: rgba(6, 10, 20, 0.95); 
+          backdrop-filter: blur(10px); 
+          border-top: 1px solid rgba(14, 184, 208, 0.2); 
+          padding: 2.5rem 2rem 2rem; 
+          text-align: center; 
+          margin-top: 2rem;
+        }
+
+        .lc-footer-logo { 
+          font-family: 'Sora', sans-serif; 
+          font-size: 1.2rem; 
+          font-weight: 600; 
+          margin-bottom: 0.8rem;
+          background: linear-gradient(135deg, #fff, #0eb8d0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .lc-footer-sub { 
+          font-size: 0.8rem; 
+          color: rgba(255, 255, 255, 0.45); 
+          margin-bottom: 1.5rem;
+          letter-spacing: 0.3px;
+        }
+
+        .lc-footer-links { 
+          display: flex; 
+          gap: 2rem; 
+          justify-content: center; 
+          flex-wrap: wrap; 
+          margin-bottom: 1.5rem; 
+        }
+
+        .lc-footer-links button { 
+          background: none; 
+          border: none; 
+          color: rgba(255, 255, 255, 0.5); 
+          font-size: 0.85rem; 
+          cursor: pointer; 
+          transition: all 0.3s ease; 
+          padding: 0.3rem 0;
+          position: relative;
+        }
+
+        .lc-footer-links button::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          background: #0eb8d0;
+          transition: width 0.3s ease;
+        }
+
+        .lc-footer-links button:hover { 
+          color: #0eb8d0; 
+          transform: translateY(-2px);
+        }
+
+        .lc-footer-links button:hover::after {
+          width: 80%;
+        }
+
+        .lc-footer-copy { 
+          font-size: 0.7rem; 
+          color: rgba(255, 255, 255, 0.2); 
+          letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+          .lc-footer { padding: 2rem 1rem 1.5rem; }
+          .lc-footer-logo { font-size: 1rem; }
+          .lc-footer-sub { font-size: 0.7rem; }
+          .lc-footer-links { gap: 1.2rem; }
+          .lc-footer-links button { font-size: 0.75rem; }
+          .lc-footer-copy { font-size: 0.6rem; }
+        }
 
         #contacto { position:relative; z-index:2; }
 
@@ -610,7 +744,6 @@ export function Home() {
         @keyframes lcFloatIcon { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
 
         @media(max-width:768px) {
-          .lc-nav-links { display:none; }
           .lc-hero h1{font-size:2.2rem;}
           .lc-stats{gap:2.5rem;padding:2rem 1.5rem;}
           .lc-section{padding:4rem 1.25rem;}
@@ -623,29 +756,6 @@ export function Home() {
       `}</style>
 
       <div className="lc-root">
-        <nav
-          className="lc-nav"
-          id="lc-navbar"
-          ref={(el) => {
-            if (!el) return
-            const onScroll = () => el.classList.toggle('scrolled', window.scrollY > 50)
-            window.addEventListener('scroll', onScroll)
-          }}
-        >
-          <div className="lc-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="lc-dot" />
-            Autolavado Camaro Fraterno
-          </div>
-          <ul className="lc-nav-links">
-            <li><a href="#servicios" onClick={(e) => { e.preventDefault(); document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' }) }}>Servicios</a></li>
-            <li><a href="#opiniones" onClick={(e) => { e.preventDefault(); document.getElementById('opiniones')?.scrollIntoView({ behavior: 'smooth' }) }}>Opiniones</a></li>
-            <li><a href="#contacto" onClick={(e) => { e.preventDefault(); document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }) }}>Contacto</a></li>
-          </ul>
-          <button className="lc-nav-cta" onClick={() => navigate('/agendar')}>
-            ☰
-          </button>
-        </nav>
-
         <section className="lc-hero" id="hero-section">
           <div className="parallax-bg" id="hero-parallax-bg"></div>
           <div className="hero-overlay"></div>
@@ -653,9 +763,8 @@ export function Home() {
           <span className="lc-car-bg"></span>
 
           <div className="lc-hero-content" style={{ paddingBottom: '3rem' }}>
-            <div className="lc-badge">Bagaces, Guanacaste — Costa Rica</div>
-           <h1>Autolavado y Servicios<br /><span>Camaro Fraterno</span></h1>
-            <p>Lavado profesional, encerado y limpieza de tapizado.<br />Agendá tu cita en segundos.</p>
+            <h1>Autolavado y Servicios<br /><span>Camaro Fraterno</span></h1>
+            <p>Lavado profesional, encerado y limpieza de tapizado.</p>
             
             <div className="lc-hours-card" style={{ marginBottom: '2rem' }}>
               <div className="lc-hours-item">
@@ -686,10 +795,6 @@ export function Home() {
             <div className="lc-stat-label">CLIENTES FELICES</div>
           </div>
           <div className="lc-stat">
-            <div className="lc-stat-num" id="counter-servicios">0</div>
-            <div className="lc-stat-label">SERVICIOS DISPONIBLES</div>
-          </div>
-          <div className="lc-stat">
             <div className="lc-stat-num" id="counter-anos">0</div>
             <div className="lc-stat-label">AÑOS DE EXPERIENCIA</div>
           </div>
@@ -699,7 +804,6 @@ export function Home() {
           </div>
         </div>
 
-        {/* SECCIÓN DE SERVICIOS CON SLIDESHOW DE FONDO */}
         <section id="servicios" className="services-section">
           <div className="services-bg-slideshow">
             {bgImages.map((img, index) => (
@@ -736,7 +840,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* SECCIÓN DE OPINIONES REDISEÑADA */}
         <section id="opiniones" className="opiniones-section">
           <div className="opiniones-bg"></div>
           <div className="opiniones-overlay"></div>
@@ -780,181 +883,171 @@ export function Home() {
           </div>
         </section>
 
-        {/* SECCIÓN DE CONTACTO SIMPLIFICADA CON LIQUID GLASS */}
-          <section id="contacto" style={{ 
-            padding: '4rem 1.5rem', 
-            backgroundImage: 'url("/fondo-contacto.jpg")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'scroll',  /* ← CAMBIADO */
-            position: 'relative',
-            borderTop: '1px solid rgba(255,255,255,.06)'
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.6)',
-              zIndex: 0
-            }}></div>
+        <section id="contacto" style={{ 
+          padding: '4rem 1.5rem', 
+          backgroundImage: 'url("/fondo-contacto.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'scroll',
+          position: 'relative',
+          borderTop: '1px solid rgba(255,255,255,.06)'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 0
+          }}></div>
+          
+          <div style={{ maxWidth: 290, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+            <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <span className="lc-tag">CONTACTO</span>
+              <h2 className="lc-section-title" style={{ fontSize: '1.6rem' }}>Hablemos</h2>
+              <p className="lc-section-sub" style={{ margin: '0 auto', color: 'rgba(255,255,255,0.9)' }}>Estamos aquí para ayudarte</p>
+            </div>
             
-            <div style={{ maxWidth: 290, margin: '0 auto', position: 'relative', zIndex: 2 }}>
-              <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <span className="lc-tag">CONTACTO</span>
-                <h2 className="lc-section-title" style={{ fontSize: '1.6rem' }}>Hablemos</h2>
-                <p className="lc-section-sub" style={{ margin: '0 auto', color: 'rgba(255,255,255,0.9)' }}>Estamos aquí para ayudarte</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '380px', margin: '0 auto' }}>
+              <div style={{ 
+                background: 'rgba(17, 24, 39, 0)', 
+                backdropFilter: 'blur(12px)', 
+                border: '1px solid rgba(255, 255, 255, 0.12)', 
+                borderRadius: '20px', 
+                overflow: 'hidden',
+                transition: 'transform 0.3s ease'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.3)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}>
+                
+                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <p style={{ fontSize: '0.7rem', color: '#0ea6d0', letterSpacing: '0.06em', fontWeight: 500 }}>INFORMACIÓN DE CONTACTO</p>
+                </div>
+                
+                <div style={{ padding: '1rem' }}>
+                  <div 
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1rem' }}>📍</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>DIRECCIÓN</div>
+                      <div style={{ fontSize: '0.8rem', color: '#fff' }}>Bagaces, Guanacaste, Costa Rica</div>
+                    </div>
+                  </div>
+                  
+                  <a 
+                    href="https://wa.me/50683606680"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1rem' }}>📱</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
+                      <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8360-6680</div>
+                    </div>
+                  </a>
+
+                  <a 
+                    href="https://wa.me/50689594947"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1rem' }}>📱</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
+                      <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8959-4947</div>
+                    </div>
+                  </a>
+                  
+                  <a 
+                    href="mailto:lavacar@gmail.com"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1rem' }}>✉️</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>CORREO</div>
+                      <div style={{ fontSize: '0.8rem', color: '#0eb8d0' }}>lavacar@gmail.com</div>
+                    </div>
+                  </a>
+                  
+                  <div 
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.4rem', borderRadius: '12px', transition: 'all 0.3s ease', background: 'transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '1rem' }}>⏰</span>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>HORARIO</div>
+                      <div style={{ fontSize: '0.8rem', color: '#fff' }}>Lunes a Sábado: 8am - 6pm</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '380px', margin: '0 auto' }}>
-                {/* TARJETA DE INFORMACIÓN */}
-                <div style={{ 
-                  background: 'rgba(17, 24, 39, 0)', 
+
+              <div 
+                style={{ 
+                  background: 'rgba(17, 24, 39, 0.25)', 
                   backdropFilter: 'blur(12px)', 
                   border: '1px solid rgba(255, 255, 255, 0.12)', 
                   borderRadius: '20px', 
-                  overflow: 'hidden',
-                  
-                  transition: 'transform 0.3s ease'
+                  overflow: 'hidden', 
+                  transition: 'all 0.3s ease', 
+                  cursor: 'pointer' 
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.3)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}>
-                  
-                  <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                    <p style={{ fontSize: '0.7rem', color: '#0ea6d0', letterSpacing: '0.06em', fontWeight: 500 }}>INFORMACIÓN DE CONTACTO</p>
-                  </div>
-                  
-                  <div style={{ padding: '1rem' }}>
-                    {/* DIRECCIÓN */}
-                    <div 
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                      onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
-                    >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1rem' }}>📍</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>DIRECCIÓN</div>
-                        <div style={{ fontSize: '0.8rem', color: '#fff' }}>Bagaces, Guanacaste, Costa Rica</div>
-                      </div>
-                    </div>
-                    
-                    {/* WHATSAPP 1 */}
-                    <a 
-                      href="https://wa.me/50683606680"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                    >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1rem' }}>📱</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
-                        <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8360-6680</div>
-                      </div>
-                    </a>
-
-                    {/* WHATSAPP 2 */}
-                    <a 
-                      href="https://wa.me/50689594947"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                    >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1rem' }}>📱</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
-                        <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8959-4947</div>
-                      </div>
-                    </a>
-                    
-                    {/* CORREO */}
-                    <a 
-                      href="mailto:lavacar@gmail.com"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                    >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1rem' }}>✉️</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>CORREO</div>
-                        <div style={{ fontSize: '0.8rem', color: '#0eb8d0' }}>lavacar@gmail.com</div>
-                      </div>
-                    </a>
-                    
-                    {/* HORARIO */}
-                    <div 
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.4rem', borderRadius: '12px', transition: 'all 0.3s ease', background: 'transparent' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                    >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '1rem' }}>⏰</span>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>HORARIO</div>
-                        <div style={{ fontSize: '0.8rem', color: '#fff' }}>Lunes a Sábado: 8am - 6pm</div>
-                      </div>
-                    </div>
-                  </div>
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
+              >
+                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <p style={{ fontSize: '0.7rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>UBICACIÓN</p>
                 </div>
-
-                {/* GOOGLE MAPS */}
-                <div 
-                  style={{ 
-                    background: 'rgba(17, 24, 39, 0.25)', 
-                    backdropFilter: 'blur(12px)', 
-                    border: '1px solid rgba(255, 255, 255, 0.12)', 
-                    borderRadius: '20px', 
-                    overflow: 'hidden', 
-                    transition: 'all 0.3s ease', 
-                    cursor: 'pointer' 
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.3)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
-                >
-                  <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                    <p style={{ fontSize: '0.7rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>UBICACIÓN</p>
-                  </div>
-                  <div style={{ padding: '0.8rem' }}>
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15716.123456789!2d-85.2548091!3d10.5218901!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDMxJzE4LjgiTiA4NcKwMTUnMTcuMyJX!5e0!3m2!1ses!2scr!4v1234567890"
-                      width="100%"
-                      height="180"
-                      style={{ border: 0, borderRadius: '12px' }}
-                      allowFullScreen
-                      loading="lazy"
-                      title="Google Maps"
-                    />
-                    <button
-                      onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
-                      style={{ width: '90%', margin: '0 auto', display: 'block', marginTop: '0.8rem', background: 'rgba(14,184,208,0.2)', color: '#0eb8d0', border: '1px solid rgba(14,184,208,0.3)', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 500, fontSize: '0.75rem', transition: 'all .2s' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.3)'; e.currentTarget.style.color = '#fff' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.2)'; e.currentTarget.style.color = '#0eb8d0' }}
-                    >
-                      Abrir en Google Maps
-                    </button>
-                  </div>
+                <div style={{ padding: '0.8rem' }}>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15716.123456789!2d-85.2548091!3d10.5218901!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDMxJzE4LjgiTiA4NcKwMTUnMTcuMyJX!5e0!3m2!1ses!2scr!4v1234567890"
+                    width="100%"
+                    height="180"
+                    style={{ border: 0, borderRadius: '12px' }}
+                    allowFullScreen
+                    loading="lazy"
+                    title="Google Maps"
+                  />
+                  <button
+                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Bagaces+Guanacaste+Costa+Rica', '_blank')}
+                    style={{ width: '90%', margin: '0 auto', display: 'block', marginTop: '0.8rem', background: 'rgba(14,184,208,0.2)', color: '#0eb8d0', border: '1px solid rgba(14,184,208,0.3)', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 500, fontSize: '0.75rem', transition: 'all .2s' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.3)'; e.currentTarget.style.color = '#fff' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.2)'; e.currentTarget.style.color = '#0eb8d0' }}
+                  >
+                    Abrir en Google Maps
+                  </button>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
         
         <footer className="lc-footer">
-          <div className="lc-footer-logo">Autolavado y Servicios Camaro Fraterno</div>
-          <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica | 8360-6680 | 8959-4947</div>
+          <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica</div>
           <div className="lc-footer-links">
             <button onClick={() => navigate('/agendar')}>Agendar</button>
             <button onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}>Servicios</button>
