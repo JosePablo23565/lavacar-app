@@ -508,12 +508,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
           
-          <footer className="text-center py-6 text-gray-400 text-sm border-t border-gray-800 mt-auto">
-            <div className="max-w-6xl mx-auto px-4">
-              <p>© {new Date().getFullYear()} Autolavado Camaro Fraterno · Todos los derechos reservados</p>
-              <p className="text-xs text-gray-500 mt-1">Bagaces, Guanacaste, Costa Rica</p>
-            </div>
-          </footer>
+         
         </div>
       </AuthProvider>
     </BrowserRouter>

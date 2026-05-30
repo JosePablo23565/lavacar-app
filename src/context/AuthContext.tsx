@@ -7,7 +7,7 @@ type Perfil = {
   telefono: string
   email?: string
   created_at: string
-  is_admin?: boolean  // ← Agregar esta línea
+  is_admin?: boolean
 }
 
 type AuthContextType = {
@@ -15,7 +15,7 @@ type AuthContextType = {
   perfil: Perfil | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: any }>
-  signUp: (email: string, password: string, nombre: string, telefono: string) => Promise<{ error: any, data: any }>
+  signUp: (email: string, password: string, nombre: string, telefono: string) => Promise<{ error: any; data: any }>
   signOut: () => Promise<void>
 }
 
@@ -25,6 +25,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null)
   const [perfil, setPerfil] = useState<Perfil | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // DEFINIR LA FUNCIÓN ANTES DE USARLA
+  const fetchPerfil = async (userId: string) => {
+    const { data } = await supabase
+      .from('perfiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle()
+    
+    setPerfil(data as Perfil | null)
+  }
 
   useEffect(() => {
     // Obtener sesión inicial
@@ -49,17 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => subscription.unsubscribe()
   }, [])
-
-  const fetchPerfil = async (userId: string) => {
-    // Usar maybeSingle para evitar error 406 si no existe el perfil
-    const { data } = await supabase
-      .from('perfiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
-    
-    setPerfil(data)
-  }
 
   const signUp = async (email: string, password: string, nombre: string, telefono: string) => {
     const { data, error } = await supabase.auth.signUp({
