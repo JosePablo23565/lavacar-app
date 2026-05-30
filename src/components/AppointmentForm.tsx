@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import logo from '../assets/logo.png'  // ← IMPORTACIÓN DEL LOGO
 
 type Appointment = {
   id: number
@@ -358,8 +359,6 @@ export function AppointmentForm() {
     }
   }
 
-
-
   const handleDateChange = (date: Date) => {
     setSelectedDate(date)
     setFormData({ ...formData, appointment_date: date.toISOString().split('T')[0], appointment_time: '' })
@@ -481,6 +480,17 @@ export function AppointmentForm() {
           padding: 1.75rem 2rem;
           text-align: center;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .logo-header {
+          width: 80px;
+          height: auto;
+          margin-bottom: 1rem;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          border-radius: 50%;
+          box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3);
         }
 
         .af-card-header h2 {
@@ -898,6 +908,7 @@ export function AppointmentForm() {
             {step === 'form' && (
               <div className="af-card">
                 <div className="af-card-header">
+                  <img src={logo} alt="Lavacar" className="logo-header" />
                   <h2>Agendar Cita</h2>
                   <p>Complete los datos para reservar su espacio</p>
                 </div>
@@ -1009,6 +1020,7 @@ export function AppointmentForm() {
             {step === 'history' && (
               <div className="af-card">
                 <div className="af-card-header">
+                  <img src={logo} alt="Lavacar" className="logo-header" />
                   <h2>Mis Citas</h2>
                   <p>Consulte sus citas agendadas</p>
                 </div>
