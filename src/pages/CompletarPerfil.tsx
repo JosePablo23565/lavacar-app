@@ -9,7 +9,6 @@ export function CompletarPerfil() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userEmail, setUserEmail] = useState('')
-z
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
