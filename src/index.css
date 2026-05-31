@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== ESTILOS GLOBALES ===== */
 
 * {
   -webkit-tap-highlight-color: transparent;
@@ -39,7 +38,6 @@ body {
   padding: 0;
 }
 
-/* ===== BOTÓN HAMBURGUESA - SIN NINGÚN CUADRO ===== */
 .menu-btn {
   width: 48px;
   height: 48px;
@@ -71,7 +69,7 @@ body {
   outline: none !important;
 }
 
-/* ===== ICONO DEL MENÚ (3 RAYITAS) ===== */
+
 .menu-icon {
   position: relative;
   width: 24px;
@@ -111,4 +109,38 @@ body {
 .menu-icon.open span:nth-child(3) {
   transform: rotate(-45deg);
   top: 14px;
+}
+
+
+.swal-glass-popup {
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(14, 184, 208, 0.3);
+  border-radius: 24px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.swal-confirm-btn {
+  background: linear-gradient(135deg, #1a6fd4, #0eb8d0) !important;
+  border-radius: 40px !important;
+  padding: 0.5rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(14, 184, 208, 0.35);
+}
+
+.swal-cancel-btn {
+  background: #7f1d1d !important;
+  border-radius: 40px !important;
+  padding: 0.5rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal-cancel-btn:hover {
+  background: #991b1b !important;
+  transform: translateY(-2px);
 }

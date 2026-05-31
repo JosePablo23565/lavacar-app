@@ -1,3 +1,5 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 export function Contact() {
   return (
     <>
@@ -98,7 +100,6 @@ export function Contact() {
           gap: 1.5rem;
         }
 
-        /* LIQUID GLASS CARDS */
         .ct-card {
           background: rgba(15, 20, 35, 0.35);
           backdrop-filter: blur(20px);
@@ -134,7 +135,6 @@ export function Contact() {
           padding: 1.5rem;
         }
 
-        /* ITEMS CON EFECTO BURBUJA */
         .ct-item {
           display: flex;
           align-items: center;
@@ -168,6 +168,7 @@ export function Contact() {
           justify-content: center;
           flex-shrink: 0;
           transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          font-size: 24px;
         }
 
         .ct-item:hover .ct-item-icon {
@@ -218,7 +219,6 @@ export function Contact() {
           font-weight: 500;
         }
 
-        /* MAP SECTION */
         .ct-iframe {
           border-radius: 18px;
           overflow: hidden;
@@ -269,7 +269,6 @@ export function Contact() {
           transform: scale(0.97);
         }
 
-        /* LINKS */
         a {
           text-decoration: none;
         }
@@ -312,6 +311,7 @@ export function Contact() {
           .ct-item-icon {
             width: 40px;
             height: 40px;
+            font-size: 20px;
           }
         }
       `}</style>
@@ -329,19 +329,15 @@ export function Contact() {
           </div>
 
           <div className="ct-grid">
-            {/* Columna izquierda - Información de contacto */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>INFORMACIÓN DE CONTACTO</p>
               </div>
               <div className="ct-items">
-                {/* Dirección con coordenadas exactas */}
+                {/* Dirección */}
                 <div className="ct-item" onClick={() => window.open('https://www.google.com/maps?q=10.5218292,-85.2548688', '_blank')}>
                   <div className="ct-item-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0eb8d0" strokeWidth="1.5">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
+                    <i className="fas fa-map-marker-alt" style={{ color: '#0eb8d0', fontSize: '24px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">DIRECCIÓN</div>
@@ -349,13 +345,10 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* WhatsApp - Número 1 con logo */}
+                {/* WHATSAPP 1 - ICONO REAL */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#25d366" strokeWidth="1.5">
-                      <path d="M21.5 12C21.5 17.5 17 22 11.5 22C9.5 22 7.5 21.5 6 20.5L2 22L3.5 18C2.5 16.5 2 14.5 2 12.5C2 7 6.5 2.5 12 2.5C17.5 2.5 21.5 6.5 21.5 12Z" />
-                      <path d="M8 8.5C8.5 10 9.5 11.5 11 12.5L12.5 11.5C13 11 13.5 11 14 11.5L15.5 13.5C16 14 15.5 14.5 15 15C14 16 12 16.5 10.5 15.5C9 14.5 7.5 12.5 8 8.5Z" />
-                    </svg>
+                    <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">WHATSAPP 1</div>
@@ -368,13 +361,10 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* WhatsApp - Número 2 con logo */}
+                {/* WHATSAPP 2 - ICONO REAL */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#25d366" strokeWidth="1.5">
-                      <path d="M21.5 12C21.5 17.5 17 22 11.5 22C9.5 22 7.5 21.5 6 20.5L2 22L3.5 18C2.5 16.5 2 14.5 2 12.5C2 7 6.5 2.5 12 2.5C17.5 2.5 21.5 6.5 21.5 12Z" />
-                      <path d="M8 8.5C8.5 10 9.5 11.5 11 12.5L12.5 11.5C13 11 13.5 11 14 11.5L15.5 13.5C16 14 15.5 14.5 15 15C14 16 12 16.5 10.5 15.5C9 14.5 7.5 12.5 8 8.5Z" />
-                    </svg>
+                    <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">WHATSAPP 2</div>
@@ -387,13 +377,10 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* Correo con logo */}
+                {/* CORREO - ICONO REAL GMAIL */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0eb8d0" strokeWidth="1.5">
-                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" />
-                      <path d="M22 6L12 13L2 6" />
-                    </svg>
+                    <i className="fas fa-envelope" style={{ color: '#EA4335', fontSize: '24px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">CORREO</div>
@@ -408,10 +395,7 @@ export function Contact() {
                 {/* Horario */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0eb8d0" strokeWidth="1.5">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
+                    <i className="far fa-clock" style={{ color: '#0eb8d0', fontSize: '24px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">HORARIO</div>
@@ -421,7 +405,7 @@ export function Contact() {
               </div>
             </div>
 
-            {/* Columna derecha - Mapa y ubicación con coordenadas exactas */}
+            {/* Mapa */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>UBICACIÓN</p>
@@ -442,6 +426,7 @@ export function Contact() {
                   className="ct-maps-btn"
                   onClick={() => window.open('https://www.google.com/maps?q=10.5218292,-85.2548688', '_blank')}
                 >
+                  <i className="fas fa-map-marked-alt"></i>
                   Abrir en Google Maps
                 </button>
               </div>

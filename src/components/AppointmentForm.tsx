@@ -322,9 +322,42 @@ export function AppointmentForm() {
 
   const fetchAvailableTimes = async () => {
     const dateStr = selectedDate.toISOString().split('T')[0]
-    const { data } = await supabase.from('appointments').select('appointment_time').eq('appointment_date', dateStr)
-    const bookedTimes12h = (data?.map((a) => a.appointment_time) || []).map((t) => convertTo12Hour(t))
-    setAvailableTimes(allTimes.filter((time) => !bookedTimes12h.includes(time)))
+    const hoy = new Date().toISOString().split('T')[0]
+    const ahora = new Date()
+    const horaActual = ahora.getHours()
+    const minutosActual = ahora.getMinutes()
+    
+    // Obtener horas ocupadas de la BD
+    const { data } = await supabase
+      .from('appointments')
+      .select('appointment_time')
+      .eq('appointment_date', dateStr)
+
+    const bookedTimes24h = data?.map(a => a.appointment_time) || []
+    const bookedTimes12h = bookedTimes24h.map(t => convertTo12Hour(t))
+    
+    // Filtrar horas ocupadas
+    let available = allTimes.filter(time => !bookedTimes12h.includes(time))
+    
+    // Si la fecha es hoy, filtrar horas pasadas
+    if (dateStr === hoy) {
+      available = available.filter(time => {
+        // Convertir hora 12h a 24h para comparar
+        const [horaStr, modifier] = time.split(' ')
+        let [hora, minuto] = horaStr.split(':')
+        let hora24 = parseInt(hora)
+        
+        if (modifier === 'PM' && hora24 !== 12) hora24 += 12
+        if (modifier === 'AM' && hora24 === 12) hora24 = 0
+        
+        // Comparar con hora actual
+        if (hora24 < horaActual) return false
+        if (hora24 === horaActual && parseInt(minuto) <= minutosActual) return false
+        return true
+      })
+    }
+    
+    setAvailableTimes(available)
   }
 
   const fetchCustomerHistory = async (phone: string) => {
@@ -357,8 +390,6 @@ export function AppointmentForm() {
       setFormData({ ...formData, vehicle_model: value })
     }
   }
-
-
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date)

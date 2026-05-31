@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
+import { swalConfirm, swalSuccess, swalError } from '../utils/swalConfig'
+
 
 type Appointment = {
   id: number
@@ -96,9 +98,17 @@ export function AdminDashboard() {
   }
 
   const deleteAppointment = async (id: number) => {
-    if (confirm('¿Eliminar esta cita?')) {
-      await supabase.from('appointments').delete().eq('id', id)
-      fetchAppointments()
+    const result = await swalConfirm('¿Eliminar esta cita?', 'Esta acción no se puede deshacer.')
+
+    if (result.isConfirmed) {
+      const { error } = await supabase.from('appointments').delete().eq('id', id)
+      
+      if (error) {
+        swalError('Error', 'No se pudo eliminar la cita')
+      } else {
+        swalSuccess('Eliminada', 'La cita se ha eliminado correctamente')
+        fetchAppointments()
+      }
     }
   }
 
@@ -112,16 +122,19 @@ export function AdminDashboard() {
   }
 
   const deleteTestimonial = async (id: number) => {
-    if (confirm('¿Eliminar esta opinión?')) {
+    const result = await swalConfirm('¿Eliminar esta opinión?', 'Esta acción no se puede deshacer.')
+
+    if (result.isConfirmed) {
       const { error } = await supabase
         .from('testimonials')
         .delete()
         .eq('id', id)
       
       if (error) {
-        alert('Error al eliminar: ' + error.message)
+        swalError('Error', 'No se pudo eliminar la opinión')
       } else {
-        await fetchTestimonials()
+        swalSuccess('Eliminada', 'La opinión se ha eliminado correctamente')
+        fetchTestimonials()
         window.dispatchEvent(new Event('opiniones-actualizadas'))
       }
     }
@@ -209,7 +222,7 @@ export function AdminDashboard() {
           font-family: 'DM Sans', sans-serif;
           background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 60%, #0a0e1a 100%);
           min-height: 100vh;
-          padding: 1.5rem;
+          padding: 2rem;
         }
         
         .admin-card {
@@ -230,7 +243,7 @@ export function AdminDashboard() {
         
         .admin-table th {
           text-align: left;
-          padding: 1rem;
+          padding: 1.1rem 1.25rem;
           background: linear-gradient(135deg, #0f1e3a, #0a0e1a);
           color: rgba(255, 255, 255, 0.9);
           font-weight: 600;
@@ -240,7 +253,7 @@ export function AdminDashboard() {
         }
         
         .admin-table td {
-          padding: 1rem;
+          padding: 1.1rem 1.25rem;
           color: rgba(255, 255, 255, 0.8);
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -317,7 +330,7 @@ export function AdminDashboard() {
         
         .search-input {
           width: 100%;
-          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          padding: 1rem 1rem 1rem 2.5rem;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 12px;
@@ -339,73 +352,163 @@ export function AdminDashboard() {
           background: #111827;
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 20px;
-          padding: 1.25rem;
+          padding: 1.5rem;
           text-align: center;
-          transition: all 0.3s;
+          transition: all 0.2s;
         }
         
         .stat-card:hover {
-          border-color: rgba(14, 184, 208, 0.4);
-          transform: translateY(-3px);
+          border-color: rgba(14, 184, 208, 0.3);
+          transform: translateY(-2px);
         }
         
-        .tab-active {
-          background: linear-gradient(135deg, #1a6fd4, #0eb8d0);
-          color: white;
-          box-shadow: 0 4px 12px rgba(14, 184, 208, 0.3);
+        .stat-number {
+          font-size: 2rem;
+          font-weight: bold;
+          color: #0eb8d0;
+          margin: 0;
         }
         
-        .tab-inactive {
-          background: rgba(255, 255, 255, 0.05);
+        .stat-label {
+          font-size: 0.7rem;
+          color: #94a3b8;
+          margin: 0.35rem 0 0 0;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        
+        /* TABS MODERNOS - MISMO ESTILO QUE AppointmentForm */
+        .af-tabs {
+          display: flex;
+          gap: 0.75rem;
+          margin-bottom: 2rem;
+          background: rgba(10, 14, 26, 0.3);
+          backdrop-filter: blur(16px);
+          border-radius: 20px;
+          padding: 0.5rem;
+          border: 1px solid rgba(14, 184, 208, 0.2);
+        }
+        
+        .af-tab {
+          flex: 1;
+          padding: 0.75rem;
+          border-radius: 14px;
+          font-weight: 500;
+          font-size: 0.9rem;
+          cursor: pointer;
+          border: none;
+          transition: all 0.3s ease;
+          font-family: 'Inter', sans-serif;
+          background: transparent;
           color: rgba(255, 255, 255, 0.6);
+          text-align: center;
         }
         
-        .tab-inactive:hover {
-          background: rgba(255, 255, 255, 0.1);
+        .af-tab.active {
+          background: linear-gradient(135deg, rgba(14, 184, 208, 0.2), rgba(14, 184, 208, 0.1));
+          color: #0eb8d0;
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          transform: translateY(-2px);
+        }
+        
+        .af-tab:not(.active):hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stats-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-bottom: 1.5rem;
+        }
+
+        .stat-pill {
+          background: #111827;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 14px;
+          padding: 1.1rem 0.75rem;
+          text-align: center;
+        }
+
+        .stat-pill-num {
+          font-size: 1.8rem;
+          font-weight: 700;
+          line-height: 1;
+          margin-bottom: 6px;
+        }
+
+        .stat-pill-label {
+          font-size: 0.68rem;
+          color: rgba(255,255,255,0.4);
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+        }
+
+        .search-bare {
+          position: relative;
+          margin-bottom: 1.5rem;
+        }
+
+        .search-bare-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: rgba(255,255,255,0.3);
+          font-size: 15px;
+          pointer-events: none;
+        }
+
+        .search-bare input {
+          width: 100%;
+          background: #111827;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
           color: white;
+          font-size: 0.875rem;
+          padding: 0.75rem 1rem 0.75rem 2.6rem;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        .search-bare input:focus {
+          border-color: rgba(14,184,208,0.5);
+        }
+
+        .search-bare input::placeholder {
+          color: rgba(255,255,255,0.25);
         }
         
         .cita-card {
           background: #111827;
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 16px;
-          padding: 1rem;
+          padding: 1.25rem;
           transition: all 0.2s;
         }
         
         .cita-card:hover {
           border-color: rgba(14, 184, 208, 0.3);
         }
+
+
       `}</style>
 
       <div className="admin-root">
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          {/* CABECERA */}
-          <div className="admin-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', background: 'linear-gradient(135deg, #fff, #0eb8d0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Panel de Administración
-              </h1>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <a href="/" className="btn-primary" style={{ textDecoration: 'none' }}>← Volver al inicio</a>
-                <button onClick={handleLogout} className="btn-danger">🚪 Cerrar Sesión</button>
-              </div>
-            </div>
-          </div>
 
-          {/* TABS */}
-          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          {/* TABS MODERNOS */}
+          <div className="af-tabs">
             <button
               onClick={() => setActiveTab('citas')}
-              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', fontWeight: '600', transition: 'all 0.2s', cursor: 'pointer', border: 'none' }}
-              className={activeTab === 'citas' ? 'tab-active' : 'tab-inactive'}
+              className={`af-tab ${activeTab === 'citas' ? 'active' : ''}`}
             >
               Citas ({appointments.length})
             </button>
             <button
               onClick={() => setActiveTab('testimonios')}
-              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', fontWeight: '600', transition: 'all 0.2s', cursor: 'pointer', border: 'none' }}
-              className={activeTab === 'testimonios' ? 'tab-active' : 'tab-inactive'}
+              className={`af-tab ${activeTab === 'testimonios' ? 'active' : ''}`}
             >
               Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
             </button>
@@ -415,46 +518,43 @@ export function AdminDashboard() {
           {activeTab === 'citas' && (
             <>
               {/* ESTADÍSTICAS */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-                <div className="stat-card">
-                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#0eb8d0' }}>{stats.total}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Total Citas</p>
+              <div className="stats-row">
+                <div className="stat-pill">
+                  <p className="stat-pill-num" style={{ color: '#0eb8d0' }}>{stats.total}</p>
+                  <p className="stat-pill-label">Total</p>
                 </div>
-                <div className="stat-card">
-                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#34d399' }}>{stats.hoy}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Citas Hoy</p>
+                <div className="stat-pill">
+                  <p className="stat-pill-num" style={{ color: '#34d399' }}>{stats.hoy}</p>
+                  <p className="stat-pill-label">Hoy</p>
                 </div>
-                <div className="stat-card">
-                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b' }}>{stats.proximas}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Próximas Citas</p>
+                <div className="stat-pill">
+                  <p className="stat-pill-num" style={{ color: '#a78bfa' }}>{stats.proximas}</p>
+                  <p className="stat-pill-label">Próximas</p>
                 </div>
               </div>
 
               {/* BUSCADOR */}
-              <div className="admin-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'rgba(255,255,255,0.4)' }}>🔍</div>
-                  <input
-                    type="text"
-                    placeholder="nombre, teléfono o vehículo..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="search-input"
-                  />
-                </div>
+              <div className="search-bare">
+                <span className="search-bare-icon">🔍</span>
+                <input
+                  type="text"
+                  placeholder="nombre, teléfono o vehículo..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
 
               {/* VISTA EN TARJETAS (MÓVIL) */}
-              <div className="block md:hidden space-y-3">
+              <div className="block md:hidden space-y-4">
                 {filteredAppointments.length === 0 ? (
                   <div className="admin-card p-8 text-center text-white/40">No hay citas registradas</div>
                 ) : (
                   filteredAppointments.map((apt) => (
                     <div key={apt.id} className="cita-card">
-                      <div className="flex justify-between items-start mb-3 pb-2 border-b border-white/10">
+                      <div className="flex justify-between items-start mb-3 pb-3 border-b border-white/10">
                         <div>
                           <p className="font-semibold text-white text-base">{apt.customer_name}</p>
-                          <p className="text-sm text-white/50">{apt.customer_phone}</p>
+                          <p className="text-sm text-white/50 mt-0.5">{apt.customer_phone}</p>
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 text-lg px-2 py-1 transition">🗑️</button>
@@ -467,7 +567,7 @@ export function AdminDashboard() {
                           </a>
                         </div>
                       </div>
-                      <div className="space-y-2 text-sm">
+                      <div className="space-y-2.5 text-sm">
                         <div className="flex">
                           <span className="text-white/40 w-24">Vehículo:</span>
                           <span className="text-white/80">{getVehicleLabel(apt.vehicle_type)}</span>
@@ -509,7 +609,7 @@ export function AdminDashboard() {
                     <tbody>
                       {filteredAppointments.length === 0 ? (
                         <tr>
-                          <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
+                          <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
                         </tr>
                       ) : (
                         filteredAppointments.map((apt) => (
@@ -524,17 +624,10 @@ export function AdminDashboard() {
                             <td style={{ textAlign: 'center' }}>
                               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                 <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️</button>
-                                <a
-                                  href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`}
-                                  target="_blank"
-                                  className="btn-success"
-                                  style={{ textDecoration: 'none' }}
-                                >
-                                  💬
-                                </a>
+                                <a href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} target="_blank" className="btn-success">💬</a>
                               </div>
                             </td>
-                          </tr>
+                           </tr>
                         ))
                       )}
                     </tbody>
@@ -547,25 +640,21 @@ export function AdminDashboard() {
           {/* CONTENIDO DE TESTIMONIOS */}
           {activeTab === 'testimonios' && (
             <div className="space-y-6">
-              <div className="admin-card" style={{ padding: '1.5rem' }}>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#94a3b8', letterSpacing: '0.05em' }}>
-                  Opiniones Pendientes ({pendingTestimonials.length})
-                </h2>
+              <div className="admin-card" style={{ padding: '1.75rem' }}>
+                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.25rem', color: '#94a3b8', letterSpacing: '0.05em' }}>Opiniones Pendientes ({pendingTestimonials.length})</h2>
                 {pendingTestimonials.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>No hay opiniones pendientes de aprobación</p>
+                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2.5rem' }}>No hay opiniones pendientes de aprobación</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {pendingTestimonials.map((t) => (
-                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-4">
+                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-5">
                         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
                           <div className="flex-1">
                             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                               <p className="font-semibold text-white">{t.customer_name}</p>
-                              <div className="flex text-yellow-500 text-sm">
-                                {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
-                              </div>
+                              <div className="flex text-yellow-500 text-sm">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
                             </div>
-                            <p className="text-gray-300 text-sm italic mb-2">"{t.comment}"</p>
+                            <p className="text-gray-300 text-sm italic mb-3">"{t.comment}"</p>
                             <p className="text-gray-500 text-xs">{formatDateLong(t.created_at)}</p>
                           </div>
                           <div className="flex gap-2">
@@ -579,25 +668,21 @@ export function AdminDashboard() {
                 )}
               </div>
 
-              <div className="admin-card" style={{ padding: '1.5rem' }}>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', color: '#94a3b8', letterSpacing: '0.05em' }}>
-                  Opiniones Aprobadas ({approvedTestimonials.length})
-                </h2>
+              <div className="admin-card" style={{ padding: '1.75rem' }}>
+                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.25rem', color: '#94a3b8', letterSpacing: '0.05em' }}>Opiniones Aprobadas ({approvedTestimonials.length})</h2>
                 {approvedTestimonials.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>No hay opiniones aprobadas aún</p>
+                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2.5rem' }}>No hay opiniones aprobadas aún</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {approvedTestimonials.map((t) => (
-                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-4">
+                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-5">
                         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
                           <div className="flex-1">
                             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                               <p className="font-semibold text-white">{t.customer_name}</p>
-                              <div className="flex text-yellow-500 text-sm">
-                                {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
-                              </div>
+                              <div className="flex text-yellow-500 text-sm">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
                             </div>
-                            <p className="text-gray-300 text-sm italic mb-2">"{t.comment}"</p>
+                            <p className="text-gray-300 text-sm italic mb-3">"{t.comment}"</p>
                             <p className="text-gray-500 text-xs">{formatDateLong(t.created_at)}</p>
                           </div>
                           <button onClick={() => deleteTestimonial(t.id)} className="bg-red-900 hover:bg-red-800 text-red-300 text-xs px-3 py-1.5 rounded transition">Eliminar</button>

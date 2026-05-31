@@ -442,7 +442,11 @@ function NavBar() {
           ))}
 
           {isAdmin && (
-            <Link to="/admin" className="nav-link" onClick={cerrarMenu}>
+            <Link 
+              to="/admin" 
+              className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+              onClick={cerrarMenu}
+            >
               <span>Admin</span>
             </Link>
           )}
@@ -465,55 +469,71 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen">
           <Routes>
-            <Route path="/" element={
-              <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Home />
-                </>
-              </RutaProtegida>
-            } />
-            
-            <Route path="/agendar" element={
-              <RutaProtegida>
-                <>
-                  <NavBar />
-                  <AppointmentForm />
-                </>
-              </RutaProtegida>
-            } />
-            
-            <Route path="/contacto" element={
-              <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Contact />
-                </>
-              </RutaProtegida>
-            } />
-            
-            <Route path="/opiniones" element={
-              <RutaProtegida>
-                <>
-                  <NavBar />
-                  <Opiniones />
-                </>
-              </RutaProtegida>
-            } />
-            
+            <Route
+              path="/"
+              element={
+                <RutaProtegida>
+                  <>
+                    <NavBar />
+                    <Home />
+                  </>
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/agendar"
+              element={
+                <RutaProtegida>
+                  <>
+                    <NavBar />
+                    <AppointmentForm />
+                  </>
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/contacto"
+              element={
+                <RutaProtegida>
+                  <>
+                    <NavBar />
+                    <Contact />
+                  </>
+                </RutaProtegida>
+              }
+            />
+
+            <Route
+              path="/opiniones"
+              element={
+                <RutaProtegida>
+                  <>
+                    <NavBar />
+                    <Opiniones />
+                  </>
+                </RutaProtegida>
+              }
+            />
+
             <Route path="/acceder" element={<ClienteLogin />} />
             <Route path="/registro" element={<ClienteRegistro />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+
+            <Route
+              path="/admin"
+              element={
+                <RutaProtegida>
+                  <>
+                    <NavBar />
+                    <AdminDashboard />
+                  </>
+                </RutaProtegida>
+              }
+            />
           </Routes>
-          
-          <footer className="text-center py-6 text-gray-400 text-sm border-t border-gray-800 mt-auto">
-            <div className="max-w-6xl mx-auto px-4">
-              <p>© {new Date().getFullYear()} Autolavado Camaro Fraterno · Todos los derechos reservados</p>
-              <p className="text-xs text-gray-500 mt-1">Bagaces, Guanacaste, Costa Rica</p>
-            </div>
-          </footer>
         </div>
       </AuthProvider>
     </BrowserRouter>
