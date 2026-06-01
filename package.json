@@ -20,6 +20,7 @@
     "react-hook-form": "^7.76.1",
     "react-phone-number-input": "^3.4.16",
     "react-router-dom": "^7.15.1",
+    "resend": "^6.12.4",
     "sweetalert2": "^11.26.25",
     "zod": "^4.4.3"
   },
