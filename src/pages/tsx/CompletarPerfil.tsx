@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import '../css/CompletarPerfil.css'
 
 export function CompletarPerfil() {
   const navigate = useNavigate()
@@ -16,7 +15,7 @@ export function CompletarPerfil() {
 
   useEffect(() => {
     const getUser = async () => {
-      console.log('🔍 1. Obteniendo usuario de Supabase...')
+      console.log('1. Obteniendo usuario de Supabase...')
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       
       if (userError) {
@@ -34,7 +33,7 @@ export function CompletarPerfil() {
       setUserEmail(user.email || '')
       
       // Cargar datos existentes del perfil
-      console.log('🔍 2. Cargando perfil existente...')
+      console.log('2. Cargando perfil existente...')
       const { data: perfil, error: perfilError } = await supabase
         .from('perfiles')
         .select('nombre, telefono')
@@ -46,13 +45,13 @@ export function CompletarPerfil() {
       }
       
       if (perfil) {
-        console.log('📝 Perfil cargado:', perfil)
+        console.log('Perfil cargado:', perfil)
         setFormData({
           nombre: perfil.nombre || '',
           telefono: perfil.telefono || ''
         })
       } else {
-        console.log('📝 No hay perfil existente, usando valores vacíos')
+        console.log('No hay perfil existente, usando valores vacíos')
       }
     }
     
@@ -63,7 +62,7 @@ export function CompletarPerfil() {
     e.preventDefault()
     setError('')
     
-    console.log('📝 3. Enviando formulario...')
+    console.log('3. Enviando formulario...')
     console.log('   userId:', userId)
     console.log('   userEmail:', userEmail)
     console.log('   nombre:', formData.nombre)
@@ -91,7 +90,7 @@ export function CompletarPerfil() {
     
     setLoading(true)
     
-    console.log('💾 4. Guardando en Supabase...')
+    console.log('4. Guardando en Supabase...')
     const { data, error: dbError } = await supabase
       .from('perfiles')
       .upsert({
@@ -101,7 +100,7 @@ export function CompletarPerfil() {
         email: userEmail
       })
     
-    console.log('📡 Respuesta de Supabase:', { data, error: dbError })
+    console.log('Respuesta de Supabase:', { data, error: dbError })
     
     if (dbError) {
       console.error('❌ Error al guardar:', dbError)
@@ -115,7 +114,7 @@ export function CompletarPerfil() {
         .select('nombre, telefono')
         .eq('id', userId)
         .single()
-      console.log('🔍 Verificación después de guardar:', verify)
+      console.log('Verificación después de guardar:', verify)
       
       navigate('/')
     }
