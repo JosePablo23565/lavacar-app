@@ -1,0 +1,589 @@
+.custom-select-trigger {
+          width: 100%;
+          padding: 0.85rem 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 24px;
+          color: #fff;
+          font-size: 0.9rem;
+          font-family: 'Inter', sans-serif;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          backdrop-filter: blur(10px);
+        }
+
+        .custom-select-trigger:hover {
+          border-color: rgba(14, 184, 208, 0.4);
+          background: rgba(14, 184, 208, 0.08);
+          transform: scale(1.01);
+        }
+
+        .custom-select-trigger:active {
+          transform: scale(0.99);
+        }
+
+        .custom-select-trigger.open {
+          border-radius: 24px;
+          background: rgba(15, 20, 35, 0.95);
+          backdrop-filter: blur(20px);
+          border-color: rgba(14, 184, 208, 0.5);
+          transform: scale(1.02);
+          box-shadow: 0 0 20px rgba(14, 184, 208, 0.2);
+        }
+
+        .custom-select-trigger.closing {
+          transform: scale(1);
+          transition: all 0.2s ease;
+        }
+
+        .custom-select-value {
+          flex: 1;
+        }
+
+        .custom-select-arrow {
+          font-size: 0.7rem;
+          transition: transform 0.3s ease;
+          color: #0eb8d0;
+        }
+
+        .custom-select-trigger.open .custom-select-arrow {
+          transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          right: 0;
+          background: rgba(15, 20, 35, 0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          border-radius: 24px;
+          overflow: hidden;
+          z-index: 100;
+          animation: bubbleExpand 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-select-options.fade-out {
+          animation: bubbleShrink 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes bubbleExpand {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px) scaleY(0.8);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scaleY(1);
+          }
+        }
+
+        @keyframes bubbleShrink {
+          0% {
+            opacity: 1;
+            transform: translateY(0) scaleY(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-10px) scaleY(0.8);
+          }
+        }
+
+        .custom-select-option {
+          padding: 0.85rem 1rem;
+          cursor: pointer;
+          color: rgba(255, 255, 255, 0.8);
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+          margin: 4px 8px;
+          border-radius: 18px;
+        }
+
+        .custom-select-option:hover {
+          background: rgba(14, 184, 208, 0.15);
+          color: #0eb8d0;
+          transform: translateX(5px);
+        }
+
+        .custom-select-option.selected {
+          background: rgba(14, 184, 208, 0.25);
+          color: #0eb8d0;
+        }
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        .af-root {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #0a0e1a 0%, #0a1225 50%, #0a0e1a 100%);
+          padding: 2rem 1rem 4rem;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .af-tabs {
+          display: flex;
+          gap: 0.75rem;
+          margin-bottom: 2rem;
+          background: rgba(10, 14, 26, 0.3);
+          backdrop-filter: blur(16px);
+          border-radius: 20px;
+          padding: 0.5rem;
+          border: 1px solid rgba(14, 184, 208, 0.2);
+          position: sticky;
+          top: 75px;
+          transition: all 0.3s ease;
+          z-index: 30;
+        }
+
+        .af-tabs.menu-abierto {
+          z-index: 1;
+          opacity: 0.3;
+          pointer-events: none;
+        }
+
+        .af-tab {
+          flex: 1;
+          padding: 0.75rem;
+          border-radius: 14px;
+          font-weight: 500;
+          font-size: 0.9rem;
+          cursor: pointer;
+          border: none;
+          transition: all 0.3s ease;
+          font-family: 'Inter', sans-serif;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .af-tab.active {
+          background: linear-gradient(135deg, rgba(14, 184, 208, 0.2), rgba(14, 184, 208, 0.1));
+          color: #0eb8d0;
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          transform: translateY(-2px);
+        }
+
+        .af-tab:not(.active):hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .af-card {
+          background: rgba(15, 20, 35, 0.35);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 32px;
+          overflow: hidden;
+          max-width: 680px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 10;
+          box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        .af-card-header {
+          background: linear-gradient(135deg, rgba(14, 184, 208, 0.15), rgba(14, 184, 208, 0.05));
+          padding: 1.75rem 2rem;
+          text-align: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .af-card-header h2 {
+          font-family: 'Sora', sans-serif;
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #fff;
+          margin-bottom: 0.3rem;
+          letter-spacing: -0.02em;
+        }
+
+        .af-card-header p {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .af-body {
+          padding: 1.75rem 2rem;
+        }
+
+        .af-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.5);
+          margin-bottom: 0.5rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+
+        .af-input {
+          width: 100%;
+          padding: 0.85rem 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 24px;
+          color: #fff;
+          font-size: 0.9rem;
+          font-family: 'Inter', sans-serif;
+          transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          outline: none;
+        }
+
+        .af-input:focus {
+          border-color: rgba(14, 184, 208, 0.5);
+          background: rgba(14, 184, 208, 0.05);
+          box-shadow: 0 0 0 3px rgba(14, 184, 208, 0.1);
+        }
+
+        .af-input:active {
+          transform: scale(1.02);
+          transition: transform 0.1s ease;
+        }
+
+        .af-input:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          background: rgba(255, 255, 255, 0.02);
+        }
+
+        .af-field {
+          margin-bottom: 1.25rem;
+        }
+
+        .af-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .af-hint {
+          font-size: 0.7rem;
+          color: rgba(255, 255, 255, 0.3);
+          margin-top: 0.4rem;
+        }
+
+        .af-section-label {
+          font-family: 'Sora', sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.5);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 1rem;
+          margin-top: 1.5rem;
+          display: block;
+        }
+
+        .af-time-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0.6rem;
+        }
+
+        .af-time-btn {
+          padding: 0.7rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          font-family: 'Inter', sans-serif;
+          background: rgba(255, 255, 255, 0.04);
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .af-time-btn:active {
+          transform: scale(0.98);
+        }
+
+        .af-time-btn.sel {
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          border-color: transparent;
+          color: #fff;
+          transform: scale(1.02);
+          box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3);
+        }
+
+        .af-time-btn:not(.sel):hover {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
+          color: #fff;
+          transform: translateY(-2px);
+        }
+
+        .af-submit {
+          width: 100%;
+          padding: 1rem;
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          color: #fff;
+          border: none;
+          border-radius: 50px;
+          font-size: 1rem;
+          font-weight: 600;
+          font-family: 'Sora', sans-serif;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          margin-top: 1.5rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .af-submit::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .af-submit:hover::before {
+          left: 100%;
+        }
+
+        .af-submit:active {
+          transform: scale(0.98);
+        }
+
+        .af-submit:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(14, 184, 208, 0.4);
+        }
+
+        .af-submit:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .af-buscar-btn {
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0) !important;
+          color: #fff !important;
+          border: none !important;
+          padding: 0.85rem 1.5rem !important;
+          border-radius: 50px !important;
+          cursor: pointer !important;
+          font-weight: 500 !important;
+          font-family: 'Inter', sans-serif !important;
+          white-space: nowrap !important;
+          transition: all 0.25s ease !important;
+        }
+
+        .af-buscar-btn:active {
+          transform: scale(0.97) !important;
+        }
+
+        .af-buscar-btn:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 8px 25px rgba(14, 184, 208, 0.4) !important;
+        }
+
+        .custom-calendar {
+          background: rgba(10, 14, 26, 0.4) !important;
+          backdrop-filter: blur(16px) !important;
+          border: 1px solid rgba(14, 184, 208, 0.2) !important;
+          border-radius: 24px !important;
+          padding: 1rem !important;
+          width: 100% !important;
+          max-width: 380px !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+          font-family: 'Inter', sans-serif !important;
+        }
+
+        .custom-calendar .react-calendar__navigation {
+          margin-bottom: 1.5rem !important;
+        }
+
+        .custom-calendar .react-calendar__navigation button {
+          color: #0eb8d0 !important;
+          font-weight: 600 !important;
+          font-size: 0.9rem !important;
+          background: transparent !important;
+          border-radius: 12px !important;
+          padding: 0.5rem !important;
+          transition: all 0.2s !important;
+        }
+
+        .custom-calendar .react-calendar__navigation button:hover {
+          background: rgba(14, 184, 208, 0.15) !important;
+        }
+
+        .custom-calendar .react-calendar__navigation button:active {
+          transform: scale(0.95);
+        }
+
+        .custom-calendar .react-calendar__month-view__weekdays {
+          color: rgba(255, 255, 255, 0.4) !important;
+          font-weight: 500 !important;
+          font-size: 0.7rem !important;
+          text-transform: uppercase !important;
+          margin-bottom: 0.5rem !important;
+        }
+
+        .custom-calendar .react-calendar__month-view__weekdays abbr {
+          text-decoration: none !important;
+        }
+
+        .custom-calendar .react-calendar__tile {
+          color: rgba(255, 255, 255, 0.8) !important;
+          border-radius: 14px !important;
+          padding: 0.7rem 0.5rem !important;
+          font-size: 0.85rem !important;
+          font-weight: 500 !important;
+          transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+          background: transparent !important;
+          cursor: pointer !important;
+        }
+
+        .custom-calendar .react-calendar__tile:enabled:hover {
+          background: rgba(14, 184, 208, 0.15) !important;
+          transform: scale(1.05) !important;
+        }
+
+        .custom-calendar .react-calendar__tile:enabled:active {
+          transform: scale(0.95) !important;
+        }
+
+        .custom-calendar .react-calendar__tile:disabled {
+          opacity: 0.3 !important;
+          background: rgba(100, 100, 100, 0.1) !important;
+          color: rgba(255, 255, 255, 0.3) !important;
+          cursor: not-allowed !important;
+          text-decoration: line-through !important;
+        }
+
+        .custom-calendar .react-calendar__tile--active {
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0) !important;
+          color: white !important;
+          box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3) !important;
+          transform: scale(1.02) !important;
+        }
+
+        .custom-calendar .react-calendar__tile--now {
+          background: rgba(14, 184, 208, 0.1) !important;
+          border: 1px solid rgba(14, 184, 208, 0.3) !important;
+          color: #0eb8d0 !important;
+        }
+
+        .custom-calendar .react-calendar__tile--now:enabled:hover {
+          background: rgba(14, 184, 208, 0.2) !important;
+        }
+
+        .af-history-card {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          padding: 1.25rem;
+          margin-bottom: 0.75rem;
+          transition: all 0.3s ease;
+        }
+
+        .af-history-card:hover {
+          border-color: rgba(14, 184, 208, 0.3);
+          background: rgba(14, 184, 208, 0.03);
+          transform: translateX(4px);
+        }
+
+        .af-history-card:active {
+          transform: scale(0.99);
+        }
+
+        .af-confirmed {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          background: rgba(14, 184, 208, 0.1);
+          color: #0eb8d0;
+          border: 1px solid rgba(14, 184, 208, 0.2);
+          padding: 0.3rem 0.9rem;
+          border-radius: 30px;
+          font-size: 0.7rem;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
+
+        .af-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 200;
+          padding: 1.5rem;
+          animation: afFadeIn 0.25s ease;
+        }
+
+        .af-modal {
+          background: rgba(15, 20, 35, 0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          border-radius: 32px;
+          padding: 2rem;
+          max-width: 440px;
+          width: 100%;
+          animation: afScaleIn 0.2s ease;
+        }
+
+        .af-modal-icon {
+          width: 70px;
+          height: 70px;
+          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.25rem;
+        }
+
+        .af-modal-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.7rem 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          font-size: 0.85rem;
+        }
+
+        .af-modal-row:last-of-type {
+          border-bottom: none;
+        }
+
+        .af-modal-key {
+          color: rgba(255, 255, 255, 0.5);
+          font-weight: 400;
+        }
+
+        .af-modal-val {
+          font-weight: 500;
+          color: #fff;
+        }
+
+        @keyframes afFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes afScaleIn {
+          from { transform: scale(0.92); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+          .af-grid-2 { grid-template-columns: 1fr; }
+          .af-body { padding: 1.25rem; }
+          .af-tabs { top: 68px; }
+          .af-time-grid { grid-template-columns: repeat(2, 1fr); }
+        }
