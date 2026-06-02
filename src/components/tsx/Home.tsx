@@ -650,6 +650,80 @@ export function Home() {
           color: rgba(255, 255, 255, 0.5);
         }
 
+        /* Estilos para la sección de ubicación con 3 mapas */
+        .ubicacion-section {
+          text-align: center;
+          position: relative;
+          z-index: 2;
+          background: linear-gradient(135deg, rgba(6, 10, 20, 0.95), rgba(10, 14, 26, 0.98));
+          border-top: 1px solid rgba(14, 184, 208, 0.2);
+          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
+        }
+
+        .ubicacion-desc {
+          color: rgba(255, 255, 255, 0.7);
+          margin-bottom: 32px;
+          font-size: 1rem;
+        }
+
+        .map-container {
+          border-radius: 32px;
+          overflow: hidden;
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          margin-bottom: 24px;
+          max-width: 850px;
+          margin-left: auto;
+          margin-right: auto;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .map-container iframe {
+          display: block;
+          width: 100%;
+          height: 420px;
+        }
+
+        .map-links {
+          display: flex;
+          justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
+          margin-top: 24px;
+        }
+
+        .map-link {
+          background: rgba(14, 184, 208, 0.1);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(14, 184, 208, 0.3);
+          padding: 12px 26px;
+          border-radius: 60px;
+          font-size: 0.88rem;
+          font-weight: 600;
+          transition: all 0.3s;
+          color: #fff;
+          text-decoration: none;
+          display: inline-block;
+          cursor: pointer;
+        }
+
+        .map-link:hover {
+          background: rgba(14, 184, 208, 0.2);
+          border-color: #0eb8d0;
+          color: #0eb8d0;
+          transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+          .map-container iframe {
+            height: 300px;
+          }
+          
+          .map-link {
+            padding: 10px 20px;
+            font-size: 0.8rem;
+          }
+        }
+
         .lc-footer { 
           background: rgba(6, 10, 20, 0.95); 
           backdrop-filter: blur(10px); 
@@ -753,6 +827,8 @@ export function Home() {
           .opinion-card { padding:0.8rem; }
           .opiniones-section { padding:3rem 1.25rem; }
         }
+
+        
       `}</style>
 
       <div className="lc-root">
@@ -883,168 +959,191 @@ export function Home() {
           </div>
         </section>
 
+        {/* SECCIÓN DE CONTACTO */}
         <section id="contacto" style={{ 
-          padding: '4rem 1.5rem', 
-          backgroundImage: 'url("/fondo-contacto.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'scroll',
-          position: 'relative',
-          borderTop: '1px solid rgba(255,255,255,.06)'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.6)',
-            zIndex: 0
-          }}></div>
-          
-          <div style={{ maxWidth: 290, margin: '0 auto', position: 'relative', zIndex: 2 }}>
-            <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <span className="lc-tag">CONTACTO</span>
-              <h2 className="lc-section-title" style={{ fontSize: '1.6rem' }}>Hablemos</h2>
-              <p className="lc-section-sub" style={{ margin: '0 auto', color: 'rgba(255,255,255,0.9)' }}>Estamos aquí para ayudarte</p>
+  padding: '4rem 1.5rem', 
+  backgroundImage: 'url("/fondo-contacto.jpg")',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundAttachment: 'scroll',
+  position: 'relative',
+  borderTop: '1px solid rgba(255,255,255,.06)'
+}}>
+  <div style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0, 0, 0, 0.7)',
+    zIndex: 0
+  }}></div>
+  
+  <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+    <div className="lc-reveal" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <span className="lc-tag">CONTACTO</span>
+      <h2 className="lc-section-title" style={{ fontSize: '1.8rem' }}>Estamos aquí para ayudarte</h2>
+      <p className="lc-section-sub" style={{ margin: '0 auto', color: 'rgba(255,255,255,0.9)' }}>Contáctanos por WhatsApp, correo o visítanos en Bagaces</p>
+    </div>
+    
+    <div style={{ 
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+      gap: '1.5rem'
+    }}>
+      {/* Tarjeta de información de contacto */}
+      <div style={{ 
+        background: 'rgba(17, 24, 39, 0.5)', 
+        backdropFilter: 'blur(12px)', 
+        border: '1px solid rgba(255, 255, 255, 0.12)', 
+        borderRadius: '24px', 
+        overflow: 'hidden',
+      }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.08em', fontWeight: 600 }}>INFORMACIÓN DE CONTACTO</p>
+        </div>
+        
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '1.2rem' }}>📍</span>
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '380px', margin: '0 auto' }}>
-              <div style={{ 
-                background: 'rgba(17, 24, 39, 0)', 
-                backdropFilter: 'blur(12px)', 
-                border: '1px solid rgba(255, 255, 255, 0.12)', 
-                borderRadius: '20px', 
-                overflow: 'hidden',
-                transition: 'transform 0.3s ease'
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.3)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}>
-                
-                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <p style={{ fontSize: '0.7rem', color: '#0ea6d0', letterSpacing: '0.06em', fontWeight: 500 }}>INFORMACIÓN DE CONTACTO</p>
-                </div>
-                
-                <div style={{ padding: '1rem' }}>
-                  <div 
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218292,-85.2548688', '_blank')}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '1rem' }}>📍</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>DIRECCIÓN</div>
-                      <div style={{ fontSize: '0.8rem', color: '#fff' }}>Bagaces, Guanacaste, Costa Rica</div>
-                    </div>
-                  </div>
-                  
-                  <a 
-                    href="https://wa.me/50683606680"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '1rem' }}>📱</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
-                      <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8360-6680</div>
-                    </div>
-                  </a>
-
-                  <a 
-                    href="https://wa.me/50689594947"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '1rem' }}>📱</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>WHATSAPP</div>
-                      <div style={{ fontSize: '0.8rem', color: '#25d366' }}>+506 8959-4947</div>
-                    </div>
-                  </a>
-                  
-                  <a 
-                    href="mailto:camarofraterno@gmail.com"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '0.8rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', background: 'transparent', textDecoration: 'none' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '1rem' }}>✉️</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>CORREO</div>
-                      <div style={{ fontSize: '0.8rem', color: '#0eb8d0' }}>camarofraterno@gmail.com</div>
-                    </div>
-                  </a>
-                  
-                  <div 
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.4rem', borderRadius: '12px', transition: 'all 0.3s ease', background: 'transparent' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span style={{ fontSize: '1rem' }}>⏰</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>HORARIO</div>
-                      <div style={{ fontSize: '0.8rem', color: '#fff' }}>Lunes a Sábado: 8am - 6pm</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                style={{ 
-                  background: 'rgba(17, 24, 39, 0.25)', 
-                  backdropFilter: 'blur(12px)', 
-                  border: '1px solid rgba(255, 255, 255, 0.12)', 
-                  borderRadius: '20px', 
-                  overflow: 'hidden', 
-                  transition: 'all 0.3s ease', 
-                  cursor: 'pointer' 
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(14,184,208,0.3)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)' }}
-              >
-                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.6rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <p style={{ fontSize: '0.7rem', color: '#0eb8d0', letterSpacing: '0.06em', fontWeight: 500 }}>UBICACIÓN</p>
-                </div>
-                <div style={{ padding: '0.8rem' }}>
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3928.123456789!2d-85.2548688!3d10.5218292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2scr!4v1234567890"
-                    width="100%"
-                    height="180"
-                    style={{ border: 0, borderRadius: '12px' }}
-                    allowFullScreen
-                    loading="lazy"
-                    title="Google Maps - Autolavado Camaro Fraterno, Bagaces"
-                  />
-                  <button
-                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=10.5218292,-85.2548688', '_blank')}
-                    style={{ width: '90%', margin: '0 auto', display: 'block', marginTop: '0.8rem', background: 'rgba(14,184,208,0.2)', color: '#0eb8d0', border: '1px solid rgba(14,184,208,0.3)', padding: '0.5rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 500, fontSize: '0.75rem', transition: 'all .2s' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.3)'; e.currentTarget.style.color = '#fff' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.2)'; e.currentTarget.style.color = '#0eb8d0' }}
-                  >
-                    Abrir en Google Maps
-                  </button>
-                </div>
-              </div>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>DIRECCIÓN</div>
+              <div style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 500 }}>Bagaces, Guanacaste, Costa Rica</div>
             </div>
           </div>
-        </section>
+          
+          <a 
+            href="https://wa.me/50683606680"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+          >
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.032 2.00195C6.586 2.00195 2.16895 6.40995 2.16895 11.855C2.16895 13.515 2.64095 15.083 3.47295 16.438L2.04195 21.002L6.69295 19.632C7.99795 20.372 9.48195 20.782 11.009 20.782H11.032C16.466 20.782 20.884 16.374 20.884 10.928C20.884 8.44395 19.871 6.13395 18.034 4.32195C16.198 2.50995 13.891 1.99895 12.032 2.00195ZM12.032 3.60195C13.531 3.60195 15.466 4.21795 16.922 5.64595C18.379 7.07395 19.229 8.92395 19.229 10.926C19.229 15.694 15.479 19.166 11.007 19.166C9.76795 19.166 8.56695 18.859 7.49695 18.288L6.94795 17.969L4.33795 18.694L5.10395 16.167L4.75195 15.594C4.11195 14.464 3.76295 13.183 3.76295 11.855C3.76295 7.08795 7.51495 3.60195 12.032 3.60195Z" fill="#25d366"/>
+                <path d="M16.132 13.444C15.883 13.319 14.794 12.784 14.569 12.707C14.344 12.63 14.179 12.591 14.014 12.841C13.849 13.091 13.407 13.574 13.266 13.735C13.125 13.896 12.984 13.918 12.735 13.793C12.486 13.668 11.692 13.384 10.757 12.547C10.032 11.9 9.55195 11.094 9.41095 10.844C9.26995 10.594 9.39495 10.458 9.51795 10.334C9.62795 10.222 9.76095 10.044 9.88295 9.897C10.005 9.75 10.046 9.647 10.128 9.48C10.21 9.313 10.169 9.168 10.107 9.043C10.045 8.918 9.56895 7.829 9.36495 7.379C9.16895 6.947 8.96895 7.012 8.82295 7.007C8.68395 7.002 8.52695 7.002 8.36995 7.002C8.21295 7.002 7.95495 7.065 7.74195 7.293C7.52895 7.521 6.94495 8.068 6.94495 9.179C6.94495 10.29 7.76695 11.367 7.87895 11.515C7.99095 11.663 9.54595 14.137 11.984 15.099C12.702 15.377 13.262 15.547 13.705 15.672C14.424 15.881 15.082 15.842 15.594 15.765C16.161 15.68 17.34 15.205 17.567 14.672C17.794 14.139 17.794 13.682 17.733 13.574C17.672 13.466 17.38 13.369 17.132 13.444Z" fill="#25d366"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>WHATSAPP</div>
+              <div style={{ fontSize: '0.9rem', color: '#25d366', fontWeight: 500 }}>+506 8360-6680</div>
+            </div>
+          </a>
+
+          <a 
+            href="https://wa.me/50689594947"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+          >
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.032 2.00195C6.586 2.00195 2.16895 6.40995 2.16895 11.855C2.16895 13.515 2.64095 15.083 3.47295 16.438L2.04195 21.002L6.69295 19.632C7.99795 20.372 9.48195 20.782 11.009 20.782H11.032C16.466 20.782 20.884 16.374 20.884 10.928C20.884 8.44395 19.871 6.13395 18.034 4.32195C16.198 2.50995 13.891 1.99895 12.032 2.00195ZM12.032 3.60195C13.531 3.60195 15.466 4.21795 16.922 5.64595C18.379 7.07395 19.229 8.92395 19.229 10.926C19.229 15.694 15.479 19.166 11.007 19.166C9.76795 19.166 8.56695 18.859 7.49695 18.288L6.94795 17.969L4.33795 18.694L5.10395 16.167L4.75195 15.594C4.11195 14.464 3.76295 13.183 3.76295 11.855C3.76295 7.08795 7.51495 3.60195 12.032 3.60195Z" fill="#25d366"/>
+                <path d="M16.132 13.444C15.883 13.319 14.794 12.784 14.569 12.707C14.344 12.63 14.179 12.591 14.014 12.841C13.849 13.091 13.407 13.574 13.266 13.735C13.125 13.896 12.984 13.918 12.735 13.793C12.486 13.668 11.692 13.384 10.757 12.547C10.032 11.9 9.55195 11.094 9.41095 10.844C9.26995 10.594 9.39495 10.458 9.51795 10.334C9.62795 10.222 9.76095 10.044 9.88295 9.897C10.005 9.75 10.046 9.647 10.128 9.48C10.21 9.313 10.169 9.168 10.107 9.043C10.045 8.918 9.56895 7.829 9.36495 7.379C9.16895 6.947 8.96895 7.012 8.82295 7.007C8.68395 7.002 8.52695 7.002 8.36995 7.002C8.21295 7.002 7.95495 7.065 7.74195 7.293C7.52895 7.521 6.94495 8.068 6.94495 9.179C6.94495 10.29 7.76695 11.367 7.87895 11.515C7.99095 11.663 9.54595 14.137 11.984 15.099C12.702 15.377 13.262 15.547 13.705 15.672C14.424 15.881 15.082 15.842 15.594 15.765C16.161 15.68 17.34 15.205 17.567 14.672C17.794 14.139 17.794 13.682 17.733 13.574C17.672 13.466 17.38 13.369 17.132 13.444Z" fill="#25d366"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>WHATSAPP</div>
+              <div style={{ fontSize: '0.9rem', color: '#25d366', fontWeight: 500 }}>+506 8959-4947</div>
+            </div>
+          </a>
+          
+          <a 
+            href="mailto:camarofraterno@gmail.com"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
+          >
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="#0eb8d0"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>CORREO</div>
+              <div style={{ fontSize: '0.85rem', color: '#0eb8d0', fontWeight: 500 }}>camarofraterno@gmail.com</div>
+            </div>
+          </a>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.4rem', borderRadius: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: '1.2rem' }}>⏰</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>HORARIO</div>
+              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>Lunes a Sábado: 8am - 6pm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tarjeta del mapa */}
+      <div style={{ 
+        background: 'rgba(17, 24, 39, 0.5)', 
+        backdropFilter: 'blur(12px)', 
+        border: '1px solid rgba(255, 255, 255, 0.12)', 
+        borderRadius: '24px', 
+        overflow: 'hidden',
+      }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.08em', fontWeight: 600 }}>UBICACIÓN</p>
+        </div>
+        
+        <div style={{ padding: '1rem' }}>
+          <div className="map-container" style={{ marginBottom: '1rem' }}>
+            <iframe
+              src="https://www.google.com/maps?q=10.5218308,-85.2548387&z=16&output=embed"
+              width="100%"
+              height="280"
+              style={{ border: 0, borderRadius: '16px' }}
+              allowFullScreen
+              loading="lazy"
+              title="Google Maps - Ubicación en Bagaces, Guanacaste"
+            />
+          </div>
+          
+          <div className="map-links" style={{ marginTop: '0.5rem' }}>
+            <a 
+              href="https://maps.google.com/?q=10.5218308,-85.2548387" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="map-link"
+              style={{ padding: '10px 20px', fontSize: '0.8rem' }}
+            >
+              Google Maps
+            </a>
+            <a 
+              href="https://waze.com/ul?ll=10.5218308,-85.2548387&navigate=yes" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="map-link"
+              style={{ padding: '10px 20px', fontSize: '0.8rem' }}
+            >
+              Waze
+            </a>
+            <a 
+              href="https://maps.apple.com/?q=10.5218308,-85.2548387" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="map-link"
+              style={{ padding: '10px 20px', fontSize: '0.8rem' }}
+            >
+              Apple Maps
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+        
         
         <footer className="lc-footer">
           <div className="lc-footer-sub">Bagaces, Guanacaste, Costa Rica</div>
