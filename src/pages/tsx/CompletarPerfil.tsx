@@ -12,6 +12,7 @@ export function CompletarPerfil() {
   })
   const [userEmail, setUserEmail] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
+  const [checking, setChecking] = useState(true)
 
   useEffect(() => {
     const getUser = async () => {
@@ -46,6 +47,17 @@ export function CompletarPerfil() {
       
       if (perfil) {
         console.log('Perfil cargado:', perfil)
+        
+        // 🔥 NUEVO: Verificar si el perfil ya está completo
+        const tieneNombre = perfil.nombre && perfil.nombre.trim() !== ''
+        const tieneTelefono = perfil.telefono && perfil.telefono.trim() !== ''
+        
+        if (tieneNombre && tieneTelefono) {
+          console.log('✅ Perfil ya completo, redirigiendo a home')
+          window.location.href = '/'
+          return
+        }
+        
         setFormData({
           nombre: perfil.nombre || '',
           telefono: perfil.telefono || ''
@@ -53,6 +65,8 @@ export function CompletarPerfil() {
       } else {
         console.log('No hay perfil existente, usando valores vacíos')
       }
+      
+      setChecking(false)
     }
     
     getUser()
@@ -108,16 +122,16 @@ export function CompletarPerfil() {
       setLoading(false)
     } else {
       console.log('✅ Guardado exitoso! Redirigiendo...')
-      // Verificar que se guardó
-      const { data: verify } = await supabase
-        .from('perfiles')
-        .select('nombre, telefono')
-        .eq('id', userId)
-        .single()
-      console.log('Verificación después de guardar:', verify)
-      
-      navigate('/')
+      window.location.href = '/'
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+        <div className="text-white">Verificando...</div>
+      </div>
+    )
   }
 
   return (
