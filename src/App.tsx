@@ -5,8 +5,7 @@ import { AppointmentForm } from './components/tsx/AppointmentForm'
 import { AdminDashboard } from './pages/tsx/AdminDashboard'
 import { Contact } from './components/tsx/Contact'
 import { Opiniones } from './components/tsx/Opiniones'
-import { ClienteLogin } from './pages/tsx/ClienteLogin'
-import { ClienteRegistro } from './pages/tsx/ClienteRegistro'
+import { ClienteAuth } from './pages/tsx/ClienteAuth'
 import { useState, useEffect } from 'react'
 import { useAuth } from './context/AuthContext'
 import { CompletarPerfil } from './pages/tsx/CompletarPerfil'
@@ -201,8 +200,7 @@ function App() {
               }
             />
 
-            <Route path="/acceder" element={<ClienteLogin />} />
-            <Route path="/registro" element={<ClienteRegistro />} />
+            <Route path="/acceder" element={<ClienteAuth />} />
             <Route path="/completar-perfil" element={<CompletarPerfil />} />
 
             <Route
