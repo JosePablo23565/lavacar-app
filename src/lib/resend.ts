@@ -1,6 +1,5 @@
 import { Resend } from 'resend';
 
-// Para Vite, usamos import.meta.env en lugar de process.env
 const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
 
 export async function sendEmail({

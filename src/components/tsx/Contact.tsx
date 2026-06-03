@@ -59,17 +59,11 @@ export function Contact() {
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.2rem;
-          box-shadow: 0 10px 25px rgba(14, 184, 208, 0.2);
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          transition: transform 0.2s ease;
         }
 
         .ct-icon-circle:hover {
-          transform: scale(1.05);
-          box-shadow: 0 15px 35px rgba(14, 184, 208, 0.3);
-        }
-
-        .ct-icon-circle:active {
-          transform: scale(0.95);
+          transform: scale(1.02);
         }
 
         .ct-icon-circle svg {
@@ -106,13 +100,12 @@ export function Contact() {
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 28px;
           overflow: hidden;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          transition: transform 0.2s ease, border-color 0.2s ease;
         }
 
         .ct-card:hover {
-          transform: translateY(-6px);
+          transform: translateY(-4px);
           border-color: rgba(14, 184, 208, 0.3);
-          box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
         }
 
         .ct-card-header {
@@ -144,18 +137,14 @@ export function Contact() {
           border-radius: 18px;
           padding: 1rem;
           margin-bottom: 1rem;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          transition: all 0.2s ease;
           cursor: pointer;
         }
 
         .ct-item:hover {
           background: rgba(14, 184, 208, 0.08);
           border-color: rgba(14, 184, 208, 0.3);
-          transform: translateX(6px);
-        }
-
-        .ct-item:active {
-          transform: scale(0.98);
+          transform: translateX(4px);
         }
 
         .ct-item-icon {
@@ -167,13 +156,7 @@ export function Contact() {
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
           font-size: 24px;
-        }
-
-        .ct-item:hover .ct-item-icon {
-          background: rgba(14, 184, 208, 0.15);
-          transform: scale(1.08);
         }
 
         .ct-item-label {
@@ -193,7 +176,6 @@ export function Contact() {
         .ct-wa-btn {
           color: #25d366;
           text-decoration: none;
-          transition: all 0.2s ease;
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
@@ -201,11 +183,6 @@ export function Contact() {
 
         .ct-wa-btn:hover {
           opacity: 0.8;
-          transform: translateX(3px);
-        }
-
-        .ct-wa-btn:active {
-          transform: scale(0.97);
         }
 
         .ct-badge {
@@ -224,12 +201,6 @@ export function Contact() {
           overflow: hidden;
           margin-bottom: 1rem;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .ct-iframe:hover {
-          border-color: rgba(14, 184, 208, 0.3);
-          transform: scale(1.01);
         }
 
         .ct-iframe iframe {
@@ -253,20 +224,15 @@ export function Contact() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          transition: all 0.2s ease;
           font-family: 'Inter', sans-serif;
         }
 
         .ct-maps-btn:hover {
           background: rgba(14, 184, 208, 0.2);
           color: #fff;
-          transform: translateY(-3px);
+          transform: translateY(-2px);
           border-color: rgba(14, 184, 208, 0.4);
-          box-shadow: 0 8px 20px rgba(14, 184, 208, 0.2);
-        }
-
-        .ct-maps-btn:active {
-          transform: scale(0.97);
         }
 
         a {
@@ -275,17 +241,13 @@ export function Contact() {
 
         .ct-email-link {
           color: #0eb8d0;
-          transition: all 0.2s ease;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
         }
 
         .ct-email-link:hover {
           color: #fff;
-          text-decoration: underline;
         }
 
+        /* Optimización para móvil: reducir efectos pesados */
         @media (max-width: 768px) {
           .ct-root {
             padding: 1.5rem 1rem;
@@ -313,6 +275,58 @@ export function Contact() {
             height: 40px;
             font-size: 20px;
           }
+          
+          /* Eliminar backdrop-filter en móvil para mejorar rendimiento */
+          .ct-card {
+            backdrop-filter: none !important;
+            background: rgba(15, 20, 35, 0.7) !important;
+          }
+          
+          /* Reducir animaciones en móvil */
+          .ct-card:hover {
+            transform: none;
+          }
+          
+          .ct-item:hover {
+            transform: translateX(2px);
+          }
+          
+          .ct-maps-btn:hover {
+            transform: none;
+          }
+        }
+
+        /* Para pantallas muy pequeñas */
+        @media (max-width: 480px) {
+          .ct-items {
+            padding: 1rem;
+          }
+          .ct-item {
+            padding: 0.6rem;
+            gap: 0.8rem;
+          }
+          .ct-item-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+          }
+          .ct-item-label {
+            font-size: 0.6rem;
+          }
+          .ct-item-value {
+            font-size: 0.75rem;
+          }
+          .ct-badge {
+            font-size: 0.55rem;
+            padding: 0.15rem 0.5rem;
+          }
+          .ct-maps-btn {
+            padding: 0.6rem;
+            font-size: 0.75rem;
+          }
+          .ct-iframe iframe {
+            height: 160px;
+          }
         }
       `}</style>
 
@@ -329,6 +343,7 @@ export function Contact() {
           </div>
 
           <div className="ct-grid">
+            {/* Tarjeta de información de contacto */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>INFORMACIÓN DE CONTACTO</p>
@@ -345,7 +360,7 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* WHATSAPP 1 - ICONO REAL */}
+                {/* WHATSAPP 1 */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
                     <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
@@ -361,7 +376,7 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* WHATSAPP 2 - ICONO REAL */}
+                {/* WHATSAPP 2 */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
                     <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
@@ -377,7 +392,7 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* CORREO - ICONO REAL GMAIL */}
+                {/* CORREO */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
                     <i className="fas fa-envelope" style={{ color: '#EA4335', fontSize: '24px' }}></i>
@@ -405,7 +420,7 @@ export function Contact() {
               </div>
             </div>
 
-            {/* Mapa */}
+            {/* Tarjeta del mapa */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>UBICACIÓN</p>

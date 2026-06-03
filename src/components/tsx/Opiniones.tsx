@@ -13,6 +13,7 @@ type Opinion = {
 export function Opiniones() {
   const [opiniones, setOpiniones] = useState<Opinion[]>([])
   const [loading, setLoading] = useState(true)
+  const [perfil, setPerfil] = useState({ nombre: '', telefono: '', email: '' })
   const [formData, setFormData] = useState({
     nombre: '',
     comentario: '',
@@ -23,9 +24,10 @@ export function Opiniones() {
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [hoveredStar, setHoveredStar] = useState(0)
 
-  // Cargar opiniones aprobadas
+  // Cargar opiniones aprobadas y perfil del usuario
   useEffect(() => {
     fetchOpiniones()
+    cargarPerfil()
   }, [])
 
   const fetchOpiniones = async () => {
@@ -39,14 +41,21 @@ export function Opiniones() {
     setLoading(false)
   }
 
-  // Función para validar solo letras en el nombre y máximo 40 caracteres
-  const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    // Solo permitir letras, espacios, acentos y ñ
-    const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
-    // Limitar a 40 caracteres
-    if (onlyLetters.length <= 40) {
-      setFormData({ ...formData, nombre: onlyLetters })
+  // Cargar perfil del usuario logueado
+  const cargarPerfil = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (user) {
+      const { data } = await supabase
+        .from('perfiles')
+        .select('nombre, telefono, email')
+        .eq('id', user.id)
+        .single()
+      
+      if (data) {
+        setPerfil(data)
+        setFormData(prev => ({ ...prev, nombre: data.nombre || '' }))
+      }
     }
   }
 
@@ -87,7 +96,7 @@ export function Opiniones() {
       setMensaje('Error al enviar: ' + error.message)
     } else {
       setMensaje('Opinión enviada con éxito. Quedará visible tras ser aprobada.')
-      setFormData({ nombre: '', comentario: '', rating: 0 })
+      setFormData({ ...formData, comentario: '', rating: 0 })
       fetchOpiniones()
       setTimeout(() => setMensaje(''), 3000)
     }
@@ -161,7 +170,6 @@ export function Opiniones() {
           z-index: 2;
         }
 
-        /* Header */
         .opiniones-header {
           text-align: center;
           margin-bottom: 3rem;
@@ -211,7 +219,6 @@ export function Opiniones() {
           font-size: 0.95rem;
         }
 
-        /* Tarjeta de formulario - LIQUID GLASS */
         .form-card {
           background: rgba(15, 20, 35, 0.35);
           backdrop-filter: blur(20px);
@@ -248,7 +255,6 @@ export function Opiniones() {
           padding: 2rem;
         }
 
-        /* Campos de formulario */
         .input-group {
           margin-bottom: 1.5rem;
         }
@@ -268,7 +274,6 @@ export function Opiniones() {
           color: #0eb8d0;
         }
 
-        /* EFECTO BURBUJA EN INPUTS */
         .input-field {
           width: 100%;
           padding: 0.85rem 1rem;
@@ -296,12 +301,17 @@ export function Opiniones() {
           color: rgba(255, 255, 255, 0.3);
         }
 
+        .input-field:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          background: rgba(255, 255, 255, 0.02);
+        }
+
         textarea.input-field {
           min-height: 100px;
           resize: vertical;
         }
 
-        /* Contador de caracteres */
         .char-counter {
           text-align: right;
           font-size: 0.65rem;
@@ -317,7 +327,6 @@ export function Opiniones() {
           color: #f87171;
         }
 
-        /* Rating stars - EFECTO BURBUJA */
         .rating-group {
           text-align: center;
         }
@@ -368,7 +377,6 @@ export function Opiniones() {
           margin-top: 0.5rem;
         }
 
-        /* Botón enviar */
         .submit-btn {
           width: 100%;
           padding: 1rem;
@@ -415,7 +423,6 @@ export function Opiniones() {
           cursor: not-allowed;
         }
 
-        /* Mensajes */
         .message {
           padding: 0.85rem;
           border-radius: 16px;
@@ -438,7 +445,6 @@ export function Opiniones() {
           border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        /* Tarjeta de opiniones - LIQUID GLASS */
         .reviews-card {
           background: rgba(15, 20, 35, 0.35);
           backdrop-filter: blur(20px);
@@ -558,7 +564,6 @@ export function Opiniones() {
           opacity: 0.5;
         }
 
-        /* Spinner */
         .spinner {
           animation: spin 1s linear infinite;
         }
@@ -603,7 +608,6 @@ export function Opiniones() {
 
       <div className="opiniones-root">
         <div className="opiniones-container">
-          {/* Header */}
           <div className="opiniones-header">
             <div className="opiniones-icon">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -614,7 +618,6 @@ export function Opiniones() {
             <p className="opiniones-sub">Comparta su experiencia y ayude a otros clientes</p>
           </div>
 
-          {/* Formulario */}
           <div className="form-card">
             <div className="form-card-header">
               <p>COMPARTE TU EXPERIENCIA</p>
@@ -628,18 +631,14 @@ export function Opiniones() {
               <form onSubmit={handleSubmit}>
                 <div className="input-group">
                   <label className={`input-label ${focusedField === 'nombre' ? 'active' : ''}`}>
-                    SU NOMBRE
+                    SU NOMBRE (NO EDITABLE)
                   </label>
                   <input
                     className="input-field"
                     type="text"
-                    value={formData.nombre}
-                    onChange={handleNombreChange}
-                    onFocus={() => setFocusedField('nombre')}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Su nombre completo"
-                    maxLength={40}
-                    required
+                    value={perfil.nombre || ''}
+                    disabled
+                    placeholder="Cargando..."
                   />
                 </div>
 
@@ -692,7 +691,6 @@ export function Opiniones() {
             </div>
           </div>
 
-          {/* Lista de opiniones */}
           <div className="reviews-card">
             <div className="reviews-header">
               <p>OPINIONES DE NUESTROS CLIENTES</p>
