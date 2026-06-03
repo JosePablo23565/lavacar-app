@@ -1,6 +1,11 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export function Contact() {
+  // Coordenadas: Bagaces, Guanacaste, Costa Rica
+  const lat = 10.5218292;
+  const lng = -85.2548688;
+  const nombreLugar = "Autolavado Camaro Fraterno";
+
   return (
     <>
       <style>{`
@@ -247,7 +252,7 @@ export function Contact() {
           color: #fff;
         }
 
-        /* Optimización para móvil: reducir efectos pesados */
+        /* Optimización para móvil */
         @media (max-width: 768px) {
           .ct-root {
             padding: 1.5rem 1rem;
@@ -276,13 +281,11 @@ export function Contact() {
             font-size: 20px;
           }
           
-          /* Eliminar backdrop-filter en móvil para mejorar rendimiento */
           .ct-card {
             backdrop-filter: none !important;
             background: rgba(15, 20, 35, 0.7) !important;
           }
           
-          /* Reducir animaciones en móvil */
           .ct-card:hover {
             transform: none;
           }
@@ -296,7 +299,6 @@ export function Contact() {
           }
         }
 
-        /* Para pantallas muy pequeñas */
         @media (max-width: 480px) {
           .ct-items {
             padding: 1rem;
@@ -350,7 +352,7 @@ export function Contact() {
               </div>
               <div className="ct-items">
                 {/* Dirección */}
-                <div className="ct-item" onClick={() => window.open('https://www.google.com/maps?q=10.5218292,-85.2548688', '_blank')}>
+                <div className="ct-item" onClick={() => window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank')}>
                   <div className="ct-item-icon">
                     <i className="fas fa-map-marker-alt" style={{ color: '#0eb8d0', fontSize: '24px' }}></i>
                   </div>
@@ -420,7 +422,7 @@ export function Contact() {
               </div>
             </div>
 
-            {/* Tarjeta del mapa */}
+            {/* Tarjeta del mapa - CON BOTONES DE GOOGLE, WAZE Y APPLE MAPS */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>UBICACIÓN</p>
@@ -428,7 +430,7 @@ export function Contact() {
               <div className="ct-items">
                 <div className="ct-iframe">
                   <iframe
-                    src="https://www.google.com/maps?q=10.5218292,-85.2548688&output=embed"
+                    src={`https://www.google.com/maps?q=${lat},${lng}&output=embed`}
                     width="100%"
                     height="200"
                     style={{ border: 0, borderRadius: '16px' }}
@@ -437,18 +439,44 @@ export function Contact() {
                     title="Google Maps - Autolavado Camaro Fraterno, Bagaces"
                   />
                 </div>
-                <button
-                  className="ct-maps-btn"
-                  onClick={() => window.open('https://www.google.com/maps?q=10.5218292,-85.2548688', '_blank')}
-                >
-                  <i className="fas fa-map-marked-alt"></i>
-                  Abrir en Google Maps
-                </button>
+                
+                {/* BOTONES DE MAPAS */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {/* Google Maps */}
+                  <button
+                    className="ct-maps-btn"
+                    onClick={() => window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank')}
+                    style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
+                  >
+                    <i className="fab fa-google"></i>
+                    Google Maps
+                  </button>
+
+                  {/* Waze */}
+                  <button
+                    className="ct-maps-btn"
+                    onClick={() => window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`, '_blank')}
+                    style={{ background: 'rgba(0, 179, 255, 0.12)', borderColor: 'rgba(0, 179, 255, 0.25)', color: '#00B3FF' }}
+                  >
+                    <i className="fab fa-waze"></i>
+                    Waze
+                  </button>
+
+                  {/* Apple Maps */}
+                  <button
+                    className="ct-maps-btn"
+                    onClick={() => window.open(`https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(nombreLugar)}`, '_blank')}
+                    style={{ background: 'rgba(0, 0, 0, 0.2)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
+                  >
+                    <i className="fab fa-apple"></i>
+                    Apple Maps
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }
