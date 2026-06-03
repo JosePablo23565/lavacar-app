@@ -21,6 +21,7 @@ type Appointment = {
 type Testimonial = {
   id: number
   customer_name: string
+  email: string 
   rating: number
   comment: string
   created_at: string
@@ -41,7 +42,7 @@ export function AdminDashboard() {
     checkAdminAndFetch()
   }, [])
 
-  // 🔥 FUNCIÓN PARA LIMPIAR CITAS PASADAS
+  // FUNCIÓN PARA LIMPIAR CITAS PASADAS
   const limpiarCitasPasadas = async () => {
     const hoy = new Date().toISOString().split('T')[0]
     const ahora = new Date()
@@ -126,34 +127,43 @@ export function AdminDashboard() {
     fetchTestimonials()
   }
 
-  const fetchAppointments = async () => {
-    const { data } = await supabase
-      .from('appointments')
-      .select('*')
-      .order('appointment_date', { ascending: true })
-    
-    const citas = data || []
-    setAppointments(citas)
-    
-    const hoy = new Date().toISOString().split('T')[0]
-    const ahora = new Date()
-    const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
-    
-    const citasHoy = citas.filter(c => c.appointment_date === hoy)
-    
-    const citasProximas = citas.filter(c => {
-      if (c.appointment_date > hoy) return true
-      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
-      return false
-    })
-    
-    setStats({
-      total: citas.length,
-      hoy: citasHoy.length,
-      proximas: citasProximas.length
-    })
-    setLoading(false)
-  }
+ const fetchAppointments = async () => {
+  const { data } = await supabase
+    .from('appointments')
+    .select('*')
+    .order('appointment_date', { ascending: true })
+    .order('appointment_time', { ascending: true })
+  
+  const citas = data || []
+  
+  // Filtrar solo citas futuras o de hoy que no han pasado
+  const hoy = new Date().toISOString().split('T')[0]
+  const ahora = new Date()
+  const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
+  
+  const citasFuturas = citas.filter(c => {
+    if (c.appointment_date > hoy) return true
+    if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
+    return false
+  })
+  
+  setAppointments(citasFuturas)
+  
+  const citasHoy = citasFuturas.filter(c => c.appointment_date === hoy)
+  
+  const citasProximas = citasFuturas.filter(c => {
+    if (c.appointment_date > hoy) return true
+    if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
+    return false
+  })
+  
+  setStats({
+    total: citasFuturas.length,
+    hoy: citasHoy.length,
+    proximas: citasProximas.length
+  })
+  setLoading(false)
+}
 
   const fetchTestimonials = async () => {
     const { data } = await supabase
@@ -353,7 +363,7 @@ export function AdminDashboard() {
                     e.currentTarget.style.transform = 'translateY(0)'
                   }}
                 >
-                  🗑️ Limpiar citas vencidas
+                  Limpiar citas vencidas
                 </button>
               </div>
 
@@ -383,12 +393,16 @@ export function AdminDashboard() {
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 text-lg px-2 py-1 transition">🗑️</button>
+                          {/* ÍCONO DE WHATSAPP - VERSIÓN MÓVIL */}
                           <a
                             href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`}
                             target="_blank"
-                            className="text-green-400 hover:text-green-300 text-lg px-2 py-1 transition"
+                            className="text-green-400 hover:text-green-300 transition"
+                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
                           >
-                            💬
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
+                            </svg>
                           </a>
                         </div>
                       </div>
@@ -411,8 +425,8 @@ export function AdminDashboard() {
                         </div>
                         {/* DETALLES EN VERSIÓN MÓVIL */}
                         {apt.notes && (
-                          <div className="flex mt-2 pt-2 border-t border-white/10">
-                            <span className="text-white/40 w-24">📝 Detalles:</span>
+                          <div className="flex mt-2 border-white/10">
+                            <span className="text-white/40 w-24">Detalles:</span>
                             <span className="text-white/80 text-sm" style={{ color: '#0eb8d0' }}>{apt.notes}</span>
                           </div>
                         )}
@@ -459,7 +473,7 @@ export function AdminDashboard() {
                             <td style={{ maxWidth: '200px', fontSize: '0.75rem', color: '#0eb8d0' }}>
                               {apt.notes ? (
                                 <span style={{ background: 'rgba(14,184,208,0.1)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>
-                                  📝 {apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}
+                                  {apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}
                                 </span>
                               ) : (
                                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>
@@ -468,7 +482,17 @@ export function AdminDashboard() {
                             <td style={{ textAlign: 'center' }}>
                               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                 <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️</button>
-                                <a href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} target="_blank" className="btn-success">💬</a>
+                                {/* ÍCONO DE WHATSAPP - VERSIÓN ESCRITORIO */}
+                                <a 
+                                  href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} 
+                                  target="_blank" 
+                                  className="btn-success"
+                                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.4rem 0.8rem' }}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
+                                  </svg>
+                                </a>
                               </div>
                             </td>
                           </tr>
@@ -481,63 +505,90 @@ export function AdminDashboard() {
             </>
           )}
 
-          {/* CONTENIDO DE TESTIMONIOS */}
           {activeTab === 'testimonios' && (
-            <div className="space-y-6">
-              <div className="admin-card" style={{ padding: '1.75rem' }}>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.25rem', color: '#94a3b8', letterSpacing: '0.05em' }}>Opiniones Pendientes ({pendingTestimonials.length})</h2>
-                {pendingTestimonials.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2.5rem' }}>No hay opiniones pendientes de aprobación</p>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingTestimonials.map((t) => (
-                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-5">
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
-                          <div className="flex-1">
-                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                              <p className="font-semibold text-white">{t.customer_name}</p>
-                              <div className="flex text-yellow-500 text-sm">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
+              <div className="space-y-6">
+                {/* OPINIONES PENDIENTES */}
+                <div className="admin-card testimonios-container">
+                  <div className="testimonios-header pendiente">
+                    <span className="testimonios-header-icon">⏳</span>
+                    <h2>Opiniones Pendientes ({pendingTestimonials.length})</h2>
+                  </div>
+                  {pendingTestimonials.length === 0 ? (
+                    <div className="testimonios-empty">
+                      <p>No hay opiniones pendientes de aprobación</p>
+                    </div>
+                  ) : (
+                    <div className="testimonios-grid">
+                      {pendingTestimonials.map((t) => (
+                        <div key={t.id} className="testimonial-card">
+                          <div className="testimonial-card-header">
+                            <div className="testimonial-avatar">
+                              {t.customer_name?.charAt(0) || 'U'}
                             </div>
-                            <p className="text-gray-300 text-sm italic mb-3">"{t.comment}"</p>
-                            <p className="text-gray-500 text-xs">{formatDateLong(t.created_at)}</p>
+                            <div className="testimonial-info">
+                              <div className="testimonial-name">{t.customer_name}</div>
+                              <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
+                            </div>
+                            <div className="testimonial-stars">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <button onClick={() => approveTestimonial(t.id)} className="bg-green-700 hover:bg-green-600 text-green-200 text-xs px-3 py-1.5 rounded transition">Aprobar</button>
-                            <button onClick={() => deleteTestimonial(t.id)} className="bg-red-900 hover:bg-red-800 text-red-300 text-xs px-3 py-1.5 rounded transition">Eliminar</button>
+                          <div className="testimonial-comment">"{t.comment}"</div>
+                          <div className="testimonial-card-footer">
+                            <div className="testimonial-date">{formatDateLong(t.created_at)}</div>
+                            <div className="testimonial-actions">
+                              <button onClick={() => approveTestimonial(t.id)} className="btn-approve">✓ Aprobar</button>
+                              <button onClick={() => deleteTestimonial(t.id)} className="btn-delete">✗ Eliminar</button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-              <div className="admin-card" style={{ padding: '1.75rem' }}>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1.25rem', color: '#94a3b8', letterSpacing: '0.05em' }}>Opiniones Aprobadas ({approvedTestimonials.length})</h2>
-                {approvedTestimonials.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center', padding: '2.5rem' }}>No hay opiniones aprobadas aún</p>
-                ) : (
-                  <div className="space-y-4">
-                    {approvedTestimonials.map((t) => (
-                      <div key={t.id} className="bg-[#1e293b] border border-[#334155] rounded-lg p-5">
-                        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
-                          <div className="flex-1">
-                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                              <p className="font-semibold text-white">{t.customer_name}</p>
-                              <div className="flex text-yellow-500 text-sm">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
-                            </div>
-                            <p className="text-gray-300 text-sm italic mb-3">"{t.comment}"</p>
-                            <p className="text-gray-500 text-xs">{formatDateLong(t.created_at)}</p>
-                          </div>
-                          <button onClick={() => deleteTestimonial(t.id)} className="bg-red-900 hover:bg-red-800 text-red-300 text-xs px-3 py-1.5 rounded transition">Eliminar</button>
-                        </div>
-                      </div>
-                    ))}
+                {/* OPINIONES APROBADAS */}
+                <div className="admin-card testimonios-container">
+                  <div className="testimonios-header aprobada">
+                    <span className="testimonios-header-icon">✓</span>
+                    <h2>Opiniones Aprobadas ({approvedTestimonials.length})</h2>
                   </div>
-                )}
+                  {approvedTestimonials.length === 0 ? (
+                    <div className="testimonios-empty">
+                      <p>No hay opiniones aprobadas aún</p>
+                    </div>
+                  ) : (
+                    <div className="testimonios-grid">
+                      {approvedTestimonials.map((t) => (
+                        <div key={t.id} className="testimonial-card approved">
+                          <div className="testimonial-card-header">
+                            <div className="testimonial-avatar">
+                              {t.customer_name?.charAt(0) || 'U'}
+                            </div>
+                            <div className="testimonial-info">
+                              <div className="testimonial-name">{t.customer_name}</div>
+                              <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
+                            </div>
+                            <div className="testimonial-stars">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="testimonial-comment">"{t.comment}"</div>
+                          <div className="testimonial-card-footer">
+                            <div className="testimonial-date">{formatDateLong(t.created_at)}</div>
+                            <button onClick={() => deleteTestimonial(t.id)} className="btn-delete">✗ Eliminar</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </>

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 type Opinion = {
   id: number
   customer_name: string
+  email: string
   comment: string
   rating: number
   created_at: string
@@ -87,6 +88,7 @@ export function Opiniones() {
     
     const { error } = await supabase.from('testimonials').insert([{
       customer_name: formData.nombre,
+      email: perfil.email, 
       comment: formData.comentario,
       rating: formData.rating,
       is_approved: false
