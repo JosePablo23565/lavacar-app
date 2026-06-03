@@ -33,11 +33,73 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [stats, setStats] = useState({ total: 0, hoy: 0, proximas: 0 })
+  const [limpiezaMsg, setLimpiezaMsg] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
     checkAdminAndFetch()
   }, [])
+
+  // 🔥 FUNCIÓN PARA LIMPIAR CITAS PASADAS
+  const limpiarCitasPasadas = async () => {
+    const hoy = new Date().toISOString().split('T')[0]
+    const ahora = new Date()
+    const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
+    
+    console.log('=== LIMPIANDO CITAS PASADAS ===')
+    console.log('Fecha actual:', hoy)
+    console.log('Hora actual:', horaActual)
+    
+    // Buscar citas pasadas (fechas anteriores O hoy pero hora pasada)
+    const { data: citasPasadas, error: selectError } = await supabase
+      .from('appointments')
+      .select('id, appointment_date, appointment_time')
+      .or(`appointment_date.lt.${hoy},and(appointment_date.eq.${hoy},appointment_time.lt.${horaActual})`)
+    
+    if (selectError) {
+      console.error('Error al buscar citas pasadas:', selectError)
+      return 0
+    }
+    
+    console.log('Citas pasadas encontradas:', citasPasadas)
+    
+    if (citasPasadas && citasPasadas.length > 0) {
+      const idsAEliminar = citasPasadas.map(c => c.id)
+      const { error: deleteError } = await supabase
+        .from('appointments')
+        .delete()
+        .in('id', idsAEliminar)
+      
+      if (!deleteError) {
+        const mensaje = `✅ Se eliminaron ${idsAEliminar.length} cita(s) vencida(s)`
+        console.log(mensaje)
+        setLimpiezaMsg(mensaje)
+        setTimeout(() => setLimpiezaMsg(''), 4000)
+        return idsAEliminar.length
+      } else {
+        console.error('Error al eliminar:', deleteError)
+      }
+    }
+    return 0
+  }
+
+  // 🧹 FUNCIÓN PARA LIMPIEZA MANUAL (CON BOTÓN)
+  const limpiarManual = async () => {
+    const resultado = await swalConfirm(
+      'Limpiar citas vencidas', 
+      'Se eliminarán todas las citas con fecha anterior a hoy y las de hoy que ya pasaron la hora actual. ¿Continuar?'
+    )
+    
+    if (resultado.isConfirmed) {
+      const eliminadas = await limpiarCitasPasadas()
+      if (eliminadas > 0) {
+        swalSuccess('Limpieza completada', `Se eliminaron ${eliminadas} cita(s) vencida(s)`)
+        await fetchAppointments()
+      } else {
+        swalSuccess('Sin cambios', 'No hay citas vencidas para eliminar')
+      }
+    }
+  }
 
   const checkAdminAndFetch = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -58,6 +120,9 @@ export function AdminDashboard() {
       return
     }
 
+    // 🔥 LIMPIAR CITAS PASADAS ANTES DE CARGAR
+    await limpiarCitasPasadas()
+    
     fetchAppointments()
     fetchTestimonials()
   }
@@ -75,16 +140,20 @@ export function AdminDashboard() {
     const ahora = new Date()
     const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
     
-    const proximas = citas.filter(c => {
-      if (c.appointment_date > hoy) return true
-      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
+    // ✅ TODAS las citas de hoy (sin importar la hora)
+    const citasHoy = citas.filter(c => c.appointment_date === hoy)
+    
+    // ✅ PRÓXIMAS: Todas las citas futuras (mañana, siguiente semana) + las de hoy que NO han pasado
+    const citasProximas = citas.filter(c => {
+      if (c.appointment_date > hoy) return true // Cualquier fecha futura
+      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true // Hoy pero no ha pasado
       return false
     })
     
     setStats({
       total: citas.length,
-      hoy: citas.filter(c => c.appointment_date === hoy).length,
-      proximas: proximas.length
+      hoy: citasHoy.length,
+      proximas: citasProximas.length
     })
     setLoading(false)
   }
@@ -216,6 +285,13 @@ export function AdminDashboard() {
       <div className="admin-root">
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
+          {/* MENSAJE DE LIMPIEZA */}
+          {limpiezaMsg && (
+            <div className="mb-4 p-3 rounded-lg text-center" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7' }}>
+              {limpiezaMsg}
+            </div>
+          )}
+
           {/* TABS MODERNOS */}
           <div className="af-tabs">
             <button
@@ -249,6 +325,39 @@ export function AdminDashboard() {
                   <p className="stat-pill-num" style={{ color: '#a78bfa' }}>{stats.proximas}</p>
                   <p className="stat-pill-label">Próximas</p>
                 </div>
+              </div>
+
+              {/* BOTÓN DE LIMPIEZA MANUAL */}
+              <div className="mb-4">
+                <button
+                  onClick={limpiarManual}
+                  className="btn-clean"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: '#f87171',
+                    padding: '0.6rem 1.2rem',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontFamily: 'inherit'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
+                >
+                  🗑️ Limpiar citas vencidas
+                </button>
               </div>
 
               {/* BUSCADOR */}
