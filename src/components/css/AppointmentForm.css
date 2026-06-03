@@ -587,3 +587,52 @@
           .af-tabs { top: 68px; }
           .af-time-grid { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* ============================================ */
+/* ESTILOS PARA DOMINGOS DESHABILITADOS */
+/* ============================================ */
+
+.custom-calendar .react-calendar__tile.sunday-disabled {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  text-decoration: line-through !important;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.custom-calendar .react-calendar__tile.sunday-disabled::after {
+  content: "🚫";
+  position: absolute;
+  font-size: 12px;
+  bottom: 2px;
+  right: 2px;
+  opacity: 0.7;
+}
+
+.custom-calendar .react-calendar__tile.sunday-disabled:hover {
+  transform: none !important;
+  background: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Tooltip opcional para domingos */
+.custom-calendar .react-calendar__tile.sunday-disabled::before {
+  content: "Cerrado los domingos";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #f87171;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+}
+
+.custom-calendar .react-calendar__tile.sunday-disabled:hover::before {
+  opacity: 1;
+}

@@ -111,16 +111,19 @@ export function AppointmentForm() {
   const [userEmail, setUserEmail] = useState('')
   const [userId, setUserId] = useState('')
   const [perfil, setPerfil] = useState({ nombre: '', telefono: '' })
+  
+  // ✅ MODIFICADO: SIN fecha seleccionada por defecto (null)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_phone: '',
     service_type: '',
     vehicle_type: '',
     vehicle_model: '',
-    appointment_date: new Date().toISOString().split('T')[0],
+    appointment_date: '',
     appointment_time: '',
   })
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
   const [customerHistory, setCustomerHistory] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(false)
@@ -143,9 +146,10 @@ export function AppointmentForm() {
     { value: 'camioneta', label: 'Camioneta / SUV' },
   ]
 
+  // ✅ Horarios cada 1 hora
   const allTimes = [
-    '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-    '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM',
+    '09:00 AM', '10:00 AM', '11:00 AM',
+    '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM',
   ]
 
   // Verificar autenticación al cargar
@@ -251,9 +255,18 @@ export function AppointmentForm() {
     return `${hour12.toString().padStart(2, '0')}:${minutes} ${ampm}`
   }
 
-  useEffect(() => { if (selectedDate) fetchAvailableTimes() }, [selectedDate])
+  // ✅ CORREGIDO: Solo buscar horarios si hay fecha seleccionada
+  useEffect(() => { 
+    if (selectedDate) {
+      fetchAvailableTimes()
+    } else {
+      setAvailableTimes([])
+    }
+  }, [selectedDate])
 
   const fetchAvailableTimes = async () => {
+    if (!selectedDate) return
+    
     const dateStr = selectedDate.toISOString().split('T')[0]
     const hoy = new Date().toISOString().split('T')[0]
     const ahora = new Date()
@@ -270,6 +283,7 @@ export function AppointmentForm() {
     
     let available = allTimes.filter(time => !bookedTimes12h.includes(time))
     
+    // ✅ CORREGIDO: Filtrar horas pasadas correctamente
     if (dateStr === hoy) {
       available = available.filter(time => {
         const [horaStr, modifier] = time.split(' ')
@@ -279,13 +293,21 @@ export function AppointmentForm() {
         if (modifier === 'PM' && hora24 !== 12) hora24 += 12
         if (modifier === 'AM' && hora24 === 12) hora24 = 0
         
+        // Comparar horas correctamente
         if (hora24 < horaActual) return false
-        if (hora24 === horaActual && parseInt(minuto) <= minutosActual) return false
+        if (hora24 === horaActual) {
+          if (parseInt(minuto) <= minutosActual) return false
+        }
         return true
       })
     }
     
     setAvailableTimes(available)
+    
+    // Limpiar hora seleccionada si ya no está disponible
+    if (formData.appointment_time && !available.includes(formData.appointment_time)) {
+      setFormData(prev => ({ ...prev, appointment_time: '' }))
+    }
   }
 
   const fetchCustomerHistory = async (phone: string) => {
@@ -294,13 +316,53 @@ export function AppointmentForm() {
   }
 
   const handleDateChange = (date: Date) => {
+    // ✅ Verificar si es domingo ANTES de seleccionar
+    if (date.getDay() === 0) {
+      // No hacer nada, el calendario ya debería bloquearlo
+      return
+    }
     setSelectedDate(date)
-    setFormData({ ...formData, appointment_date: date.toISOString().split('T')[0], appointment_time: '' })
+    setFormData({ 
+      ...formData, 
+      appointment_date: date.toISOString().split('T')[0], 
+      appointment_time: '' 
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.appointment_time) { alert('Por favor seleccioná una hora'); return }
+    
+    // ✅ Validaciones mejoradas
+    if (!selectedDate) {
+      alert('Por favor seleccione una fecha')
+      return
+    }
+    
+    if (!formData.appointment_time) {
+      alert('Por favor seleccioná una hora')
+      return
+    }
+    
+    // ✅ Validar que la hora no haya pasado (si es hoy)
+    const hoy = new Date().toISOString().split('T')[0]
+    const ahora = new Date()
+    const horaActual = ahora.getHours()
+    const minutosActual = ahora.getMinutes()
+    
+    if (formData.appointment_date === hoy) {
+      const [horaStr, modifier] = formData.appointment_time.split(' ')
+      let [hora, minuto] = horaStr.split(':')
+      let hora24 = parseInt(hora)
+      
+      if (modifier === 'PM' && hora24 !== 12) hora24 += 12
+      if (modifier === 'AM' && hora24 === 12) hora24 = 0
+      
+      if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
+        alert('No puede agendar una cita en un horario que ya pasó')
+        return
+      }
+    }
+    
     setLoading(true)
     
     if (!userId || !userEmail) {
@@ -331,17 +393,20 @@ export function AppointmentForm() {
         vehicleType: veh?.label || formData.vehicle_type, 
         vehicleModel: formData.vehicle_model 
       })
+      
+      // Resetear formulario
+      setSelectedDate(null)
       setFormData({ 
         customer_name: perfil.nombre,
         customer_phone: perfil.telefono,
         service_type: '', 
         vehicle_type: '', 
         vehicle_model: '', 
-        appointment_date: new Date().toISOString().split('T')[0], 
+        appointment_date: '', 
         appointment_time: '' 
       })
-      setSelectedDate(new Date())
-      fetchAvailableTimes()
+      setAvailableTimes([])
+      
       setTimeout(() => setSuccessData({ 
         show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '' 
       }), 6000)
@@ -354,10 +419,25 @@ export function AppointmentForm() {
   const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
+  // ✅ CORREGIDO: Bloquear fechas pasadas Y domingos
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return date < today
+    
+    // Bloquear fechas pasadas
+    if (date < today) return true
+    
+    // Bloquear domingos (0 = domingo)
+    if (date.getDay() === 0) return true
+    
+    return false
+  }
+
+  const getTileClassName = ({ date, view }: { date: Date; view: string }) => {
+    if (view === 'month' && date.getDay() === 0) {
+      return 'sunday-disabled'
+    }
+    return ''
   }
 
   return (
@@ -451,27 +531,50 @@ export function AppointmentForm() {
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <Calendar 
                         onChange={(date) => handleDateChange(date as Date)} 
-                        value={selectedDate} 
+                        value={selectedDate}
                         minDate={new Date()}
                         tileDisabled={({ date }) => isDateDisabled(date)}
+                        tileClassName={getTileClassName}
                         className="custom-calendar"
                       />
                     </div>
 
-                    <span className="af-section-label">HORARIOS DISPONIBLES</span>
-                    {availableTimes.length === 0 ? (
-                      <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>No hay horarios disponibles para este día</p>
-                    ) : (
-                      <div className="af-time-grid">
-                        {availableTimes.map((time) => (
-                          <button key={time} type="button" className={`af-time-btn${formData.appointment_time === time ? ' sel' : ''}`} onClick={() => setFormData({ ...formData, appointment_time: time })}>
-                            {time}
-                          </button>
-                        ))}
-                      </div>
+                    {/* ✅ Mensaje cuando no hay fecha seleccionada */}
+                    {!selectedDate && (
+                      <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
+                        Seleccione una fecha para ver los horarios disponibles
+                      </p>
                     )}
 
-                    <button type="submit" className="af-submit" disabled={loading || !formData.appointment_time || availableTimes.length === 0}>
+                    {selectedDate && (
+                      <>
+                        <span className="af-section-label">HORARIOS DISPONIBLES</span>
+                        {availableTimes.length === 0 ? (
+                          <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
+                            No hay horarios disponibles para este día
+                          </p>
+                        ) : (
+                          <div className="af-time-grid">
+                            {availableTimes.map((time) => (
+                              <button 
+                                key={time} 
+                                type="button" 
+                                className={`af-time-btn${formData.appointment_time === time ? ' sel' : ''}`} 
+                                onClick={() => setFormData({ ...formData, appointment_time: time })}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <button 
+                      type="submit" 
+                      className="af-submit" 
+                      disabled={loading || !selectedDate || !formData.appointment_time || availableTimes.length === 0}
+                    >
                       {loading ? (
                         <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem' }}>
                           <svg style={{ animation: 'spin 1s linear infinite', width: 18, height: 18 }} viewBox="0 0 24 24">
@@ -516,7 +619,7 @@ export function AppointmentForm() {
                   {showHistory && (
                     customerHistory.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,.4)' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}></div>
                         <p>No hay citas registradas para ese número</p>
                       </div>
                     ) : (
