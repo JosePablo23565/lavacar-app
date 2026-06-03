@@ -636,3 +636,73 @@
 .custom-calendar .react-calendar__tile.sunday-disabled:hover::before {
   opacity: 1;
 }
+
+/* Estilo para los valores de texto (nombre y teléfono) */
+.af-display-value {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  cursor: default;
+}
+
+/* Estilo para el textarea de detalles */
+.af-textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  outline: none;
+  resize: vertical;
+}
+
+.af-textarea:focus {
+  border-color: rgba(14, 184, 208, 0.5);
+  background: rgba(14, 184, 208, 0.05);
+  box-shadow: 0 0 0 3px rgba(14, 184, 208, 0.1);
+}
+
+.af-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+/* Estilos compactos para nombre y teléfono */
+.af-row-compact {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 0.75rem 1rem;
+}
+
+.af-compact-field {
+  flex: 1;
+}
+
+.af-label-compact {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(14, 184, 208, 0.7);
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.af-value-compact {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}

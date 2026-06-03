@@ -14,6 +14,7 @@ type Appointment = {
   vehicle_model: string
   appointment_date: string
   appointment_time: string
+  notes: string
   created_at: string
 }
 
@@ -50,7 +51,6 @@ export function AdminDashboard() {
     console.log('Fecha actual:', hoy)
     console.log('Hora actual:', horaActual)
     
-    // Buscar citas pasadas (fechas anteriores O hoy pero hora pasada)
     const { data: citasPasadas, error: selectError } = await supabase
       .from('appointments')
       .select('id, appointment_date, appointment_time')
@@ -83,7 +83,7 @@ export function AdminDashboard() {
     return 0
   }
 
-  // 🧹 FUNCIÓN PARA LIMPIEZA MANUAL (CON BOTÓN)
+  // 🧹 FUNCIÓN PARA LIMPIEZA MANUAL
   const limpiarManual = async () => {
     const resultado = await swalConfirm(
       'Limpiar citas vencidas', 
@@ -120,7 +120,6 @@ export function AdminDashboard() {
       return
     }
 
-    // 🔥 LIMPIAR CITAS PASADAS ANTES DE CARGAR
     await limpiarCitasPasadas()
     
     fetchAppointments()
@@ -140,13 +139,11 @@ export function AdminDashboard() {
     const ahora = new Date()
     const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
     
-    // ✅ TODAS las citas de hoy (sin importar la hora)
     const citasHoy = citas.filter(c => c.appointment_date === hoy)
     
-    // ✅ PRÓXIMAS: Todas las citas futuras (mañana, siguiente semana) + las de hoy que NO han pasado
     const citasProximas = citas.filter(c => {
-      if (c.appointment_date > hoy) return true // Cualquier fecha futura
-      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true // Hoy pero no ha pasado
+      if (c.appointment_date > hoy) return true
+      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
       return false
     })
     
@@ -412,6 +409,13 @@ export function AdminDashboard() {
                           <span className="text-white/40 w-24">Fecha y hora:</span>
                           <span className="text-white/80">{formatDateCard(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span>
                         </div>
+                        {/* DETALLES EN VERSIÓN MÓVIL */}
+                        {apt.notes && (
+                          <div className="flex mt-2 pt-2 border-t border-white/10">
+                            <span className="text-white/40 w-24">📝 Detalles:</span>
+                            <span className="text-white/80 text-sm" style={{ color: '#0eb8d0' }}>{apt.notes}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))
@@ -432,13 +436,14 @@ export function AdminDashboard() {
                         <th>Servicio</th>
                         <th>Fecha</th>
                         <th>Hora</th>
+                        <th>Detalles</th>
                         <th style={{ textAlign: 'center' }}>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredAppointments.length === 0 ? (
                         <tr>
-                          <td colSpan={9} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
+                          <td colSpan={10} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
                         </tr>
                       ) : (
                         filteredAppointments.map((apt) => (
@@ -451,6 +456,15 @@ export function AdminDashboard() {
                             <td>{getServiceLabel(apt.service_type)}</td>
                             <td><span className="badge-blue">{formatDateDisplay(apt.appointment_date)}</span></td>
                             <td><span className="badge-green">{convertTo12Hour(apt.appointment_time)}</span></td>
+                            <td style={{ maxWidth: '200px', fontSize: '0.75rem', color: '#0eb8d0' }}>
+                              {apt.notes ? (
+                                <span style={{ background: 'rgba(14,184,208,0.1)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>
+                                  📝 {apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}
+                                </span>
+                              ) : (
+                                <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>
+                              )}
+                            </td>
                             <td style={{ textAlign: 'center' }}>
                               <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                 <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️</button>

@@ -14,6 +14,7 @@ type Appointment = {
   vehicle_model: string
   appointment_date: string
   appointment_time: string
+  notes: string
   created_at: string
 }
 
@@ -112,7 +113,6 @@ export function AppointmentForm() {
   const [userId, setUserId] = useState('')
   const [perfil, setPerfil] = useState({ nombre: '', telefono: '' })
   
-  // ✅ MODIFICADO: SIN fecha seleccionada por defecto (null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   
   const [formData, setFormData] = useState({
@@ -123,6 +123,7 @@ export function AppointmentForm() {
     vehicle_model: '',
     appointment_date: '',
     appointment_time: '',
+    notes: '',
   })
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
   const [customerHistory, setCustomerHistory] = useState<Appointment[]>([])
@@ -130,8 +131,8 @@ export function AppointmentForm() {
   const [showHistory, setShowHistory] = useState(false)
   const [phoneToSearch, setPhoneToSearch] = useState('')
   const [successData, setSuccessData] = useState<{
-    show: boolean; name: string; date: string; time: string; service: string; vehicleType: string; vehicleModel: string
-  }>({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '' })
+    show: boolean; name: string; date: string; time: string; service: string; vehicleType: string; vehicleModel: string; notes: string
+  }>({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })
 
   const services = [
     { value: 'basico', label: 'Lavado Básico', price: '$10', duration: 30 },
@@ -146,7 +147,7 @@ export function AppointmentForm() {
     { value: 'camioneta', label: 'Camioneta / SUV' },
   ]
 
-  // ✅ Horarios cada 1 hora
+  // Horarios cada 1 hora
   const allTimes = [
     '09:00 AM', '10:00 AM', '11:00 AM',
     '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM',
@@ -255,7 +256,6 @@ export function AppointmentForm() {
     return `${hour12.toString().padStart(2, '0')}:${minutes} ${ampm}`
   }
 
-  // ✅ CORREGIDO: Solo buscar horarios si hay fecha seleccionada
   useEffect(() => { 
     if (selectedDate) {
       fetchAvailableTimes()
@@ -283,7 +283,6 @@ export function AppointmentForm() {
     
     let available = allTimes.filter(time => !bookedTimes12h.includes(time))
     
-    // ✅ CORREGIDO: Filtrar horas pasadas correctamente
     if (dateStr === hoy) {
       available = available.filter(time => {
         const [horaStr, modifier] = time.split(' ')
@@ -293,18 +292,14 @@ export function AppointmentForm() {
         if (modifier === 'PM' && hora24 !== 12) hora24 += 12
         if (modifier === 'AM' && hora24 === 12) hora24 = 0
         
-        // Comparar horas correctamente
         if (hora24 < horaActual) return false
-        if (hora24 === horaActual) {
-          if (parseInt(minuto) <= minutosActual) return false
-        }
+        if (hora24 === horaActual && parseInt(minuto) <= minutosActual) return false
         return true
       })
     }
     
     setAvailableTimes(available)
     
-    // Limpiar hora seleccionada si ya no está disponible
     if (formData.appointment_time && !available.includes(formData.appointment_time)) {
       setFormData(prev => ({ ...prev, appointment_time: '' }))
     }
@@ -316,9 +311,7 @@ export function AppointmentForm() {
   }
 
   const handleDateChange = (date: Date) => {
-    // ✅ Verificar si es domingo ANTES de seleccionar
     if (date.getDay() === 0) {
-      // No hacer nada, el calendario ya debería bloquearlo
       return
     }
     setSelectedDate(date)
@@ -332,7 +325,6 @@ export function AppointmentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // ✅ Validaciones mejoradas
     if (!selectedDate) {
       alert('Por favor seleccione una fecha')
       return
@@ -343,7 +335,6 @@ export function AppointmentForm() {
       return
     }
     
-    // ✅ Validar que la hora no haya pasado (si es hoy)
     const hoy = new Date().toISOString().split('T')[0]
     const ahora = new Date()
     const horaActual = ahora.getHours()
@@ -376,7 +367,8 @@ export function AppointmentForm() {
       ...formData, 
       appointment_time: convertTo24Hour(formData.appointment_time),
       email: userEmail,
-      user_id: userId
+      user_id: userId,
+      notes: formData.notes || null
     }])
     
     if (error) {
@@ -391,10 +383,10 @@ export function AppointmentForm() {
         time: formData.appointment_time, 
         service: svc?.label || formData.service_type, 
         vehicleType: veh?.label || formData.vehicle_type, 
-        vehicleModel: formData.vehicle_model 
+        vehicleModel: formData.vehicle_model,
+        notes: formData.notes || ''
       })
       
-      // Resetear formulario
       setSelectedDate(null)
       setFormData({ 
         customer_name: perfil.nombre,
@@ -403,12 +395,13 @@ export function AppointmentForm() {
         vehicle_type: '', 
         vehicle_model: '', 
         appointment_date: '', 
-        appointment_time: '' 
+        appointment_time: '',
+        notes: ''
       })
       setAvailableTimes([])
       
       setTimeout(() => setSuccessData({ 
-        show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '' 
+        show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
       }), 6000)
     }
     setLoading(false)
@@ -419,15 +412,11 @@ export function AppointmentForm() {
   const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
-  // ✅ CORREGIDO: Bloquear fechas pasadas Y domingos
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    // Bloquear fechas pasadas
     if (date < today) return true
-    
-    // Bloquear domingos (0 = domingo)
     if (date.getDay() === 0) return true
     
     return false
@@ -464,26 +453,16 @@ export function AppointmentForm() {
                 </div>
                 <div className="af-body">
                   <form onSubmit={handleSubmit}>
-                    <div className="af-field">
-                      <label className="af-label">NOMBRE COMPLETO</label>
-                      <input 
-                        className="af-input" 
-                        type="text" 
-                        value={perfil.nombre || ''} 
-                        disabled
-                        placeholder="Cargando..."
-                      />
-                    </div>
-
-                    <div className="af-field">
-                      <label className="af-label">TELÉFONO</label>
-                      <input 
-                        className="af-input" 
-                        type="tel" 
-                        value={perfil.telefono || ''} 
-                        disabled
-                        placeholder="Cargando..."
-                      />
+                    
+                    <div className="af-row-compact">
+                      <div className="af-compact-field">
+                        <label className="af-label-compact">NOMBRE</label>
+                        <p className="af-value-compact">{perfil.nombre || 'Cargando...'}</p>
+                      </div>
+                      <div className="af-compact-field">
+                        <label className="af-label-compact">TELÉFONO</label>
+                        <p className="af-value-compact">{perfil.telefono || 'Cargando...'}</p>
+                      </div>
                     </div>
 
                     <div className="af-grid-2">
@@ -527,6 +506,26 @@ export function AppointmentForm() {
                       {selectedService && <p className="af-hint">Duración estimada: {selectedService.duration} minutos</p>}
                     </div>
 
+                    {/* NUEVO CAMPO: Detalles de la cita */}
+                    <div className="af-field">
+                      <label className="af-label">DETALLES DE LA CITA (OPCIONAL)</label>
+                      <textarea
+                        className="af-textarea"
+                        rows={3}
+                        placeholder="Ej: No va a llegar el dueño, lo va a llevar mi hermano(NOMBRE).                O alguna observación importante..."
+                        value={formData.notes}
+                        onChange={(e) => {
+                          if (e.target.value.length <= 100) {
+                            setFormData({ ...formData, notes: e.target.value })
+                          }
+                        }}
+                        maxLength={100}
+                      />
+                      <div className="af-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>
+                        {formData.notes.length}/100 caracteres
+                      </div>
+                    </div>
+
                     <span className="af-section-label">SELECCIONE LA FECHA</span>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <Calendar 
@@ -539,7 +538,6 @@ export function AppointmentForm() {
                       />
                     </div>
 
-                    {/* ✅ Mensaje cuando no hay fecha seleccionada */}
                     {!selectedDate && (
                       <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
                         Seleccione una fecha para ver los horarios disponibles
@@ -551,7 +549,7 @@ export function AppointmentForm() {
                         <span className="af-section-label">HORARIOS DISPONIBLES</span>
                         {availableTimes.length === 0 ? (
                           <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
-                            No hay horarios disponibles para este día
+                             No hay horarios disponibles para este día
                           </p>
                         ) : (
                           <div className="af-time-grid">
@@ -630,7 +628,7 @@ export function AppointmentForm() {
                           return (
                             <div key={cita.id} className="af-history-card">
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                                <div>
+                                <div style={{ flex: 1 }}>
                                   <div style={{ marginBottom: '.5rem' }}>
                                     <span style={{ fontWeight: 600, fontSize: '.95rem', color: '#0eb8d0' }}>{svc?.label || cita.service_type}</span>
                                   </div>
@@ -639,6 +637,11 @@ export function AppointmentForm() {
                                   </p>
                                   <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.2rem' }}>{formatDateDisplay(cita.appointment_date)}</p>
                                   <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)' }}>{convertTo12Hour(cita.appointment_time)}</p>
+                                  {cita.notes && (
+                                    <p style={{ fontSize: '.75rem', color: '#0eb8d0', marginTop: '.5rem', fontStyle: 'italic', background: 'rgba(14,184,208,0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px' }}>
+                                       {cita.notes}
+                                    </p>
+                                  )}
                                 </div>
                                 <span className="af-confirmed">Confirmada</span>
                               </div>
@@ -671,6 +674,7 @@ export function AppointmentForm() {
                   { k: 'Fecha', v: formatDateSimple(successData.date) },
                   { k: 'Hora', v: successData.time },
                   { k: 'Servicio', v: successData.service },
+                  ...(successData.notes ? [{ k: 'Detalles', v: successData.notes }] : [])
                 ].map((row) => (
                   <div key={row.k} className="af-modal-row">
                     <span className="af-modal-key">{row.k}</span>
@@ -679,7 +683,7 @@ export function AppointmentForm() {
                 ))}
               </div>
 
-              <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #0eb8d0, #0a8ca0)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+              <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #0eb8d0, #0a8ca0)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
                 Cerrar
               </button>
             </div>
