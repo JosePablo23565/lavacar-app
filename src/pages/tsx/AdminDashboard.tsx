@@ -345,7 +345,7 @@ export function AdminDashboard() {
             onClick={() => setActiveTab('horarios')}
             className={`af-tab ${activeTab === 'horarios' ? 'active' : ''}`}
           >
-            ⏰ Horarios
+            Horarios
           </button>
         </div>
 
@@ -542,7 +542,7 @@ export function AdminDashboard() {
             {/* OPINIONES PENDIENTES */}
             <div className="admin-card testimonios-container">
               <div className="testimonios-header pendiente">
-                <span className="testimonios-header-icon">⏳</span>
+                <span className="testimonios-header-icon"></span>
                 <h2>Opiniones Pendientes ({pendingTestimonials.length})</h2>
               </div>
               {pendingTestimonials.length === 0 ? (
@@ -705,7 +705,7 @@ export function AdminDashboard() {
                 </table>
               </div>
               <p className="af-hint" style={{ marginTop: '1rem', textAlign: 'center' }}>
-                ℹ️ Los horarios se actualizan automáticamente. Los clientes verán los cambios inmediatamente.
+                 Los horarios se actualizan automáticamente. Los clientes verán los cambios inmediatamente.
               </p>
             </div>
           </div>
