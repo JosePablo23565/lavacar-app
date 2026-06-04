@@ -277,7 +277,6 @@ export function AppointmentForm() {
   const generateTimeSlots = (start12h: string, end12h: string, intervalMinutes: number): string[] => {
     const slots: string[] = []
     
-    // Si no está activo o es domingo, retornar vacío
     if (!start12h || !end12h || start12h === '00:00 AM' || end12h === '00:00 AM') {
       return slots
     }
@@ -324,9 +323,7 @@ export function AppointmentForm() {
   const fetchAvailableTimes = async () => {
     if (!selectedDate) return
     
-    const diaSemana = selectedDate.getDay() // 0=domingo, 1=lunes, etc.
-    
-    // Obtener horarios base según la configuración de la tabla horarios
+    const diaSemana = selectedDate.getDay()
     const horariosDelDia = getHorariosPorDia(diaSemana)
     
     if (horariosDelDia.length === 0) {
@@ -346,7 +343,6 @@ export function AppointmentForm() {
     const horaActual = ahora.getHours()
     const minutosActual = ahora.getMinutes()
     
-    // Obtener horas ya reservadas
     const { data } = await supabase
       .from('appointments')
       .select('appointment_time')
@@ -355,10 +351,8 @@ export function AppointmentForm() {
     const bookedTimes24h = data?.map(a => a.appointment_time) || []
     const bookedTimes12h = bookedTimes24h.map(t => convertTo12Hour(t))
     
-    // Filtrar horas ocupadas
     let available = horariosDelDia.filter(time => !bookedTimes12h.includes(time))
     
-    // Si es hoy, filtrar horas pasadas
     if (dateStr === hoyStr) {
       available = available.filter(time => {
         const [horaStr, modifier] = time.split(' ')
@@ -387,11 +381,7 @@ export function AppointmentForm() {
   }
 
   const handleDateChange = (date: Date) => {
-    if (date.getDay() === 0) {
-      alert('Los domingos estamos cerrados')
-      return
-    }
-    
+    // Los domingos ya no están bloqueados - dependen de la tabla horarios
     const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     setSelectedDate(newDate)
     
@@ -497,23 +487,22 @@ export function AppointmentForm() {
   const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
-  // Función para deshabilitar fechas pasadas
+  // Función para deshabilitar SOLO fechas pasadas (domingos NO están bloqueados)
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
+    // Solo deshabilitar fechas anteriores a hoy
     if (compareDate < todayMidnight) return true
-    if (date.getDay() === 0) return true
     
+    // Los domingos ya NO se bloquean aquí
     return false
   }
 
-  const getTileClassName = ({ date, view }: { date: Date; view: string }) => {
-    if (view === 'month' && date.getDay() === 0) {
-      return 'sunday-disabled'
-    }
-    return ''
+  // No aplicamos ninguna clase especial a los tiles del calendario
+  const getTileClassName = () => {
+    return null
   }
 
   // Fecha mínima para el calendario (hoy sin horas)
