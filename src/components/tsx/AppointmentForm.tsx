@@ -18,6 +18,16 @@ type Appointment = {
   created_at: string
 }
 
+type Horario = {
+  id: number
+  dia_semana: number
+  nombre_dia: string
+  hora_inicio: string
+  hora_fin: string
+  intervalo_minutos: number
+  activo: boolean
+}
+
 // Componente Select personalizado con efecto burbuja
 interface CustomSelectProps {
   value: string
@@ -114,6 +124,7 @@ export function AppointmentForm() {
   const [perfil, setPerfil] = useState({ nombre: '', telefono: '' })
   
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [horarios, setHorarios] = useState<Horario[]>([])
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -147,11 +158,17 @@ export function AppointmentForm() {
     { value: 'camioneta', label: 'Camioneta / SUV' },
   ]
 
-  // Horarios cada 1 hora
-  const allTimes = [
-    '09:00 AM', '10:00 AM', '11:00 AM',
-    '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM',
-  ]
+  // Cargar horarios desde Supabase
+  useEffect(() => {
+    const fetchHorarios = async () => {
+      const { data } = await supabase
+        .from('horarios')
+        .select('*')
+        .order('dia_semana', { ascending: true })
+      setHorarios(data || [])
+    }
+    fetchHorarios()
+  }, [])
 
   // Verificar autenticación al cargar
   useEffect(() => {
@@ -256,23 +273,80 @@ export function AppointmentForm() {
     return `${hour12.toString().padStart(2, '0')}:${minutes} ${ampm}`
   }
 
+  // Generar horarios según inicio, fin e intervalo
+  const generateTimeSlots = (start12h: string, end12h: string, intervalMinutes: number): string[] => {
+    const slots: string[] = []
+    
+    // Si no está activo o es domingo, retornar vacío
+    if (!start12h || !end12h || start12h === '00:00 AM' || end12h === '00:00 AM') {
+      return slots
+    }
+    
+    const start24h = convertTo24Hour(start12h)
+    const end24h = convertTo24Hour(end12h)
+    
+    let [startHour, startMinute] = start24h.split(':').map(Number)
+    let [endHour, endMinute] = end24h.split(':').map(Number)
+    
+    let current = new Date(2000, 0, 1, startHour, startMinute)
+    const end = new Date(2000, 0, 1, endHour, endMinute)
+    
+    while (current <= end) {
+      const hour = current.getHours()
+      const minute = current.getMinutes()
+      const ampm = hour >= 12 ? 'PM' : 'AM'
+      const hour12 = hour % 12 || 12
+      const minuteStr = minute.toString().padStart(2, '0')
+      slots.push(`${hour12}:${minuteStr} ${ampm}`)
+      current.setMinutes(current.getMinutes() + intervalMinutes)
+    }
+    
+    return slots
+  }
+
+  // Obtener horarios para un día específico
+  const getHorariosPorDia = (diaSemana: number): string[] => {
+    const horario = horarios.find(h => h.dia_semana === diaSemana)
+    if (!horario || !horario.activo) {
+      return []
+    }
+    return generateTimeSlots(horario.hora_inicio, horario.hora_fin, horario.intervalo_minutos)
+  }
+
   useEffect(() => { 
     if (selectedDate) {
       fetchAvailableTimes()
     } else {
       setAvailableTimes([])
     }
-  }, [selectedDate])
+  }, [selectedDate, horarios])
 
   const fetchAvailableTimes = async () => {
     if (!selectedDate) return
     
-    const dateStr = selectedDate.toISOString().split('T')[0]
-    const hoy = new Date().toISOString().split('T')[0]
+    const diaSemana = selectedDate.getDay() // 0=domingo, 1=lunes, etc.
+    
+    // Obtener horarios base según la configuración de la tabla horarios
+    const horariosDelDia = getHorariosPorDia(diaSemana)
+    
+    if (horariosDelDia.length === 0) {
+      setAvailableTimes([])
+      return
+    }
+    
+    const year = selectedDate.getFullYear()
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
+    const day = String(selectedDate.getDate()).padStart(2, '0')
+    const dateStr = `${year}-${month}-${day}`
+    
+    const hoy = new Date()
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+    
     const ahora = new Date()
     const horaActual = ahora.getHours()
     const minutosActual = ahora.getMinutes()
     
+    // Obtener horas ya reservadas
     const { data } = await supabase
       .from('appointments')
       .select('appointment_time')
@@ -281,9 +355,11 @@ export function AppointmentForm() {
     const bookedTimes24h = data?.map(a => a.appointment_time) || []
     const bookedTimes12h = bookedTimes24h.map(t => convertTo12Hour(t))
     
-    let available = allTimes.filter(time => !bookedTimes12h.includes(time))
+    // Filtrar horas ocupadas
+    let available = horariosDelDia.filter(time => !bookedTimes12h.includes(time))
     
-    if (dateStr === hoy) {
+    // Si es hoy, filtrar horas pasadas
+    if (dateStr === hoyStr) {
       available = available.filter(time => {
         const [horaStr, modifier] = time.split(' ')
         let [hora, minuto] = horaStr.split(':')
@@ -312,14 +388,22 @@ export function AppointmentForm() {
 
   const handleDateChange = (date: Date) => {
     if (date.getDay() === 0) {
+      alert('Los domingos estamos cerrados')
       return
     }
-    setSelectedDate(date)
-    setFormData({ 
-      ...formData, 
-      appointment_date: date.toISOString().split('T')[0], 
+    
+    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    setSelectedDate(newDate)
+    
+    const year = newDate.getFullYear()
+    const month = String(newDate.getMonth() + 1).padStart(2, '0')
+    const day = String(newDate.getDate()).padStart(2, '0')
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      appointment_date: `${year}-${month}-${day}`, 
       appointment_time: '' 
-    })
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -335,12 +419,13 @@ export function AppointmentForm() {
       return
     }
     
-    const hoy = new Date().toISOString().split('T')[0]
+    const hoy = new Date()
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
     const ahora = new Date()
     const horaActual = ahora.getHours()
     const minutosActual = ahora.getMinutes()
     
-    if (formData.appointment_date === hoy) {
+    if (formData.appointment_date === hoyStr) {
       const [horaStr, modifier] = formData.appointment_time.split(' ')
       let [hora, minuto] = horaStr.split(':')
       let hora24 = parseInt(hora)
@@ -412,11 +497,13 @@ export function AppointmentForm() {
   const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
+  // Función para deshabilitar fechas pasadas
   const isDateDisabled = (date: Date) => {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
-    if (date < today) return true
+    if (compareDate < todayMidnight) return true
     if (date.getDay() === 0) return true
     
     return false
@@ -429,267 +516,265 @@ export function AppointmentForm() {
     return ''
   }
 
+  // Fecha mínima para el calendario (hoy sin horas)
+  const today = new Date()
+  const minDateValue = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
   return (
-    <>
-
-      <div className="af-root">
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <div className={`af-tabs ${menuAbiertoGlobal ? 'menu-abierto' : ''}`} id="sticky-tabs">
-            <button className={`af-tab${step === 'form' ? ' active' : ''}`} onClick={() => handleStepChange('form')}>
-              Agendar Cita
-            </button>
-            <button className={`af-tab${step === 'history' ? ' active' : ''}`} onClick={() => handleStepChange('history')}>
-              Mis Citas
-            </button>
-          </div>
-
-          <div style={{ transition: 'all .3s', opacity: animating ? 0 : 1, transform: animating ? 'scale(.97)' : 'scale(1)' }}>
-
-            {step === 'form' && (
-              <div className="af-card">
-                <div className="af-card-header">
-                  <h2>Agendar Cita</h2>
-                  <p>Complete los datos para reservar su espacio</p>
-                </div>
-                <div className="af-body">
-                  <form onSubmit={handleSubmit}>
-                    
-                    <div className="af-row-compact">
-                      <div className="af-compact-field">
-                        <label className="af-label-compact">NOMBRE</label>
-                        <p className="af-value-compact">{perfil.nombre || 'Cargando...'}</p>
-                      </div>
-                      <div className="af-compact-field">
-                        <label className="af-label-compact">TELÉFONO</label>
-                        <p className="af-value-compact">{perfil.telefono || 'Cargando...'}</p>
-                      </div>
-                    </div>
-
-                    <div className="af-grid-2">
-                      <div>
-                        <CustomSelect
-                          label="TIPO DE VEHÍCULO"
-                          value={formData.vehicle_type}
-                          onChange={(value) => setFormData({ ...formData, vehicle_type: value })}
-                          options={vehicleTypes}
-                          placeholder="Seleccione"
-                        />
-                      </div>
-                      <div>
-                        <label className="af-label">MARCA Y MODELO</label>
-                        <input 
-                          className="af-input" 
-                          type="text" 
-                          name="vehicle_model" 
-                          value={formData.vehicle_model} 
-                          onChange={(e) => {
-                            const value = e.target.value
-                            if (value.length <= 25) {
-                              setFormData({ ...formData, vehicle_model: value })
-                            }
-                          }} 
-                          required 
-                          placeholder="Ej: Toyota Hilux"
-                          maxLength={25}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="af-field">
-                      <CustomSelect
-                        label="SERVICIO"
-                        value={formData.service_type}
-                        onChange={(value) => setFormData({ ...formData, service_type: value })}
-                        options={services.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
-                        placeholder="Seleccione un servicio"
-                      />
-                      {selectedService && <p className="af-hint">Duración estimada: {selectedService.duration} minutos</p>}
-                    </div>
-
-                    {/* NUEVO CAMPO: Detalles de la cita */}
-                    <div className="af-field">
-                      <label className="af-label">DETALLES DE LA CITA (OPCIONAL)</label>
-                      <textarea
-                        className="af-textarea"
-                        rows={3}
-                        placeholder="Ej: No va a llegar el dueño, lo va a llevar mi hermano(NOMBRE).                O alguna observación importante..."
-                        value={formData.notes}
-                        onChange={(e) => {
-                          if (e.target.value.length <= 100) {
-                            setFormData({ ...formData, notes: e.target.value })
-                          }
-                        }}
-                        maxLength={100}
-                      />
-                      <div className="af-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>
-                        {formData.notes.length}/100 caracteres
-                      </div>
-                    </div>
-
-                    <span className="af-section-label">SELECCIONE LA FECHA</span>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <Calendar 
-                        onChange={(date) => handleDateChange(date as Date)} 
-                        value={selectedDate}
-                        minDate={new Date()}
-                        tileDisabled={({ date }) => isDateDisabled(date)}
-                        tileClassName={getTileClassName}
-                        className="custom-calendar"
-                      />
-                    </div>
-
-                    {!selectedDate && (
-                      <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
-                        Seleccione una fecha para ver los horarios disponibles
-                      </p>
-                    )}
-
-                    {selectedDate && (
-                      <>
-                        <span className="af-section-label">HORARIOS DISPONIBLES</span>
-                        {availableTimes.length === 0 ? (
-                          <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
-                             No hay horarios disponibles para este día
-                          </p>
-                        ) : (
-                          <div className="af-time-grid">
-                            {availableTimes.map((time) => (
-                              <button 
-                                key={time} 
-                                type="button" 
-                                className={`af-time-btn${formData.appointment_time === time ? ' sel' : ''}`} 
-                                onClick={() => setFormData({ ...formData, appointment_time: time })}
-                              >
-                                {time}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <button 
-                      type="submit" 
-                      className="af-submit" 
-                      disabled={loading || !selectedDate || !formData.appointment_time || availableTimes.length === 0}
-                    >
-                      {loading ? (
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem' }}>
-                          <svg style={{ animation: 'spin 1s linear infinite', width: 18, height: 18 }} viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" fill="none" strokeDasharray="31" strokeDashoffset="10" />
-                          </svg>
-                          Agendando...
-                        </span>
-                      ) : 'AGENDAR CITA'}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {step === 'history' && (
-              <div className="af-card">
-                <div className="af-card-header">
-                  <h2>Mis Citas</h2>
-                  <p>Consulte sus citas agendadas</p>
-                </div>
-                <div className="af-body">
-                  <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem' }}>
-                    <input 
-                      className="af-input" 
-                      type="tel" 
-                      placeholder="Ingrese su número de teléfono" 
-                      value={phoneToSearch} 
-                      onChange={(e) => {
-                        const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
-                        if (onlyNumbers.length <= 8) {
-                          setPhoneToSearch(onlyNumbers)
-                        }
-                      }} 
-                      style={{ flex: 1 }} 
-                      maxLength={8}
-                    />
-                    <button onClick={() => { if (phoneToSearch) { fetchCustomerHistory(phoneToSearch); setShowHistory(true) } }} className="af-buscar-btn">
-                      Buscar
-                    </button>
-                  </div>
-
-                  {showHistory && (
-                    customerHistory.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,.4)' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}></div>
-                        <p>No hay citas registradas para ese número</p>
-                      </div>
-                    ) : (
-                      <div>
-                        {customerHistory.map((cita) => {
-                          const svc = services.find((s) => s.value === cita.service_type)
-                          const veh = vehicleTypes.find((v) => v.value === cita.vehicle_type)
-                          return (
-                            <div key={cita.id} className="af-history-card">
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ marginBottom: '.5rem' }}>
-                                    <span style={{ fontWeight: 600, fontSize: '.95rem', color: '#0eb8d0' }}>{svc?.label || cita.service_type}</span>
-                                  </div>
-                                  <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.3rem' }}>
-                                    {veh?.label || cita.vehicle_type} — {cita.vehicle_model}
-                                  </p>
-                                  <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.2rem' }}>{formatDateDisplay(cita.appointment_date)}</p>
-                                  <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)' }}>{convertTo12Hour(cita.appointment_time)}</p>
-                                  {cita.notes && (
-                                    <p style={{ fontSize: '.75rem', color: '#0eb8d0', marginTop: '.5rem', fontStyle: 'italic', background: 'rgba(14,184,208,0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px' }}>
-                                       {cita.notes}
-                                    </p>
-                                  )}
-                                </div>
-                                <span className="af-confirmed">Confirmada</span>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+    <div className="af-root">
+      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <div className={`af-tabs ${menuAbiertoGlobal ? 'menu-abierto' : ''}`} id="sticky-tabs">
+          <button className={`af-tab${step === 'form' ? ' active' : ''}`} onClick={() => handleStepChange('form')}>
+            Agendar Cita
+          </button>
+          <button className={`af-tab${step === 'history' ? ' active' : ''}`} onClick={() => handleStepChange('history')}>
+            Mis Citas
+          </button>
         </div>
 
-        {successData.show && (
-          <div className="af-modal-overlay">
-            <div className="af-modal">
-              <div className="af-modal-icon">
-                <svg width="32" height="32" fill="none" stroke="white" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
+        <div style={{ transition: 'all .3s', opacity: animating ? 0 : 1, transform: animating ? 'scale(.97)' : 'scale(1)' }}>
+          {step === 'form' && (
+            <div className="af-card">
+              <div className="af-card-header">
+                <h2>Agendar Cita</h2>
+                <p>Complete los datos para reservar su espacio</p>
               </div>
-              <h2 style={{ fontFamily: "'Sora',sans-serif", textAlign: 'center', fontSize: '1.3rem', marginBottom: '.4rem', color: '#fff' }}>Cita Agendada</h2>
-              <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1.5rem' }}>Su cita fue confirmada exitosamente</p>
-
-              <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 16, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
-                {[
-                  { k: 'Vehículo', v: `${successData.vehicleType} ${successData.vehicleModel}` },
-                  { k: 'Fecha', v: formatDateSimple(successData.date) },
-                  { k: 'Hora', v: successData.time },
-                  { k: 'Servicio', v: successData.service },
-                  ...(successData.notes ? [{ k: 'Detalles', v: successData.notes }] : [])
-                ].map((row) => (
-                  <div key={row.k} className="af-modal-row">
-                    <span className="af-modal-key">{row.k}</span>
-                    <span className="af-modal-val">{row.v}</span>
+              <div className="af-body">
+                <form onSubmit={handleSubmit}>
+                  <div className="af-row-compact">
+                    <div className="af-compact-field">
+                      <label className="af-label-compact">NOMBRE</label>
+                      <p className="af-value-compact">{perfil.nombre || 'Cargando...'}</p>
+                    </div>
+                    <div className="af-compact-field">
+                      <label className="af-label-compact">TELÉFONO</label>
+                      <p className="af-value-compact">{perfil.telefono || 'Cargando...'}</p>
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #0eb8d0, #0a8ca0)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
-                Cerrar
-              </button>
+                  <div className="af-grid-2">
+                    <div>
+                      <CustomSelect
+                        label="TIPO DE VEHÍCULO"
+                        value={formData.vehicle_type}
+                        onChange={(value) => setFormData({ ...formData, vehicle_type: value })}
+                        options={vehicleTypes}
+                        placeholder="Seleccione"
+                      />
+                    </div>
+                    <div>
+                      <label className="af-label">MARCA Y MODELO</label>
+                      <input 
+                        className="af-input" 
+                        type="text" 
+                        name="vehicle_model" 
+                        value={formData.vehicle_model} 
+                        onChange={(e) => {
+                          const value = e.target.value
+                          if (value.length <= 25) {
+                            setFormData({ ...formData, vehicle_model: value })
+                          }
+                        }} 
+                        required 
+                        placeholder="Ej: Toyota Hilux"
+                        maxLength={25}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="af-field">
+                    <CustomSelect
+                      label="SERVICIO"
+                      value={formData.service_type}
+                      onChange={(value) => setFormData({ ...formData, service_type: value })}
+                      options={services.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
+                      placeholder="Seleccione un servicio"
+                    />
+                    {selectedService && <p className="af-hint">Duración estimada: {selectedService.duration} minutos</p>}
+                  </div>
+
+                  <div className="af-field">
+                    <label className="af-label">DETALLES DE LA CITA (OPCIONAL)</label>
+                    <textarea
+                      className="af-textarea"
+                      rows={3}
+                      placeholder="Ej: No va a llegar el dueño, lo va a llevar mi hermano(NOMBRE). O alguna observación importante..."
+                      value={formData.notes}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 100) {
+                          setFormData({ ...formData, notes: e.target.value })
+                        }
+                      }}
+                      maxLength={100}
+                    />
+                    <div className="af-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>
+                      {formData.notes.length}/100 caracteres
+                    </div>
+                  </div>
+
+                  <span className="af-section-label">SELECCIONE LA FECHA</span>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Calendar 
+                      onChange={(date) => handleDateChange(date as Date)} 
+                      value={selectedDate}
+                      minDate={minDateValue}
+                      tileDisabled={({ date }) => isDateDisabled(date)}
+                      tileClassName={getTileClassName}
+                      className="custom-calendar"
+                    />
+                  </div>
+
+                  {!selectedDate && (
+                    <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
+                      Seleccione una fecha para ver los horarios disponibles
+                    </p>
+                  )}
+
+                  {selectedDate && (
+                    <>
+                      <span className="af-section-label">HORARIOS DISPONIBLES</span>
+                      {availableTimes.length === 0 ? (
+                        <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
+                          No hay horarios disponibles para este día
+                        </p>
+                      ) : (
+                        <div className="af-time-grid">
+                          {availableTimes.map((time) => (
+                            <button 
+                              key={time} 
+                              type="button" 
+                              className={`af-time-btn${formData.appointment_time === time ? ' sel' : ''}`} 
+                              onClick={() => setFormData({ ...formData, appointment_time: time })}
+                            >
+                              {time}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <button 
+                    type="submit" 
+                    className="af-submit" 
+                    disabled={loading || !selectedDate || !formData.appointment_time || availableTimes.length === 0}
+                  >
+                    {loading ? (
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem' }}>
+                        <svg style={{ animation: 'spin 1s linear infinite', width: 18, height: 18 }} viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" fill="none" strokeDasharray="31" strokeDashoffset="10" />
+                        </svg>
+                        Agendando...
+                      </span>
+                    ) : 'AGENDAR CITA'}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {step === 'history' && (
+            <div className="af-card">
+              <div className="af-card-header">
+                <h2>Mis Citas</h2>
+                <p>Consulte sus citas agendadas</p>
+              </div>
+              <div className="af-body">
+                <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem' }}>
+                  <input 
+                    className="af-input" 
+                    type="tel" 
+                    placeholder="Ingrese su número de teléfono" 
+                    value={phoneToSearch} 
+                    onChange={(e) => {
+                      const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
+                      if (onlyNumbers.length <= 8) {
+                        setPhoneToSearch(onlyNumbers)
+                      }
+                    }} 
+                    style={{ flex: 1 }} 
+                    maxLength={8}
+                  />
+                  <button onClick={() => { if (phoneToSearch) { fetchCustomerHistory(phoneToSearch); setShowHistory(true) } }} className="af-buscar-btn">
+                    Buscar
+                  </button>
+                </div>
+
+                {showHistory && (
+                  customerHistory.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,.4)' }}>
+                      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
+                      <p>No hay citas registradas para ese número</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {customerHistory.map((cita) => {
+                        const svc = services.find((s) => s.value === cita.service_type)
+                        const veh = vehicleTypes.find((v) => v.value === cita.vehicle_type)
+                        return (
+                          <div key={cita.id} className="af-history-card">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                              <div style={{ flex: 1 }}>
+                                <div style={{ marginBottom: '.5rem' }}>
+                                  <span style={{ fontWeight: 600, fontSize: '.95rem', color: '#0eb8d0' }}>{svc?.label || cita.service_type}</span>
+                                </div>
+                                <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.3rem' }}>
+                                  {veh?.label || cita.vehicle_type} — {cita.vehicle_model}
+                                </p>
+                                <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.2rem' }}>{formatDateDisplay(cita.appointment_date)}</p>
+                                <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)' }}>{convertTo12Hour(cita.appointment_time)}</p>
+                                {cita.notes && (
+                                  <p style={{ fontSize: '.75rem', color: '#0eb8d0', marginTop: '.5rem', fontStyle: 'italic', background: 'rgba(14,184,208,0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px' }}>
+                                    {cita.notes}
+                                  </p>
+                                )}
+                              </div>
+                              <span className="af-confirmed">Confirmada</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </>
+
+      {successData.show && (
+        <div className="af-modal-overlay">
+          <div className="af-modal">
+            <div className="af-modal-icon">
+              <svg width="32" height="32" fill="none" stroke="white" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 style={{ fontFamily: "'Sora',sans-serif", textAlign: 'center', fontSize: '1.3rem', marginBottom: '.4rem', color: '#fff' }}>Cita Agendada</h2>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1.5rem' }}>Su cita fue confirmada exitosamente</p>
+
+            <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 16, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+              {[
+                { k: 'Vehículo', v: `${successData.vehicleType} ${successData.vehicleModel}` },
+                { k: 'Fecha', v: formatDateSimple(successData.date) },
+                { k: 'Hora', v: successData.time },
+                { k: 'Servicio', v: successData.service },
+                ...(successData.notes ? [{ k: 'Detalles', v: successData.notes }] : [])
+              ].map((row) => (
+                <div key={row.k} className="af-modal-row">
+                  <span className="af-modal-key">{row.k}</span>
+                  <span className="af-modal-val">{row.v}</span>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #0eb8d0, #0a8ca0)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

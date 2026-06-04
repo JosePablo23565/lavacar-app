@@ -43,6 +43,57 @@
 .admin-table tr:hover td {
   background: rgba(14, 184, 208, 0.05);
 }
+
+/* ============================================ */
+/* ESTILOS PARA SELECTS EN TABLA DE HORARIOS */
+/* ============================================ */
+
+.admin-table select {
+  background: #1e293b !important;
+  border: 1px solid rgba(14, 184, 208, 0.4) !important;
+  border-radius: 12px !important;
+  color: white !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.85rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+}
+
+.admin-table select:hover {
+  border-color: rgba(14, 184, 208, 0.7) !important;
+  background: rgba(14, 184, 208, 0.1) !important;
+}
+
+.admin-table select:focus {
+  border-color: #0eb8d0 !important;
+  box-shadow: 0 0 0 2px rgba(14, 184, 208, 0.2) !important;
+}
+
+.admin-table select option {
+  background: #111827 !important;
+  color: white !important;
+}
+
+/* Estilos para checkbox en tabla de horarios */
+.admin-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0eb8d0;
+  margin: 0;
+}
+
+/* Estilos para selects deshabilitados */
+.admin-table select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================ */
+/* ESTILOS PARA BOTONES Y OTROS ELEMENTOS */
+/* ============================================ */
         
 .badge-blue {
   background: rgba(14, 184, 208, 0.15);
@@ -225,7 +276,7 @@
 }
 
 /* ============================================ */
-/* ESTILOS PARA OPINIONES - MEJORADOS */
+/* ESTILOS PARA OPINIONES */
 /* ============================================ */
 
 .testimonios-container {
@@ -417,6 +468,21 @@
 
 /* Responsive para móvil */
 @media (max-width: 640px) {
+  .admin-root {
+    padding: 1rem;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: 0.75rem;
+  }
+  
+  .admin-table select {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.7rem !important;
+    width: 80px !important;
+  }
+  
   .testimonial-card-header {
     flex-direction: column;
     align-items: flex-start;
