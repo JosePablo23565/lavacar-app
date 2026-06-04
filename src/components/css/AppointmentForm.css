@@ -706,3 +706,29 @@
   margin: 0;
   font-family: 'Inter', sans-serif;
 }
+
+/* Días bloqueados (sin horario activo) */
+.custom-calendar .blocked-day {
+  background-color: rgba(255, 68, 68, 0.15) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  text-decoration: line-through;
+  position: relative;
+  cursor: not-allowed !important;
+}
+
+.custom-calendar .blocked-day:hover {
+  background-color: rgba(255, 68, 68, 0.25) !important;
+}
+
+/* Tooltip opcional para días bloqueados */
+.custom-calendar .blocked-day abbr {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-calendar .blocked-day abbr::after {
+  content: '🔒';
+  font-size: 0.7rem;
+  margin-left: 2px;
+  opacity: 0.7;
+}

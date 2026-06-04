@@ -381,7 +381,6 @@ export function AppointmentForm() {
   }
 
   const handleDateChange = (date: Date) => {
-    // Los domingos ya no están bloqueados - dependen de la tabla horarios
     const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     setSelectedDate(newDate)
     
@@ -487,21 +486,40 @@ export function AppointmentForm() {
   const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
 
-  // Función para deshabilitar SOLO fechas pasadas (domingos NO están bloqueados)
+  // Función para deshabilitar fechas (pasadas y días sin horario activo)
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
-    // Solo deshabilitar fechas anteriores a hoy
+    // 1. Deshabilitar fechas anteriores a hoy
     if (compareDate < todayMidnight) return true
     
-    // Los domingos ya NO se bloquean aquí
+    // 2. Verificar si el día tiene horario activo (domingos desactivados, etc.)
+    const diaSemana = date.getDay()
+    const horarioDelDia = horarios.find(h => h.dia_semana === diaSemana)
+    
+    // Si no hay horario configurado o está inactivo, deshabilitar el día
+    if (!horarioDelDia || !horarioDelDia.activo) return true
+    
+    // Si el horario está activo pero tiene hora_inicio y hora_fin vacíos/inválidos
+    if (horarioDelDia.hora_inicio === '00:00 AM' || horarioDelDia.hora_fin === '00:00 AM') return true
+    
     return false
   }
 
-  // No aplicamos ninguna clase especial a los tiles del calendario
-  const getTileClassName = () => {
+  // Función para aplicar clases CSS a los tiles del calendario
+  const getTileClassName = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== 'month') return null
+    
+    const diaSemana = date.getDay()
+    const horarioDelDia = horarios.find(h => h.dia_semana === diaSemana)
+    const isBlocked = !horarioDelDia || !horarioDelDia.activo
+    
+    if (isBlocked) {
+      return 'blocked-day'
+    }
+    
     return null
   }
 
