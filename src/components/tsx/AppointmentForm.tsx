@@ -396,90 +396,87 @@ export function AppointmentForm() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedDate) {
-      alert('Por favor seleccione una fecha')
-      return
-    }
-    
-    if (!formData.appointment_time) {
-      alert('Por favor seleccioná una hora')
-      return
-    }
-    
-    const hoy = new Date()
-    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
-    const ahora = new Date()
-    const horaActual = ahora.getHours()
-    const minutosActual = ahora.getMinutes()
-    
-    if (formData.appointment_date === hoyStr) {
-      const [horaStr, modifier] = formData.appointment_time.split(' ')
-      let [hora, minuto] = horaStr.split(':')
-      let hora24 = parseInt(hora)
-      
-      if (modifier === 'PM' && hora24 !== 12) hora24 += 12
-      if (modifier === 'AM' && hora24 === 12) hora24 = 0
-      
-      if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
-        alert('No puede agendar una cita en un horario que ya pasó')
-        return
-      }
-    }
-    
-    setLoading(true)
-    
-    if (!userId || !userEmail) {
-      alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.')
-      setLoading(false)
-      navigate('/acceder')
-      return
-    }
-    
-    const { error } = await supabase.from('appointments').insert([{ 
-      ...formData, 
-      appointment_time: convertTo24Hour(formData.appointment_time),
-      email: userEmail,
-      user_id: userId,
-      notes: formData.notes || null
-    }])
-    
-    if (error) {
-      alert('Error: ' + error.message)
-    } else {
-      const svc = services.find((s) => s.value === formData.service_type)
-      const veh = vehicleTypes.find((v) => v.value === formData.vehicle_type)
-      setSuccessData({ 
-        show: true, 
-        name: formData.customer_name, 
-        date: formData.appointment_date, 
-        time: formData.appointment_time, 
-        service: svc?.label || formData.service_type, 
-        vehicleType: veh?.label || formData.vehicle_type, 
-        vehicleModel: formData.vehicle_model,
-        notes: formData.notes || ''
-      })
-      
-      setSelectedDate(null)
-      setFormData({ 
-        customer_name: perfil.nombre,
-        customer_phone: perfil.telefono,
-        service_type: '', 
-        vehicle_type: '', 
-        vehicle_model: '', 
-        appointment_date: '', 
-        appointment_time: '',
-        notes: ''
-      })
-      setAvailableTimes([])
-      
-      setTimeout(() => setSuccessData({ 
-        show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
-      }), 6000)
-    }
-    setLoading(false)
+  e.preventDefault()
+  
+  if (!selectedDate) {
+    alert('Por favor seleccione una fecha')
+    return
   }
+  
+  if (!formData.appointment_time) {
+    alert('Por favor seleccioná una hora')
+    return
+  }
+  
+  const hoy = new Date()
+  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+  const ahora = new Date()
+  const horaActual = ahora.getHours()
+  const minutosActual = ahora.getMinutes()
+  
+  if (formData.appointment_date === hoyStr) {
+    const [horaStr, modifier] = formData.appointment_time.split(' ')
+    let [hora, minuto] = horaStr.split(':')
+    let hora24 = parseInt(hora)
+    
+    if (modifier === 'PM' && hora24 !== 12) hora24 += 12
+    if (modifier === 'AM' && hora24 === 12) hora24 = 0
+    
+    if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
+      alert('No puede agendar una cita en un horario que ya pasó')
+      return
+    }
+  }
+  
+  setLoading(true)
+  
+  if (!userId || !userEmail) {
+    alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.')
+    setLoading(false)
+    navigate('/acceder')
+    return
+  }
+  
+  const { error } = await supabase.from('appointments').insert([{ 
+    ...formData, 
+    appointment_time: convertTo24Hour(formData.appointment_time),
+    email: userEmail,
+    user_id: userId,
+    notes: formData.notes || null
+  }])
+  
+  if (error) {
+    alert('Error: ' + error.message)
+    setLoading(false)
+  } else {
+    const svc = services.find((s) => s.value === formData.service_type)
+    const veh = vehicleTypes.find((v) => v.value === formData.vehicle_type)
+    setSuccessData({ 
+      show: true, 
+      name: formData.customer_name, 
+      date: formData.appointment_date, 
+      time: formData.appointment_time, 
+      service: svc?.label || formData.service_type, 
+      vehicleType: veh?.label || formData.vehicle_type, 
+      vehicleModel: formData.vehicle_model,
+      notes: formData.notes || ''
+    })
+    
+    // IMPORTANTE: Mantener la fecha pero recargar horarios
+    setFormData(prev => ({ 
+      ...prev, 
+      appointment_time: '' // Solo limpiar la hora seleccionada
+    }))
+    
+    // Recargar los horarios disponibles para la misma fecha
+    await fetchAvailableTimes()
+    
+    setTimeout(() => setSuccessData({ 
+      show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
+    }), 6000)
+  }
+  setLoading(false)
+}
 
   const selectedService = services.find((s) => s.value === formData.service_type)
 
