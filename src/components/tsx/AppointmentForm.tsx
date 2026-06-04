@@ -688,7 +688,7 @@ export function AppointmentForm() {
                   <input 
                     className="af-input" 
                     type="tel" 
-                    placeholder="Ingrese su número de teléfono" 
+                    placeholder="Número de teléfono" 
                     value={phoneToSearch} 
                     onChange={(e) => {
                       const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
