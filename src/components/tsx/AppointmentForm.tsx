@@ -602,7 +602,7 @@ export function AppointmentForm() {
                     <textarea
                       className="af-textarea"
                       rows={3}
-                      placeholder="Ej: No va a llegar el dueño, lo va a llevar mi hermano(NOMBRE). O alguna observación importante..."
+                      placeholder="Ej: No va a llegar el dueño, lo va a llevar mi hermano(NOMBRE)"
                       value={formData.notes}
                       onChange={(e) => {
                         if (e.target.value.length <= 100) {
