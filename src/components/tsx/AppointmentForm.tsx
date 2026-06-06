@@ -381,107 +381,133 @@ export function AppointmentForm() {
   }
 
   const handleDateChange = (date: Date) => {
-    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-    setSelectedDate(newDate)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const localDateStr = `${year}-${month}-${day}`
     
-    const year = newDate.getFullYear()
-    const month = String(newDate.getMonth() + 1).padStart(2, '0')
-    const day = String(newDate.getDate()).padStart(2, '0')
-    
+    setSelectedDate(date)
     setFormData(prev => ({ 
       ...prev, 
-      appointment_date: `${year}-${month}-${day}`, 
+      appointment_date: localDateStr, 
       appointment_time: '' 
     }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  
-  if (!selectedDate) {
-    alert('Por favor seleccione una fecha')
-    return
-  }
-  
-  if (!formData.appointment_time) {
-    alert('Por favor seleccioná una hora')
-    return
-  }
-  
-  const hoy = new Date()
-  const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
-  const ahora = new Date()
-  const horaActual = ahora.getHours()
-  const minutosActual = ahora.getMinutes()
-  
-  if (formData.appointment_date === hoyStr) {
-    const [horaStr, modifier] = formData.appointment_time.split(' ')
-    let [hora, minuto] = horaStr.split(':')
-    let hora24 = parseInt(hora)
+    e.preventDefault()
     
-    if (modifier === 'PM' && hora24 !== 12) hora24 += 12
-    if (modifier === 'AM' && hora24 === 12) hora24 = 0
-    
-    if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
-      alert('No puede agendar una cita en un horario que ya pasó')
+    if (!selectedDate) {
+      alert('Por favor seleccione una fecha')
       return
     }
-  }
-  
-  setLoading(true)
-  
-  if (!userId || !userEmail) {
-    alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.')
-    setLoading(false)
-    navigate('/acceder')
-    return
-  }
-  
-  const { error } = await supabase.from('appointments').insert([{ 
-    ...formData, 
-    appointment_time: convertTo24Hour(formData.appointment_time),
-    email: userEmail,
-    user_id: userId,
-    notes: formData.notes || null
-  }])
-  
-  if (error) {
-    alert('Error: ' + error.message)
-    setLoading(false)
-  } else {
-    const svc = services.find((s) => s.value === formData.service_type)
-    const veh = vehicleTypes.find((v) => v.value === formData.vehicle_type)
-    setSuccessData({ 
-      show: true, 
-      name: formData.customer_name, 
-      date: formData.appointment_date, 
-      time: formData.appointment_time, 
-      service: svc?.label || formData.service_type, 
-      vehicleType: veh?.label || formData.vehicle_type, 
-      vehicleModel: formData.vehicle_model,
-      notes: formData.notes || ''
-    })
     
-    // IMPORTANTE: Mantener la fecha pero recargar horarios
-    setFormData(prev => ({ 
-      ...prev, 
-      appointment_time: '' // Solo limpiar la hora seleccionada
-    }))
+    if (!formData.appointment_time) {
+      alert('Por favor seleccioná una hora')
+      return
+    }
     
-    // Recargar los horarios disponibles para la misma fecha
-    await fetchAvailableTimes()
+    const hoy = new Date()
+    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+    const ahora = new Date()
+    const horaActual = ahora.getHours()
+    const minutosActual = ahora.getMinutes()
     
-    setTimeout(() => setSuccessData({ 
-      show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
-    }), 6000)
+    if (formData.appointment_date === hoyStr) {
+      const [horaStr, modifier] = formData.appointment_time.split(' ')
+      let [hora, minuto] = horaStr.split(':')
+      let hora24 = parseInt(hora)
+      
+      if (modifier === 'PM' && hora24 !== 12) hora24 += 12
+      if (modifier === 'AM' && hora24 === 12) hora24 = 0
+      
+      if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
+        alert('No puede agendar una cita en un horario que ya pasó')
+        return
+      }
+    }
+    
+    setLoading(true)
+    
+    if (!userId || !userEmail) {
+      alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.')
+      setLoading(false)
+      navigate('/acceder')
+      return
+    }
+    
+    const { error } = await supabase.from('appointments').insert([{ 
+      ...formData, 
+      appointment_time: convertTo24Hour(formData.appointment_time),
+      email: userEmail,
+      user_id: userId,
+      notes: formData.notes || null
+    }])
+    
+    if (error) {
+      alert('Error: ' + error.message)
+      setLoading(false)
+    } else {
+      const svc = services.find((s) => s.value === formData.service_type)
+      const veh = vehicleTypes.find((v) => v.value === formData.vehicle_type)
+      setSuccessData({ 
+        show: true, 
+        name: formData.customer_name, 
+        date: formData.appointment_date, 
+        time: formData.appointment_time, 
+        service: svc?.label || formData.service_type, 
+        vehicleType: veh?.label || formData.vehicle_type, 
+        vehicleModel: formData.vehicle_model,
+        notes: formData.notes || ''
+      })
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        appointment_time: ''
+      }))
+      
+      await fetchAvailableTimes()
+      
+      setTimeout(() => setSuccessData({ 
+        show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
+      }), 6000)
+      setLoading(false)
+    }
   }
-  setLoading(false)
-}
 
   const selectedService = services.find((s) => s.value === formData.service_type)
 
-  const formatDateDisplay = (date: string) => new Date(date).toLocaleDateString('es-CR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-  const formatDateSimple = (date: string) => new Date(date).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })
+  // ============================================
+  // FUNCIONES DE FORMATO DE FECHA CORREGIDAS
+  // SIN usar toLocaleDateString que causa problemas de zona horaria
+  // ============================================
+  
+  const formatDateDisplay = (date: string) => {
+    if (!date) return ''
+    const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    const [year, month, day] = date.split('-')
+    const fecha = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    const diaSemana = dias[fecha.getDay()]
+    const mesNum = parseInt(month) - 1
+    return `${diaSemana}, ${parseInt(day)} de ${meses[mesNum]} de ${year}`
+  }
+
+  const formatDateSimple = (date: string) => {
+    if (!date) return ''
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    const [year, month, day] = date.split('-')
+    const mesNum = parseInt(month) - 1
+    return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
+  }
+
+  const formatDateCard = (date: string) => {
+    if (!date) return ''
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+    const [year, month, day] = date.split('-')
+    const mesNum = parseInt(month) - 1
+    return `${parseInt(day)} ${meses[mesNum]} ${year}`
+  }
 
   // Función para deshabilitar fechas (pasadas y días sin horario activo)
   const isDateDisabled = (date: Date) => {
@@ -489,23 +515,18 @@ export function AppointmentForm() {
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
-    // 1. Deshabilitar fechas anteriores a hoy
     if (compareDate < todayMidnight) return true
     
-    // 2. Verificar si el día tiene horario activo (domingos desactivados, etc.)
     const diaSemana = date.getDay()
     const horarioDelDia = horarios.find(h => h.dia_semana === diaSemana)
     
-    // Si no hay horario configurado o está inactivo, deshabilitar el día
     if (!horarioDelDia || !horarioDelDia.activo) return true
     
-    // Si el horario está activo pero tiene hora_inicio y hora_fin vacíos/inválidos
     if (horarioDelDia.hora_inicio === '00:00 AM' || horarioDelDia.hora_fin === '00:00 AM') return true
     
     return false
   }
 
-  // Función para aplicar clases CSS a los tiles del calendario
   const getTileClassName = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') return null
     
@@ -520,7 +541,6 @@ export function AppointmentForm() {
     return null
   }
 
-  // Fecha mínima para el calendario (hoy sin horas)
   const today = new Date()
   const minDateValue = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
@@ -624,7 +644,8 @@ export function AppointmentForm() {
                       minDate={minDateValue}
                       tileDisabled={({ date }) => isDateDisabled(date)}
                       tileClassName={getTileClassName}
-                      className="custom-calendar"
+                      className={`custom-calendar ${horarios.length > 0 ? 'calendar-loaded' : ''}`}
+                      showNeighboringMonth={false}
                     />
                   </div>
 

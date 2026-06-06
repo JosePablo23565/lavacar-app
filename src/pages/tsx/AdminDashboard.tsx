@@ -54,15 +54,16 @@ export function AdminDashboard() {
     checkAdminAndFetch()
   }, [])
 
-  // FUNCIÓN PARA LIMPIAR CITAS PASADAS
+  // Función para limpiar citas pasadas (ahora usa fecha local)
   const limpiarCitasPasadas = async () => {
-    const hoy = new Date().toISOString().split('T')[0]
-    const ahora = new Date()
-    const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
+    // Usar fecha local, no UTC
+    const hoyLocal = new Date()
+    const year = hoyLocal.getFullYear()
+    const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
+    const day = String(hoyLocal.getDate()).padStart(2, '0')
+    const hoy = `${year}-${month}-${day}`
     
-    console.log('=== LIMPIANDO CITAS PASADAS ===')
-    console.log('Fecha actual:', hoy)
-    console.log('Hora actual:', horaActual)
+    const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
     
     const { data: citasPasadas, error: selectError } = await supabase
       .from('appointments')
@@ -74,8 +75,6 @@ export function AdminDashboard() {
       return 0
     }
     
-    console.log('Citas pasadas encontradas:', citasPasadas)
-    
     if (citasPasadas && citasPasadas.length > 0) {
       const idsAEliminar = citasPasadas.map(c => c.id)
       const { error: deleteError } = await supabase
@@ -85,7 +84,6 @@ export function AdminDashboard() {
       
       if (!deleteError) {
         const mensaje = `✅ Se eliminaron ${idsAEliminar.length} cita(s) vencida(s)`
-        console.log(mensaje)
         setLimpiezaMsg(mensaje)
         setTimeout(() => setLimpiezaMsg(''), 4000)
         return idsAEliminar.length
@@ -96,7 +94,6 @@ export function AdminDashboard() {
     return 0
   }
 
-  // 🧹 FUNCIÓN PARA LIMPIEZA MANUAL
   const limpiarManual = async () => {
     const resultado = await swalConfirm(
       'Limpiar citas vencidas', 
@@ -133,7 +130,9 @@ export function AdminDashboard() {
       return
     }
 
-    await limpiarCitasPasadas()
+    // IMPORTANTE: YA NO se eliminan citas automáticamente al cargar
+    // La limpieza ahora es SOLO manual con el botón
+    // await limpiarCitasPasadas()  // <--- ELIMINADO
     
     fetchAppointments()
     fetchTestimonials()
@@ -149,10 +148,15 @@ export function AdminDashboard() {
     
     const citas = data || []
     
-    const hoy = new Date().toISOString().split('T')[0]
-    const ahora = new Date()
-    const horaActual = `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}:00`
+    const hoyLocal = new Date()
+    const year = hoyLocal.getFullYear()
+    const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
+    const day = String(hoyLocal.getDate()).padStart(2, '0')
+    const hoy = `${year}-${month}-${day}`
     
+    const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
+    
+    // Mostrar SOLO citas futuras (no vencidas)
     const citasFuturas = citas.filter(c => {
       if (c.appointment_date > hoy) return true
       if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
@@ -277,27 +281,24 @@ export function AdminDashboard() {
 
   const formatDateDisplay = (date: string) => {
     if (!date) return '—'
-    return new Date(date).toLocaleDateString('es-CR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
+    const [year, month, day] = date.split('-')
+    return `${parseInt(day)}/${parseInt(month)}/${year}`
   }
 
   const formatDateLong = (date: string) => {
-    return new Date(date).toLocaleDateString('es-CR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    if (!date) return ''
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    const [year, month, day] = date.split('-')
+    const mesNum = parseInt(month) - 1
+    return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
   }
 
   const formatDateCard = (date: string) => {
-    return new Date(date).toLocaleDateString('es-CR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    })
+    if (!date) return ''
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+    const [year, month, day] = date.split('-')
+    const mesNum = parseInt(month) - 1
+    return `${parseInt(day)} ${meses[mesNum]} ${year}`
   }
 
   const filteredAppointments = appointments.filter(a =>
@@ -310,6 +311,19 @@ export function AdminDashboard() {
   const pendingTestimonials = testimonials.filter(t => !t.is_approved)
   const approvedTestimonials = testimonials.filter(t => t.is_approved)
 
+  const generateTimeOptions = (): string[] => {
+    const times: string[] = []
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const hour12 = hour % 12 || 12
+        const ampm = hour < 12 ? 'AM' : 'PM'
+        const minuteStr = minute.toString().padStart(2, '0')
+        times.push(`${hour12.toString().padStart(2, '0')}:${minuteStr} ${ampm}`)
+      }
+    }
+    return times
+  }
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-xl text-gray-300">Cargando...</div>
@@ -320,39 +334,26 @@ export function AdminDashboard() {
     <div className="admin-root">
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-        {/* MENSAJE DE LIMPIEZA */}
         {limpiezaMsg && (
           <div className="mb-4 p-3 rounded-lg text-center" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7' }}>
             {limpiezaMsg}
           </div>
         )}
 
-        {/* TABS MODERNOS */}
         <div className="af-tabs">
-          <button
-            onClick={() => setActiveTab('citas')}
-            className={`af-tab ${activeTab === 'citas' ? 'active' : ''}`}
-          >
+          <button onClick={() => setActiveTab('citas')} className={`af-tab ${activeTab === 'citas' ? 'active' : ''}`}>
             Citas ({appointments.length})
           </button>
-          <button
-            onClick={() => setActiveTab('testimonios')}
-            className={`af-tab ${activeTab === 'testimonios' ? 'active' : ''}`}
-          >
+          <button onClick={() => setActiveTab('testimonios')} className={`af-tab ${activeTab === 'testimonios' ? 'active' : ''}`}>
             Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
           </button>
-          <button
-            onClick={() => setActiveTab('horarios')}
-            className={`af-tab ${activeTab === 'horarios' ? 'active' : ''}`}
-          >
+          <button onClick={() => setActiveTab('horarios')} className={`af-tab ${activeTab === 'horarios' ? 'active' : ''}`}>
             Horarios
           </button>
         </div>
 
-        {/* CONTENIDO DE CITAS */}
         {activeTab === 'citas' && (
           <>
-            {/* ESTADÍSTICAS */}
             <div className="stats-row">
               <div className="stat-pill">
                 <p className="stat-pill-num" style={{ color: '#0eb8d0' }}>{stats.total}</p>
@@ -368,51 +369,31 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            {/* BOTÓN DE LIMPIEZA MANUAL */}
             <div className="mb-4">
-              <button
-                onClick={limpiarManual}
-                className="btn-clean"
-                style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: '#f87171',
-                  padding: '0.6rem 1.2rem',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontFamily: 'inherit'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
+              <button onClick={limpiarManual} className="btn-clean" style={{
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#f87171',
+                padding: '0.6rem 1.2rem',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: '500',
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: 'inherit'
+              }}>
                 Limpiar citas vencidas
               </button>
             </div>
 
-            {/* BUSCADOR */}
             <div className="search-bare">
               <span className="search-bare-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="nombre, teléfono, correo o vehículo..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+              <input type="text" placeholder="nombre, teléfono, correo o vehículo..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
 
-            {/* VISTA EN TARJETAS (MÓVIL) */}
             <div className="block md:hidden space-y-4">
               {filteredAppointments.length === 0 ? (
                 <div className="admin-card p-8 text-center text-white/40">No hay citas registradas</div>
@@ -427,12 +408,7 @@ export function AdminDashboard() {
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 text-lg px-2 py-1 transition">🗑️</button>
-                        <a
-                          href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`}
-                          target="_blank"
-                          className="text-green-400 hover:text-green-300 transition"
-                          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}
-                        >
+                        <a href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} target="_blank" className="text-green-400 hover:text-green-300 transition" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
                           </svg>
@@ -440,57 +416,28 @@ export function AdminDashboard() {
                       </div>
                     </div>
                     <div className="space-y-2.5 text-sm">
-                      <div className="flex">
-                        <span className="text-white/40 w-24">Vehículo:</span>
-                        <span className="text-white/80">{getVehicleLabel(apt.vehicle_type)}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="text-white/40 w-24">Modelo:</span>
-                        <span className="text-white/80">{apt.vehicle_model || '—'}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="text-white/40 w-24">Servicio:</span>
-                        <span className="text-white/80">{getServiceLabel(apt.service_type)}</span>
-                      </div>
-                      <div className="flex">
-                        <span className="text-white/40 w-24">Fecha y hora:</span>
-                        <span className="text-white/80">{formatDateCard(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span>
-                      </div>
-                      {apt.notes && (
-                        <div className="flex mt-2 border-white/10">
-                          <span className="text-white/40 w-24">Detalles:</span>
-                          <span className="text-white/80 text-sm" style={{ color: '#0eb8d0' }}>{apt.notes}</span>
-                        </div>
-                      )}
+                      <div className="flex"><span className="text-white/40 w-24">Vehículo:</span><span className="text-white/80">{getVehicleLabel(apt.vehicle_type)}</span></div>
+                      <div className="flex"><span className="text-white/40 w-24">Modelo:</span><span className="text-white/80">{apt.vehicle_model || '—'}</span></div>
+                      <div className="flex"><span className="text-white/40 w-24">Servicio:</span><span className="text-white/80">{getServiceLabel(apt.service_type)}</span></div>
+                      <div className="flex"><span className="text-white/40 w-24">Fecha y hora:</span><span className="text-white/80">{formatDateCard(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span></div>
+                      {apt.notes && (<div className="flex mt-2 border-white/10"><span className="text-white/40 w-24">Detalles:</span><span className="text-white/80 text-sm" style={{ color: '#0eb8d0' }}>{apt.notes}</span></div>)}
                     </div>
                   </div>
                 ))
               )}
             </div>
 
-            {/* VISTA EN TABLA (ESCRITORIO) */}
             <div className="hidden md:block admin-card" style={{ overflow: 'hidden' }}>
               <div style={{ overflowX: 'auto' }}>
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Cliente</th>
-                      <th>Teléfono</th>
-                      <th>Correo</th>
-                      <th>Vehículo</th>
-                      <th>Modelo</th>
-                      <th>Servicio</th>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Detalles</th>
-                      <th style={{ textAlign: 'center' }}>Acciones</th>
+                      <th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Vehículo</th><th>Modelo</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Detalles</th><th style={{ textAlign: 'center' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAppointments.length === 0 ? (
-                      <tr>
-                        <td colSpan={10} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td>
-                      </tr>
+                      <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td></tr>
                     ) : (
                       filteredAppointments.map((apt) => (
                         <tr key={apt.id}>
@@ -503,23 +450,12 @@ export function AdminDashboard() {
                           <td><span className="badge-blue">{formatDateDisplay(apt.appointment_date)}</span></td>
                           <td><span className="badge-green">{convertTo12Hour(apt.appointment_time)}</span></td>
                           <td style={{ maxWidth: '200px', fontSize: '0.75rem', color: '#0eb8d0' }}>
-                            {apt.notes ? (
-                              <span style={{ background: 'rgba(14,184,208,0.1)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>
-                                {apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}
-                              </span>
-                            ) : (
-                              <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>
-                            )}
+                            {apt.notes ? <span style={{ background: 'rgba(14,184,208,0.1)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>{apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}</span> : <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>}
                           </td>
                           <td style={{ textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                               <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️</button>
-                              <a 
-                                href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} 
-                                target="_blank" 
-                                className="btn-success"
-                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.4rem 0.8rem' }}
-                              >
+                              <a href={`https://wa.me/${apt.customer_phone}?text=Hola%20${apt.customer_name}%2C%20tu%20cita%20del%20${formatDateDisplay(apt.appointment_date)}%20a%20las%20${convertTo12Hour(apt.appointment_time)}%20está%20confirmada.`} target="_blank" className="btn-success" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.4rem 0.8rem' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                   <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
                                 </svg>
@@ -536,35 +472,27 @@ export function AdminDashboard() {
           </>
         )}
 
-        {/* CONTENIDO DE TESTIMONIOS */}
         {activeTab === 'testimonios' && (
           <div className="space-y-6">
-            {/* OPINIONES PENDIENTES */}
             <div className="admin-card testimonios-container">
               <div className="testimonios-header pendiente">
                 <span className="testimonios-header-icon"></span>
                 <h2>Opiniones Pendientes ({pendingTestimonials.length})</h2>
               </div>
               {pendingTestimonials.length === 0 ? (
-                <div className="testimonios-empty">
-                  <p>No hay opiniones pendientes de aprobación</p>
-                </div>
+                <div className="testimonios-empty"><p>No hay opiniones pendientes de aprobación</p></div>
               ) : (
                 <div className="testimonios-grid">
                   {pendingTestimonials.map((t) => (
                     <div key={t.id} className="testimonial-card">
                       <div className="testimonial-card-header">
-                        <div className="testimonial-avatar">
-                          {t.customer_name?.charAt(0) || 'U'}
-                        </div>
+                        <div className="testimonial-avatar">{t.customer_name?.charAt(0) || 'U'}</div>
                         <div className="testimonial-info">
                           <div className="testimonial-name">{t.customer_name}</div>
                           <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
                         </div>
                         <div className="testimonial-stars">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>
-                          ))}
+                          {[1, 2, 3, 4, 5].map((star) => (<span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>))}
                         </div>
                       </div>
                       <div className="testimonial-comment">"{t.comment}"</div>
@@ -581,32 +509,25 @@ export function AdminDashboard() {
               )}
             </div>
 
-            {/* OPINIONES APROBADAS */}
             <div className="admin-card testimonios-container">
               <div className="testimonios-header aprobada">
                 <span className="testimonios-header-icon">✓</span>
                 <h2>Opiniones Aprobadas ({approvedTestimonials.length})</h2>
               </div>
               {approvedTestimonials.length === 0 ? (
-                <div className="testimonios-empty">
-                  <p>No hay opiniones aprobadas aún</p>
-                </div>
+                <div className="testimonios-empty"><p>No hay opiniones aprobadas aún</p></div>
               ) : (
                 <div className="testimonios-grid">
                   {approvedTestimonials.map((t) => (
                     <div key={t.id} className="testimonial-card approved">
                       <div className="testimonial-card-header">
-                        <div className="testimonial-avatar">
-                          {t.customer_name?.charAt(0) || 'U'}
-                        </div>
+                        <div className="testimonial-avatar">{t.customer_name?.charAt(0) || 'U'}</div>
                         <div className="testimonial-info">
                           <div className="testimonial-name">{t.customer_name}</div>
                           <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
                         </div>
                         <div className="testimonial-stars">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>
-                          ))}
+                          {[1, 2, 3, 4, 5].map((star) => (<span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>))}
                         </div>
                       </div>
                       <div className="testimonial-comment">"{t.comment}"</div>
@@ -622,7 +543,6 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {/* CONTENIDO DE HORARIOS */}
         {activeTab === 'horarios' && (
           <div className="admin-card">
             <div className="af-card-header">
@@ -646,39 +566,17 @@ export function AdminDashboard() {
                       <tr key={horario.id}>
                         <td style={{ fontWeight: '500' }}>{horario.nombre_dia}</td>
                         <td>
-                          <select
-                            value={horario.hora_inicio}
-                            onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)}
-                            className="af-input"
-                            style={{ width: '120px', padding: '0.4rem' }}
-                            disabled={savingHorarios}
-                          >
-                            {generateTimeOptions().map(time => (
-                              <option key={time} value={time}>{time}</option>
-                            ))}
+                          <select value={horario.hora_inicio} onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} className="af-input" style={{ width: '120px', padding: '0.4rem' }} disabled={savingHorarios}>
+                            {generateTimeOptions().map(time => (<option key={time} value={time}>{time}</option>))}
                           </select>
                         </td>
                         <td>
-                          <select
-                            value={horario.hora_fin}
-                            onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)}
-                            className="af-input"
-                            style={{ width: '120px', padding: '0.4rem' }}
-                            disabled={savingHorarios}
-                          >
-                            {generateTimeOptions().map(time => (
-                              <option key={time} value={time}>{time}</option>
-                            ))}
+                          <select value={horario.hora_fin} onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} className="af-input" style={{ width: '120px', padding: '0.4rem' }} disabled={savingHorarios}>
+                            {generateTimeOptions().map(time => (<option key={time} value={time}>{time}</option>))}
                           </select>
                         </td>
                         <td>
-                          <select
-                            value={horario.intervalo_minutos}
-                            onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))}
-                            className="af-input"
-                            style={{ width: '100px', padding: '0.4rem' }}
-                            disabled={savingHorarios}
-                          >
+                          <select value={horario.intervalo_minutos} onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} className="af-input" style={{ width: '100px', padding: '0.4rem' }} disabled={savingHorarios}>
                             <option value={30}>30 min</option>
                             <option value={60}>60 min</option>
                             <option value={90}>90 min</option>
@@ -687,16 +585,8 @@ export function AdminDashboard() {
                         </td>
                         <td>
                           <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <input
-                              type="checkbox"
-                              checked={horario.activo}
-                              onChange={(e) => updateHorario(horario.id, 'activo', e.target.checked)}
-                              disabled={savingHorarios}
-                              style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                            />
-                            <span style={{ color: horario.activo ? '#34d399' : '#f87171' }}>
-                              {horario.activo ? 'Activo' : 'Inactivo'}
-                            </span>
+                            <input type="checkbox" checked={horario.activo} onChange={(e) => updateHorario(horario.id, 'activo', e.target.checked)} disabled={savingHorarios} style={{ width: '20px', height: '20px', cursor: 'pointer' }} />
+                            <span style={{ color: horario.activo ? '#34d399' : '#f87171' }}>{horario.activo ? 'Activo' : 'Inactivo'}</span>
                           </label>
                         </td>
                       </tr>
@@ -704,27 +594,11 @@ export function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              <p className="af-hint" style={{ marginTop: '1rem', textAlign: 'center' }}>
-                 Los horarios se actualizan automáticamente. Los clientes verán los cambios inmediatamente.
-              </p>
+              <p className="af-hint" style={{ marginTop: '1rem', textAlign: 'center' }}>ℹ️ Los horarios se actualizan automáticamente. Los clientes verán los cambios inmediatamente.</p>
             </div>
           </div>
         )}
       </div>
     </div>
   )
-}
-
-// Función para generar opciones de tiempo cada 30 minutos (formato 12 horas)
-function generateTimeOptions(): string[] {
-  const times: string[] = []
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const hour12 = hour % 12 || 12
-      const ampm = hour < 12 ? 'AM' : 'PM'
-      const minuteStr = minute.toString().padStart(2, '0')
-      times.push(`${hour12.toString().padStart(2, '0')}:${minuteStr} ${ampm}`)
-    }
-  }
-  return times
 }
