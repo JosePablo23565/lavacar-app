@@ -293,14 +293,6 @@ export function AdminDashboard() {
     return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
   }
 
-  const formatDateCard = (date: string) => {
-    if (!date) return ''
-    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
-    const [year, month, day] = date.split('-')
-    const mesNum = parseInt(month) - 1
-    return `${parseInt(day)} ${meses[mesNum]} ${year}`
-  }
-
   const filteredAppointments = appointments.filter(a =>
     a.customer_name.toLowerCase().includes(search.toLowerCase()) ||
     a.customer_phone.includes(search) ||
@@ -419,7 +411,7 @@ export function AdminDashboard() {
                       <div className="flex"><span className="text-white/40 w-24">Vehículo:</span><span className="text-white/80">{getVehicleLabel(apt.vehicle_type)}</span></div>
                       <div className="flex"><span className="text-white/40 w-24">Modelo:</span><span className="text-white/80">{apt.vehicle_model || '—'}</span></div>
                       <div className="flex"><span className="text-white/40 w-24">Servicio:</span><span className="text-white/80">{getServiceLabel(apt.service_type)}</span></div>
-                      <div className="flex"><span className="text-white/40 w-24">Fecha y hora:</span><span className="text-white/80">{formatDateCard(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span></div>
+                      <div className="flex"><span className="text-white/40 w-24">Fecha y hora:</span><span className="text-white/80">{formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span></div>
                       {apt.notes && (<div className="flex mt-2 border-white/10"><span className="text-white/40 w-24">Detalles:</span><span className="text-white/80 text-sm" style={{ color: '#0eb8d0' }}>{apt.notes}</span></div>)}
                     </div>
                   </div>
