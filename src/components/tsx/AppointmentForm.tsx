@@ -501,14 +501,6 @@ export function AppointmentForm() {
     return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
   }
 
-  const formatDateCard = (date: string) => {
-    if (!date) return ''
-    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
-    const [year, month, day] = date.split('-')
-    const mesNum = parseInt(month) - 1
-    return `${parseInt(day)} ${meses[mesNum]} ${year}`
-  }
-
   // Función para deshabilitar fechas (pasadas y días sin horario activo)
   const isDateDisabled = (date: Date) => {
     const today = new Date()
