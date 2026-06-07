@@ -22,6 +22,12 @@ export function ClienteAuth() {
   const [regPassword, setRegPassword] = useState('')
   const [regConfirmPassword, setRegConfirmPassword] = useState('')
 
+  // Reset password state
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetMessage, setResetMessage] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -38,6 +44,32 @@ export function ClienteAuth() {
       navigate('/')
     }
     setLoading(false)
+  }
+
+  const handleResetPassword = async () => {
+    if (!resetEmail) {
+      setResetMessage('Por favor ingresa tu correo electrónico')
+      return
+    }
+
+    setResetLoading(true)
+    setResetMessage('')
+
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/actualizar-contrasena`,
+    })
+
+    if (error) {
+      setResetMessage(`❌ ${error.message}`)
+    } else {
+      setResetMessage('✅ Se ha enviado un enlace de recuperación a tu correo electrónico')
+      setTimeout(() => {
+        setShowResetModal(false)
+        setResetEmail('')
+        setResetMessage('')
+      }, 3000)
+    }
+    setResetLoading(false)
   }
 
   const handleTelefonoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +197,14 @@ export function ClienteAuth() {
                   />
                 </div>
 
-                <a href="#" className="forgot-link">¿Olvidaste tu contraseña?</a>
+                <button 
+                  type="button" 
+                  className="forgot-link" 
+                  onClick={() => setShowResetModal(true)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: 'auto', padding: 0 }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
 
                 <button type="submit" className="auth-btn" disabled={loading}>
                   {loading ? <div className="spinner" /> : 'Iniciar Sesión'}
@@ -289,6 +328,43 @@ export function ClienteAuth() {
           )}
         </div>
       </div>
+
+      {/* Modal de recuperar contraseña */}
+      {showResetModal && (
+        <div className="reset-modal-overlay">
+          <div className="reset-modal">
+            <h3>Recuperar Contraseña</h3>
+            <p>Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña</p>
+            
+            <input
+              type="email"
+              placeholder="tu@correo.com"
+              className="reset-input"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+            />
+            
+            {resetMessage && (
+              <div className={`reset-message ${resetMessage.includes('✅') ? 'success' : 'error'}`}>
+                {resetMessage}
+              </div>
+            )}
+            
+            <div className="reset-buttons">
+              <button onClick={handleResetPassword} disabled={resetLoading}>
+                {resetLoading ? 'Enviando...' : 'Enviar enlace'}
+              </button>
+              <button onClick={() => {
+                setShowResetModal(false)
+                setResetEmail('')
+                setResetMessage('')
+              }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

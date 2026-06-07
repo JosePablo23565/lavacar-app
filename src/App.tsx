@@ -6,6 +6,7 @@ import { AdminDashboard } from './pages/tsx/AdminDashboard'
 import { Contact } from './components/tsx/Contact'
 import { Opiniones } from './components/tsx/Opiniones'
 import { ClienteAuth } from './pages/tsx/ClienteAuth'
+import { ActualizarContrasena } from './pages/tsx/ActualizarContrasena'
 import { useState, useEffect } from 'react'
 import { useAuth } from './context/AuthContext'
 import { CompletarPerfil } from './pages/tsx/CompletarPerfil'
@@ -1083,6 +1084,7 @@ function App() {
             />
             <Route path="/acceder" element={<ClienteAuth />} />
             <Route path="/completar-perfil" element={<CompletarPerfil />} />
+            <Route path="/actualizar-contrasena" element={<ActualizarContrasena />} />
             <Route
               path="/admin"
               element={
