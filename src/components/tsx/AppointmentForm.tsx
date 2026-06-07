@@ -636,7 +636,7 @@ export function AppointmentForm() {
                       minDate={minDateValue}
                       tileDisabled={({ date }) => isDateDisabled(date)}
                       tileClassName={getTileClassName}
-                      className={`custom-calendar ${horarios.length > 0 ? 'calendar-loaded' : ''}`}
+                      className="custom-calendar"
                       showNeighboringMonth={false}
                     />
                   </div>

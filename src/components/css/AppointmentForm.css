@@ -465,14 +465,19 @@
   transform: scale(1.02) !important;
 }
 
+/* Eliminar el resaltado del día actual cuando no está seleccionado */
 .custom-calendar .react-calendar__tile--now {
-  background: rgba(14, 184, 208, 0.1) !important;
-  border: 1px solid rgba(14, 184, 208, 0.3) !important;
-  color: #0eb8d0 !important;
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
-.custom-calendar .react-calendar__tile--now:enabled:hover {
-  background: rgba(14, 184, 208, 0.2) !important;
+/* Mantener el estilo solo cuando está seleccionado */
+.custom-calendar .react-calendar__tile--active {
+  background: linear-gradient(135deg, #0eb8d0, #0a8ca0) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3) !important;
+  transform: scale(1.02) !important;
 }
 
 .af-history-card {
@@ -732,19 +737,4 @@
   font-size: 0.7rem;
   margin-left: 2px;
   opacity: 0.7;
-}
-
-/* ============================================ */
-/* OCULTAR FLASH INICIAL DEL CALENDARIO */
-/* ============================================ */
-
-/* Oculta el calendario inicialmente */
-.custom-calendar {
-  opacity: 0;
-  transition: opacity 0.1s ease;
-}
-
-/* Muestra el calendario cuando ya está listo */
-.custom-calendar.calendar-loaded {
-  opacity: 1;
 }
