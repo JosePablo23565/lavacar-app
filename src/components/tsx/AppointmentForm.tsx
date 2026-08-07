@@ -379,29 +379,6 @@ export function AppointmentForm() {
     setCustomerHistory(data || [])
   }
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    const onlyLetters = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')
-    if (onlyLetters.length <= 40) {
-      setFormData({ ...formData, customer_name: onlyLetters })
-    }
-  }
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    const onlyNumbers = value.replace(/[^0-9]/g, '')
-    if (onlyNumbers.length <= 8) {
-      setFormData({ ...formData, customer_phone: onlyNumbers })
-    }
-  }
-
-  const handleVehicleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (value.length <= 25) {
-      setFormData({ ...formData, vehicle_model: value })
-    }
-  }
-
   const handleDateChange = (date: Date) => {
     const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     setSelectedDate(newDate)
