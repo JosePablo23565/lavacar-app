@@ -477,7 +477,7 @@ export function AppointmentForm() {
 
   const selectedService = services.find((s) => s.value === formData.service_type)
 
-  // 🔧 FUNCIÓN CORREGIDA PARA FORMATO DE FECHA (CON ZONA HORARIA)
+  // Formato de fecha con zona horaria
   const formatDateDisplay = (date: string) => {
     if (!date) return ''
     const d = new Date(date + 'T00:00:00')
@@ -490,7 +490,7 @@ export function AppointmentForm() {
     })
   }
 
-  // 🔧 FUNCIÓN CORREGIDA PARA FORMATO DE FECHA SIMPLE (CON ZONA HORARIA)
+  // Formato de fecha simple con zona horaria
   const formatDateSimple = (date: string) => {
     if (!date) return ''
     const d = new Date(date + 'T00:00:00')
@@ -506,16 +506,33 @@ export function AppointmentForm() {
     const today = new Date()
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    
+    // Días pasados
     if (compareDate < todayMidnight) return true
+    
+    // Días deshabilitados desde la tabla horarios
+    const diaSemana = date.getDay()
+    const horario = horarios.find(h => h.dia_semana === diaSemana)
+    if (!horario || !horario.activo) return true
+    
     return false
   }
 
   const getTileClassName = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') return null
+    
     const today = new Date()
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+    
+    // Días pasados → candado
     if (compareDate < todayMidnight) return 'blocked-day'
+    
+    // Días deshabilitados desde horarios
+    const diaSemana = date.getDay()
+    const horario = horarios.find(h => h.dia_semana === diaSemana)
+    if (!horario || !horario.activo) return 'blocked-day'
+    
     return null
   }
 
@@ -600,7 +617,7 @@ export function AppointmentForm() {
                     <textarea
                       className="af-textarea"
                       rows={3}
-                      placeholder="Ej: Dejar el auto limpio por dentro"
+                      placeholder="Ej: No lo voy a llevar yo, lo va a llevar mi hermano (NOMBRE)"
                       value={formData.notes}
                       onChange={(e) => {
                         if (e.target.value.length <= 100) {
@@ -627,6 +644,8 @@ export function AppointmentForm() {
                       next2Label={null}
                       prevLabel="‹"
                       nextLabel="›"
+                      locale="es-ES"
+                      showNeighboringMonth={false}
                     />
                   </div>
 
