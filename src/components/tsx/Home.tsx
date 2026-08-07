@@ -847,7 +847,7 @@ export function Home() {
               <div className="lc-hours-item">
                 <div>
                   <div className="lc-hours-label">LUNES A SÁBADO</div>
-                  <div className="lc-hours-value" style={{ color: '#0eb8d0' }}>8:00am - 6:00pm</div>
+                  <div className="lc-hours-value" style={{ color: '#0eb8d0' }}>8:00am - 5:30pm</div>
                 </div>
               </div>
               <div className="lc-hours-divider" />
@@ -1070,7 +1070,7 @@ export function Home() {
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>HORARIO</div>
-                      <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>Lunes a Sábado: 8am - 6pm</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>Lunes a Sábado: 8:00am - 5:30pm</div>
                     </div>
                   </div>
                 </div>
