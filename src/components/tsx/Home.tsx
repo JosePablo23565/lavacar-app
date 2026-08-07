@@ -121,7 +121,7 @@ export function Home() {
 
   const services = [
     { 
-      name: 'Lavado Básico', 
+      name: 'Lavado y Aspirado', 
       value: 'basico', 
       price: '$10', 
       desc: 'Lavado exterior con agua a presión, shampoo especial y secado manual.', 
@@ -129,7 +129,7 @@ export function Home() {
       bgImage: '/lavado-basico.jpg'
     },
     { 
-      name: 'Lavado Completo', 
+      name: 'Lavado prémium', 
       value: 'completo', 
       price: '$20', 
       desc: 'Interior y exterior. Aspirado, tablero, vidrios y limpieza de llantas.', 
@@ -137,7 +137,7 @@ export function Home() {
       bgImage: '/lavado-completo.jpg'
     },
     { 
-      name: 'Encerado + Lavado', 
+      name: 'Full Prémium', 
       value: 'encerado', 
       price: '$35', 
       desc: 'Lavado completo más encerado profesional para proteger y dar brillo a la pintura.', 
@@ -145,7 +145,7 @@ export function Home() {
       bgImage: '/encerado.jpg'
     },
     { 
-      name: 'Limpieza de Tapizado', 
+      name: 'Pulido de  Focos', 
       value: 'tapizado', 
       price: '$25', 
       desc: 'Limpieza profunda de asientos y alfombras con extractora profesional.', 
