@@ -9,9 +9,9 @@ export const swalConfirm = (title: string, text?: string) => {
     confirmButtonText: 'Sí',
     cancelButtonText: 'No',
     reverseButtons: true,
-    background: '#1e293b',
-    color: '#e2e8f0',
-    confirmButtonColor: '#0eb8d0',
+    background: '#2d2d2d',
+    color: '#e9e9e9',
+    confirmButtonColor: '#e0142c',
     cancelButtonColor: '#ef4444',
     customClass: {
       popup: 'swal-glass-popup',
@@ -28,9 +28,9 @@ export const swalSuccess = (title: string, text?: string) => {
     text: text || '',
     icon: 'success',
     confirmButtonText: 'OK',
-    background: '#1e293b',
-    color: '#e2e8f0',
-    confirmButtonColor: '#0eb8d0',
+    background: '#2d2d2d',
+    color: '#e9e9e9',
+    confirmButtonColor: '#e0142c',
     timer: 2000,
     showConfirmButton: true,
   })
@@ -42,8 +42,8 @@ export const swalError = (title: string, text?: string) => {
     text: text || '',
     icon: 'error',
     confirmButtonText: 'OK',
-    background: '#1e293b',
-    color: '#e2e8f0',
+    background: '#2d2d2d',
+    color: '#e9e9e9',
     confirmButtonColor: '#ef4444',
   })
 }

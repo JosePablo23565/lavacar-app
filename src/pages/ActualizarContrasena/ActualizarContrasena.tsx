@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import '../css/ClienteAuth.css'
+import '../ClienteAuth/ClienteAuth.css'
 
 export function ActualizarContrasena() {
   const [password, setPassword] = useState('')

@@ -12,7 +12,7 @@ export function Contact() {
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
         .ct-root {
-          background: linear-gradient(135deg, #0a0e1a 0%, #0a1225 50%, #0a0e1a 100%);
+          background: linear-gradient(135deg, #121212 0%, #181818 50%, #121212 100%);
           padding: 2rem 1.5rem;
           font-family: 'Inter', sans-serif;
           position: relative;
@@ -26,7 +26,7 @@ export function Contact() {
           right: -20%;
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(14,184,208,0.06) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(224, 20, 44,0.06) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -38,7 +38,7 @@ export function Contact() {
           left: -10%;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(14,184,208,0.04) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(224, 20, 44,0.04) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -58,7 +58,7 @@ export function Contact() {
         .ct-icon-circle {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -81,7 +81,7 @@ export function Contact() {
           font-family: 'Sora', sans-serif;
           font-size: 2.5rem;
           font-weight: 700;
-          background: linear-gradient(135deg, #fff, #0eb8d0);
+          background: linear-gradient(135deg, #fff, #e0142c);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -100,7 +100,7 @@ export function Contact() {
         }
 
         .ct-card {
-          background: rgba(15, 20, 35, 0.35);
+          background: rgba(25, 25, 25, 0.35);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 28px;
@@ -110,11 +110,11 @@ export function Contact() {
 
         .ct-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(14, 184, 208, 0.3);
+          border-color: rgba(224, 20, 44, 0.3);
         }
 
         .ct-card-header {
-          background: linear-gradient(135deg, rgba(14, 184, 208, 0.15), rgba(14, 184, 208, 0.05));
+          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
           padding: 1rem 1.5rem;
           text-align: center;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -122,7 +122,7 @@ export function Contact() {
 
         .ct-card-header p {
           font-size: 0.75rem;
-          color: #0eb8d0;
+          color: #e0142c;
           letter-spacing: 0.1em;
           font-weight: 600;
           text-transform: uppercase;
@@ -147,8 +147,8 @@ export function Contact() {
         }
 
         .ct-item:hover {
-          background: rgba(14, 184, 208, 0.08);
-          border-color: rgba(14, 184, 208, 0.3);
+          background: rgba(224, 20, 44, 0.08);
+          border-color: rgba(224, 20, 44, 0.3);
           transform: translateX(4px);
         }
 
@@ -191,9 +191,9 @@ export function Contact() {
         }
 
         .ct-badge {
-          background: rgba(14, 184, 208, 0.12);
-          color: #0eb8d0;
-          border: 1px solid rgba(14, 184, 208, 0.2);
+          background: rgba(224, 20, 44, 0.12);
+          color: #e0142c;
+          border: 1px solid rgba(224, 20, 44, 0.2);
           padding: 0.2rem 0.6rem;
           border-radius: 30px;
           font-size: 0.65rem;
@@ -217,9 +217,9 @@ export function Contact() {
 
         .ct-maps-btn {
           width: 100%;
-          background: rgba(14, 184, 208, 0.12);
-          color: #0eb8d0;
-          border: 1px solid rgba(14, 184, 208, 0.25);
+          background: rgba(224, 20, 44, 0.12);
+          color: #e0142c;
+          border: 1px solid rgba(224, 20, 44, 0.25);
           padding: 0.85rem;
           border-radius: 16px;
           font-size: 0.85rem;
@@ -234,10 +234,10 @@ export function Contact() {
         }
 
         .ct-maps-btn:hover {
-          background: rgba(14, 184, 208, 0.2);
+          background: rgba(224, 20, 44, 0.2);
           color: #fff;
           transform: translateY(-2px);
-          border-color: rgba(14, 184, 208, 0.4);
+          border-color: rgba(224, 20, 44, 0.4);
         }
 
         a {
@@ -245,7 +245,7 @@ export function Contact() {
         }
 
         .ct-email-link {
-          color: #0eb8d0;
+          color: #e0142c;
         }
 
         .ct-email-link:hover {
@@ -283,7 +283,7 @@ export function Contact() {
           
           .ct-card {
             backdrop-filter: none !important;
-            background: rgba(15, 20, 35, 0.7) !important;
+            background: rgba(25, 25, 25, 0.7) !important;
           }
           
           .ct-card:hover {
@@ -354,7 +354,7 @@ export function Contact() {
                 {/* Dirección */}
                 <div className="ct-item" onClick={() => window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank')}>
                   <div className="ct-item-icon">
-                    <i className="fas fa-map-marker-alt" style={{ color: '#0eb8d0', fontSize: '24px' }}></i>
+                    <i className="fas fa-map-marker-alt" style={{ color: '#e0142c', fontSize: '24px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">DIRECCIÓN</div>
@@ -412,7 +412,7 @@ export function Contact() {
                 {/* Horario */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <i className="far fa-clock" style={{ color: '#0eb8d0', fontSize: '24px' }}></i>
+                    <i className="far fa-clock" style={{ color: '#e0142c', fontSize: '24px' }}></i>
                   </div>
                   <div>
                     <div className="ct-item-label">HORARIO</div>

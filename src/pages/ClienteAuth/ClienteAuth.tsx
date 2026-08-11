@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import '../css/ClienteAuth.css'
+import './ClienteAuth.css'
 
 export function ClienteAuth() {
   const navigate = useNavigate()

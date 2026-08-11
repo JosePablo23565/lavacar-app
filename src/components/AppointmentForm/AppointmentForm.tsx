@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { swalConfirm, swalSuccess, swalError } from '../../utils/swalConfig'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
-import '../css/AppointmentForm.css'
+import './AppointmentForm.css'
 
 type Appointment = {
   id: number
@@ -124,6 +125,7 @@ export function AppointmentForm() {
   
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [horarios, setHorarios] = useState<Horario[]>([])
+  const [diasCerrados, setDiasCerrados] = useState<string[]>([])
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -149,6 +151,8 @@ export function AppointmentForm() {
     { value: 'completo', label: 'Lavado prémium', price: '$20', duration: 45 },
     { value: 'encerado', label: 'Full Prémium', price: '$35', duration: 60 },
     { value: 'tapizado', label: 'Pulido de Focos', price: '$25', duration: 40 },
+    { value: 'parabrisas', label: 'Pulido de Parabrisas', price: '$15', duration: 25 },
+    { value: 'ceramico', label: 'Tratamiento Cerámico', price: '$50', duration: 90 },
   ]
 
   const vehicleTypes = [
@@ -167,6 +171,22 @@ export function AppointmentForm() {
       setHorarios(data || [])
     }
     fetchHorarios()
+  }, [])
+
+  // Cargar los días que el negocio cerró (fechas específicas)
+  useEffect(() => {
+    const fetchDiasCerrados = async () => {
+      const hoyLocal = new Date()
+      const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
+
+      const { data } = await supabase
+        .from('dias_cerrados')
+        .select('fecha')
+        .gte('fecha', hoy)
+
+      setDiasCerrados((data || []).map(d => d.fecha))
+    }
+    fetchDiasCerrados()
   }, [])
 
   // Verificar autenticación al cargar
@@ -217,10 +237,15 @@ export function AppointmentForm() {
     cargarPerfil()
   }, [])
 
+  // Mostrar el formulario desde arriba al entrar (ej: al tocar un servicio en Home)
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const servicio = params.get('servicio')
-    if (servicio && ['basico', 'completo', 'encerado', 'tapizado'].includes(servicio)) {
+    if (servicio && services.some(s => s.value === servicio)) {
       setFormData(prev => ({ ...prev, service_type: servicio }))
     }
   }, [location])
@@ -375,8 +400,53 @@ export function AppointmentForm() {
   }
 
   const fetchCustomerHistory = async (phone: string) => {
-    const { data } = await supabase.from('appointments').select('*').eq('customer_phone', phone).order('appointment_date', { ascending: false })
-    setCustomerHistory(data || [])
+    const { data } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('customer_phone', phone)
+      .order('appointment_date', { ascending: true })
+      .order('appointment_time', { ascending: true })
+
+    const citas = data || []
+
+    // Mostrar SOLO las citas pendientes (las que ya pasaron se ocultan)
+    const hoyLocal = new Date()
+    const year = hoyLocal.getFullYear()
+    const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
+    const day = String(hoyLocal.getDate()).padStart(2, '0')
+    const hoy = `${year}-${month}-${day}`
+
+    const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
+
+    const citasPendientes = citas.filter(c => {
+      if (c.appointment_date > hoy) return true
+      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
+      return false
+    })
+
+    setCustomerHistory(citasPendientes)
+  }
+
+  const eliminarCita = async (cita: Appointment) => {
+    const result = await swalConfirm(
+      '¿Seguro de eliminar esta cita?',
+      'El espacio quedará disponible para otro cliente. Esta acción no se puede deshacer.'
+    )
+
+    if (!result.isConfirmed) return
+
+    const { error } = await supabase.from('appointments').delete().eq('id', cita.id)
+
+    if (error) {
+      swalError('Error', 'No se pudo eliminar la cita')
+      return
+    }
+
+    swalSuccess('Cita eliminada', 'El horario quedó disponible nuevamente')
+
+    // Refrescar la lista y liberar el horario en el calendario
+    await fetchCustomerHistory(cita.customer_phone)
+    await fetchAvailableTimes()
   }
 
   const handleDateChange = (date: Date) => {
@@ -396,14 +466,34 @@ export function AppointmentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
+    if (!formData.vehicle_type) {
+      alert('Por favor seleccione el tipo de vehículo')
+      return
+    }
+
+    if (!formData.vehicle_model.trim()) {
+      alert('Por favor ingrese la marca y modelo del vehículo')
+      return
+    }
+
+    if (!formData.service_type) {
+      alert('Por favor seleccione un servicio')
+      return
+    }
+
     if (!selectedDate) {
       alert('Por favor seleccione una fecha')
       return
     }
-    
+
     if (!formData.appointment_time) {
       alert('Por favor seleccioná una hora')
+      return
+    }
+
+    if (diasCerrados.includes(formData.appointment_date)) {
+      alert('Ese día el negocio permanecerá cerrado. Por favor elegí otra fecha.')
       return
     }
     
@@ -502,19 +592,25 @@ export function AppointmentForm() {
     })
   }
 
+  const toFechaStr = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
   const isDateDisabled = (date: Date) => {
     const today = new Date()
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-    
+
     // Días pasados
     if (compareDate < todayMidnight) return true
-    
+
     // Días deshabilitados desde la tabla horarios
     const diaSemana = date.getDay()
     const horario = horarios.find(h => h.dia_semana === diaSemana)
     if (!horario || !horario.activo) return true
-    
+
+    // Días cerrados por el negocio (fechas específicas)
+    if (diasCerrados.includes(toFechaStr(date))) return true
+
     return false
   }
 
@@ -532,7 +628,10 @@ export function AppointmentForm() {
     const diaSemana = date.getDay()
     const horario = horarios.find(h => h.dia_semana === diaSemana)
     if (!horario || !horario.activo) return 'blocked-day'
-    
+
+    // Días cerrados por el negocio (fechas específicas)
+    if (diasCerrados.includes(toFechaStr(date))) return 'blocked-day'
+
     return null
   }
 
@@ -679,10 +778,18 @@ export function AppointmentForm() {
                     </>
                   )}
 
-                  <button 
-                    type="submit" 
-                    className="af-submit" 
-                    disabled={loading || !selectedDate || !formData.appointment_time || availableTimes.length === 0}
+                  <button
+                    type="submit"
+                    className="af-submit"
+                    disabled={
+                      loading ||
+                      !formData.vehicle_type ||
+                      !formData.vehicle_model.trim() ||
+                      !formData.service_type ||
+                      !selectedDate ||
+                      !formData.appointment_time ||
+                      availableTimes.length === 0
+                    }
                   >
                     {loading ? (
                       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.5rem' }}>
@@ -715,8 +822,13 @@ export function AppointmentForm() {
                       const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
                       if (onlyNumbers.length <= 8) {
                         setPhoneToSearch(onlyNumbers)
+                        // Buscar automáticamente al completar los 8 dígitos
+                        if (onlyNumbers.length === 8) {
+                          fetchCustomerHistory(onlyNumbers)
+                          setShowHistory(true)
+                        }
                       }
-                    }} 
+                    }}
                     style={{ flex: 1 }} 
                     maxLength={8}
                   />
@@ -741,7 +853,7 @@ export function AppointmentForm() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                               <div style={{ flex: 1 }}>
                                 <div style={{ marginBottom: '.5rem' }}>
-                                  <span style={{ fontWeight: 600, fontSize: '.95rem', color: '#0eb8d0' }}>{svc?.label || cita.service_type}</span>
+                                  <span style={{ fontWeight: 600, fontSize: '.95rem', color: '#e0142c' }}>{svc?.label || cita.service_type}</span>
                                 </div>
                                 <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)', marginBottom: '.3rem' }}>
                                   {veh?.label || cita.vehicle_type} — {cita.vehicle_model}
@@ -751,12 +863,24 @@ export function AppointmentForm() {
                                 </p>
                                 <p style={{ fontSize: '.8rem', color: 'rgba(255,255,255,.5)' }}>{convertTo12Hour(cita.appointment_time)}</p>
                                 {cita.notes && (
-                                  <p style={{ fontSize: '.75rem', color: '#0eb8d0', marginTop: '.5rem', fontStyle: 'italic', background: 'rgba(14,184,208,0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px' }}>
+                                  <p style={{ fontSize: '.75rem', color: '#e0142c', marginTop: '.5rem', fontStyle: 'italic', background: 'rgba(224, 20, 44,0.1)', padding: '0.3rem 0.6rem', borderRadius: '12px' }}>
                                     {cita.notes}
                                   </p>
                                 )}
                               </div>
-                              <span className="af-confirmed">Confirmada</span>
+                              <button
+                                type="button"
+                                className="af-delete-btn"
+                                onClick={() => eliminarCita(cita)}
+                                title="Eliminar cita"
+                              >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                  <line x1="10" y1="11" x2="10" y2="17" />
+                                  <line x1="14" y1="11" x2="14" y2="17" />
+                                </svg>
+                              </button>
                             </div>
                           </div>
                         )
@@ -796,7 +920,7 @@ export function AppointmentForm() {
               ))}
             </div>
 
-            <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #0eb8d0, #0a8ca0)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
+            <button onClick={() => setSuccessData({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })} style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, #e0142c, #a10e1f)', color: '#fff', border: 'none', borderRadius: 14, fontWeight: 600, fontSize: '.9rem', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
               Cerrar
             </button>
           </div>

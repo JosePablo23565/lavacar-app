@@ -134,7 +134,7 @@ export function Opiniones() {
 
         .opiniones-root {
           min-height: 100vh;
-          background: linear-gradient(135deg, #0a0e1a 0%, #0a1225 50%, #0a0e1a 100%);
+          background: linear-gradient(135deg, #121212 0%, #181818 50%, #121212 100%);
           padding: 3rem 1.5rem;
           font-family: 'Inter', sans-serif;
           position: relative;
@@ -148,7 +148,7 @@ export function Opiniones() {
           right: -20%;
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(14,184,208,0.06) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(224, 20, 44,0.06) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -160,7 +160,7 @@ export function Opiniones() {
           left: -10%;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(14,184,208,0.04) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(224, 20, 44,0.04) 0%, transparent 70%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -180,19 +180,19 @@ export function Opiniones() {
         .opiniones-icon {
           width: 80px;
           height: 80px;
-          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem;
-          box-shadow: 0 10px 25px rgba(14, 184, 208, 0.2);
+          box-shadow: 0 10px 25px rgba(224, 20, 44, 0.2);
           transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .opiniones-icon:hover {
           transform: scale(1.05);
-          box-shadow: 0 15px 35px rgba(14, 184, 208, 0.3);
+          box-shadow: 0 15px 35px rgba(224, 20, 44, 0.3);
         }
 
         .opiniones-icon:active {
@@ -209,7 +209,7 @@ export function Opiniones() {
           font-family: 'Sora', sans-serif;
           font-size: 2.5rem;
           font-weight: 700;
-          background: linear-gradient(135deg, #fff, #0eb8d0);
+          background: linear-gradient(135deg, #fff, #e0142c);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -222,7 +222,7 @@ export function Opiniones() {
         }
 
         .form-card {
-          background: rgba(15, 20, 35, 0.35);
+          background: rgba(25, 25, 25, 0.35);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 28px;
@@ -233,12 +233,12 @@ export function Opiniones() {
 
         .form-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(14, 184, 208, 0.3);
+          border-color: rgba(224, 20, 44, 0.3);
           box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
         }
 
         .form-card-header {
-          background: linear-gradient(135deg, rgba(14, 184, 208, 0.15), rgba(14, 184, 208, 0.05));
+          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
           padding: 1rem 1.5rem;
           text-align: center;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -246,7 +246,7 @@ export function Opiniones() {
 
         .form-card-header p {
           font-size: 0.75rem;
-          color: #0eb8d0;
+          color: #e0142c;
           letter-spacing: 0.1em;
           font-weight: 600;
           text-transform: uppercase;
@@ -273,7 +273,7 @@ export function Opiniones() {
         }
 
         .input-label.active {
-          color: #0eb8d0;
+          color: #e0142c;
         }
 
         .input-field {
@@ -290,9 +290,9 @@ export function Opiniones() {
         }
 
         .input-field:focus {
-          border-color: rgba(14, 184, 208, 0.5);
-          background: rgba(14, 184, 208, 0.05);
-          box-shadow: 0 0 0 3px rgba(14, 184, 208, 0.1);
+          border-color: rgba(224, 20, 44, 0.5);
+          background: rgba(224, 20, 44, 0.05);
+          box-shadow: 0 0 0 3px rgba(224, 20, 44, 0.1);
         }
 
         .input-field:active {
@@ -345,7 +345,7 @@ export function Opiniones() {
           border: none;
           font-size: 2.5rem;
           cursor: pointer;
-          color: #374151;
+          color: #444444;
           transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
           padding: 0;
           line-height: 1;
@@ -382,7 +382,7 @@ export function Opiniones() {
         .submit-btn {
           width: 100%;
           padding: 1rem;
-          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
           color: white;
           border: none;
           border-radius: 50px;
@@ -413,7 +413,7 @@ export function Opiniones() {
 
         .submit-btn:hover:not(:disabled) {
           transform: translateY(-3px);
-          box-shadow: 0 10px 30px rgba(14, 184, 208, 0.4);
+          box-shadow: 0 10px 30px rgba(224, 20, 44, 0.4);
         }
 
         .submit-btn:active {
@@ -448,7 +448,7 @@ export function Opiniones() {
         }
 
         .reviews-card {
-          background: rgba(15, 20, 35, 0.35);
+          background: rgba(25, 25, 25, 0.35);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 28px;
@@ -456,7 +456,7 @@ export function Opiniones() {
         }
 
         .reviews-header {
-          background: linear-gradient(135deg, rgba(14, 184, 208, 0.15), rgba(14, 184, 208, 0.05));
+          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
           padding: 1rem 1.5rem;
           text-align: center;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -464,7 +464,7 @@ export function Opiniones() {
 
         .reviews-header p {
           font-size: 0.75rem;
-          color: #0eb8d0;
+          color: #e0142c;
           letter-spacing: 0.1em;
           font-weight: 600;
           text-transform: uppercase;
@@ -487,9 +487,9 @@ export function Opiniones() {
         }
 
         .review-card:hover {
-          border-color: rgba(14, 184, 208, 0.3);
+          border-color: rgba(224, 20, 44, 0.3);
           transform: translateY(-4px);
-          background: rgba(14, 184, 208, 0.02);
+          background: rgba(224, 20, 44, 0.02);
         }
 
         .review-card:active {
@@ -523,7 +523,7 @@ export function Opiniones() {
         .review-avatar {
           width: 36px;
           height: 36px;
-          background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
           border-radius: 50%;
           display: flex;
           align-items: center;

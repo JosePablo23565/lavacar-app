@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
+// Componente para rutas protegidas
 export function RutaProtegida({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
 

@@ -60,7 +60,7 @@
 
 .liquid-glass-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(14, 184, 208, 0.3);
+  border-color: rgba(224, 20, 44, 0.3);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -121,9 +121,9 @@
 }
 
 .input-field:focus {
-  border-color: #0eb8d0;
-  background: rgba(14, 184, 208, 0.12);
-  box-shadow: 0 0 0 2px rgba(14, 184, 208, 0.15);
+  border-color: #e0142c;
+  background: rgba(224, 20, 44, 0.12);
+  box-shadow: 0 0 0 2px rgba(224, 20, 44, 0.15);
 }
 
 .input-field::placeholder {
@@ -134,10 +134,10 @@
 .auth-btn {
   width: 100%;
   padding: 0.7rem;
-  background: rgba(14, 184, 208, 0.15);
+  background: rgba(224, 20, 44, 0.15);
   backdrop-filter: blur(8px);
   color: #fff;
-  border: 1px solid rgba(14, 184, 208, 0.4);
+  border: 1px solid rgba(224, 20, 44, 0.4);
   border-radius: 40px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -146,14 +146,14 @@
   transition: all 0.3s ease;
   margin-top: 0.5rem;
   margin-bottom: 0.8rem;
-  box-shadow: 0 4px 12px rgba(14, 184, 208, 0.1);
+  box-shadow: 0 4px 12px rgba(224, 20, 44, 0.1);
 }
 
 .auth-btn:hover:not(:disabled) {
-  background: rgba(14, 184, 208, 0.25);
-  border-color: rgba(14, 184, 208, 0.6);
+  background: rgba(224, 20, 44, 0.25);
+  border-color: rgba(224, 20, 44, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(14, 184, 208, 0.25);
+  box-shadow: 0 8px 20px rgba(224, 20, 44, 0.25);
 }
 
 .auth-btn:disabled {
@@ -177,7 +177,7 @@
 }
 
 .forgot-link:hover {
-  color: #0eb8d0;
+  color: #e0142c;
 }
 
 .divider {
@@ -233,7 +233,7 @@
 .switch-link button {
   background: none;
   border: none;
-  color: #0eb8d0;
+  color: #e0142c;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.7rem;
@@ -260,7 +260,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #0eb8d0;
+  border-top-color: #e0142c;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   display: inline-block;
@@ -335,9 +335,9 @@
 }
 
 .reset-modal {
-  background: rgba(15, 20, 35, 0.95);
+  background: rgba(25, 25, 25, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(14, 184, 208, 0.3);
+  border: 1px solid rgba(224, 20, 44, 0.3);
   border-radius: 28px;
   padding: 1.8rem;
   max-width: 360px;
@@ -373,8 +373,8 @@
 }
 
 .reset-input:focus {
-  border-color: #0eb8d0;
-  background: rgba(14, 184, 208, 0.1);
+  border-color: #e0142c;
+  background: rgba(224, 20, 44, 0.1);
 }
 
 .reset-buttons {
@@ -393,14 +393,14 @@
 }
 
 .reset-buttons button:first-child {
-  background: linear-gradient(135deg, #0eb8d0, #0a8ca0);
+  background: linear-gradient(135deg, #e0142c, #a10e1f);
   border: none;
   color: #fff;
 }
 
 .reset-buttons button:first-child:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(14, 184, 208, 0.3);
+  box-shadow: 0 4px 15px rgba(224, 20, 44, 0.3);
 }
 
 .reset-buttons button:last-child {

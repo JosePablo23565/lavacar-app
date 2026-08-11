@@ -1,14 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-
-type Perfil = {
-  id: string
-  nombre: string
-  telefono: string
-  email?: string
-  created_at: string
-  is_admin?: boolean  // ← Agregar esta línea
-}
+import type { Perfil } from '../types/perfil'
 
 type AuthContextType = {
   user: any | null

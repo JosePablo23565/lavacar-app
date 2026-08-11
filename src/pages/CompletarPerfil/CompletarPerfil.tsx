@@ -148,7 +148,7 @@ export function CompletarPerfil() {
         
         <div className="bg-gray-700/50 rounded-lg p-3 mb-6 text-center">
           <span className="text-gray-400 text-sm">📧 </span>
-          <span className="text-cyan-400 text-sm">{userEmail || 'Cargando...'}</span>
+          <span className="text-red-400 text-sm">{userEmail || 'Cargando...'}</span>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -157,7 +157,7 @@ export function CompletarPerfil() {
             <input
               type="text"
               placeholder="Ej: Juan Pérez"
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
               value={formData.nombre}
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
               required
@@ -169,7 +169,7 @@ export function CompletarPerfil() {
             <input
               type="tel"
               placeholder="Ej: 88888888"
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
               value={formData.telefono}
               onChange={(e) => {
                 const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
@@ -186,7 +186,7 @@ export function CompletarPerfil() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-2 px-4 rounded-lg hover:from-red-600 hover:to-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Guardando...' : 'CONTINUAR'}
           </button>

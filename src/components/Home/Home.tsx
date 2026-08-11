@@ -144,13 +144,29 @@ export function Home() {
       time: '60 min',
       bgImage: '/encerado.jpg'
     },
-    { 
-      name: 'Pulido de  Focos', 
-      value: 'tapizado', 
-      price: '$25', 
-      desc: 'Limpieza profunda de asientos y alfombras con extractora profesional.', 
+    {
+      name: 'Pulido de  Focos',
+      value: 'tapizado',
+      price: '$25',
+      desc: 'Limpieza profunda de asientos y alfombras con extractora profesional.',
       time: '40 min',
       bgImage: '/tapizado.jpg'
+    },
+    {
+      name: 'Pulido de Parabrisas',
+      value: 'parabrisas',
+      price: '$15',
+      desc: 'Pulido profesional del parabrisas para eliminar manchas de agua dura y mejorar la visibilidad.',
+      time: '25 min',
+      bgImage: '/lavado-basico.jpg'
+    },
+    {
+      name: 'Tratamiento Cerámico',
+      value: 'ceramico',
+      price: '$50',
+      desc: 'Protección cerámica de larga duración que sella la pintura y realza el brillo.',
+      time: '90 min',
+      bgImage: '/encerado.jpg'
     },
   ]
 
@@ -160,7 +176,7 @@ export function Home() {
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
-        .lc-root { font-family:'DM Sans',sans-serif; background:#0a0e1a; color:#fff; overflow-x:hidden; }
+        .lc-root { font-family:'DM Sans',sans-serif; background:#121212; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
 
         @keyframes lcCarFloat { 
@@ -169,8 +185,8 @@ export function Home() {
         }
         
         @keyframes lcCarGlow { 
-          0%,100%{filter:drop-shadow(0 5px 15px rgba(14,184,208,0.3))} 
-          50%{filter:drop-shadow(0 5px 25px rgba(14,184,208,0.6))} 
+          0%,100%{filter:drop-shadow(0 5px 15px rgba(224, 20, 44,0.3))} 
+          50%{filter:drop-shadow(0 5px 25px rgba(224, 20, 44,0.6))} 
         }
         
         @keyframes lcLineMove { 
@@ -217,16 +233,16 @@ export function Home() {
         .lc-glow { position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;animation:lcGlowPulse 4s ease-in-out infinite;z-index:1;pointer-events:none; }
         .lc-car-bg { position:absolute;bottom:0;right:-2%;font-size:300px;line-height:1;opacity:.05;animation:lcFloatCar 6s ease-in-out infinite;pointer-events:none;z-index:1; }
         .lc-hero-content { position:relative;z-index:2;text-align:center;padding:2rem;max-width:850px; }
-        .lc-badge { display:inline-block;background:rgba(14,184,208,.12);border:1px solid rgba(14,184,208,.3);color:#0eb8d0;padding:.4rem 1rem;border-radius:999px;font-size:.8rem;margin-bottom:1.5rem;animation:lcFadeUp .8s ease both; }
+        .lc-badge { display:inline-block;background:rgba(224, 20, 44,.12);border:1px solid rgba(224, 20, 44,.3);color:#e0142c;padding:.4rem 1rem;border-radius:999px;font-size:.8rem;margin-bottom:1.5rem;animation:lcFadeUp .8s ease both; }
         .lc-hero h1 { font-size:clamp(2.5rem,6vw,4.5rem);font-weight:600;line-height:1.1;margin-bottom:1.2rem;animation:lcFadeUp .8s .15s ease both; }
-        .lc-hero h1 span { color:#0eb8d0; }
+        .lc-hero h1 span { color:#e0142c; }
         .lc-hero p { font-size:1.05rem;color:rgba(255,255,255,.6);margin-bottom:2rem;line-height:1.75;animation:lcFadeUp .8s .3s ease both; }
         .lc-hero-btns { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:lcFadeUp .8s .45s ease both; }
         
         .lc-btn-primary { 
-          background: rgba(14, 184, 208, 0.1); 
+          background: rgba(224, 20, 44, 0.1); 
           backdrop-filter: blur(8px); 
-          border: 1px solid rgba(14, 184, 208, 0.3); 
+          border: 1px solid rgba(224, 20, 44, 0.3); 
           color:#fff; 
           padding:.85rem 2rem; 
           border-radius:40px; 
@@ -235,8 +251,8 @@ export function Home() {
           cursor:pointer; 
         }
         .lc-btn-primary:hover { 
-          background: rgba(14, 184, 208, 0.2); 
-          border-color: rgba(14, 184, 208, 0.5); 
+          background: rgba(224, 20, 44, 0.2); 
+          border-color: rgba(224, 20, 44, 0.5); 
           transform:translateY(-2px); 
         }
         
@@ -265,7 +281,7 @@ export function Home() {
         .lc-hours-divider { width:1px; height:25px; background:rgba(255,255,255,0.2); }
 
         .lc-stats { 
-          background: rgba(10, 14, 26, 0.6);
+          background: rgba(18, 18, 18, 0.6);
           backdrop-filter: blur(8px); 
           padding: 1rem 1.5rem; 
           display: flex; 
@@ -279,7 +295,7 @@ export function Home() {
           margin-top: -25px;
           position: relative;
           z-index: 10;
-          border: 1px solid rgba(14,184,208,.15);
+          border: 1px solid rgba(224, 20, 44,.15);
         }
 
         .lc-stat { 
@@ -304,7 +320,7 @@ export function Home() {
           font-family:'Sora',sans-serif;
           font-size: 1.5rem;
           font-weight: 700;
-          color: #0eb8d0;
+          color: #e0142c;
           line-height: 1;
         }
 
@@ -368,7 +384,7 @@ export function Home() {
         }
 
         .lc-section { padding:6rem 2rem; max-width:1100px; margin:0 auto; position:relative; z-index:2; }
-        .lc-tag { display:inline-block;background:rgba(14,184,208,.1);color:#0eb8d0;padding:.3rem .9rem;border-radius:6px;font-size:.75rem;margin-bottom:1rem;letter-spacing:.06em; }
+        .lc-tag { display:inline-block;background:rgba(224, 20, 44,.1);color:#e0142c;padding:.3rem .9rem;border-radius:6px;font-size:.75rem;margin-bottom:1rem;letter-spacing:.06em; }
         .lc-section-title { font-size:2.2rem;font-weight:600;margin-bottom:.8rem;line-height:1.2; }
         .lc-section-sub { color:rgba(255,255,255,.5);font-size:.95rem;line-height:1.75;max-width:520px; }
 
@@ -488,7 +504,7 @@ export function Home() {
           font-family: 'Sora', sans-serif; 
           font-size: 1rem; 
           font-weight: 700; 
-          color: #0eb8d0; 
+          color: #e0142c; 
           margin-bottom: 0.3rem; 
           text-shadow: 0 1px 2px rgba(0,0,0,0.3); 
         }
@@ -579,7 +595,7 @@ export function Home() {
         }
 
         .opinion-card {
-          background: rgba(20, 25, 45, 0.1);
+          background: rgba(33, 33, 33, 0.1);
           backdrop-filter: blur(12px);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 20px;
@@ -590,8 +606,8 @@ export function Home() {
 
         .opinion-card:hover {
           transform: translateY(-8px);
-          border-color: rgba(14, 184, 208, 0.5);
-          background: rgba(20, 25, 45, 0.6);
+          border-color: rgba(224, 20, 44, 0.5);
+          background: rgba(33, 33, 33, 0.6);
         }
 
         .opinion-stars {
@@ -621,7 +637,7 @@ export function Home() {
           width: 45px;
           height: 45px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #1494ea, #010322);
+          background: linear-gradient(135deg, #e0142c, #121212);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -656,9 +672,9 @@ export function Home() {
           text-align: center;
           position: relative;
           z-index: 2;
-          background: linear-gradient(135deg, rgba(6, 10, 20, 0.95), rgba(10, 14, 26, 0.98));
-          border-top: 1px solid rgba(14, 184, 208, 0.2);
-          border-bottom: 1px solid rgba(14, 184, 208, 0.2);
+          background: linear-gradient(135deg, rgba(13, 13, 13, 0.95), rgba(18, 18, 18, 0.98));
+          border-top: 1px solid rgba(224, 20, 44, 0.2);
+          border-bottom: 1px solid rgba(224, 20, 44, 0.2);
         }
 
         .ubicacion-desc {
@@ -670,7 +686,7 @@ export function Home() {
         .map-container {
           border-radius: 32px;
           overflow: hidden;
-          border: 1px solid rgba(14, 184, 208, 0.3);
+          border: 1px solid rgba(224, 20, 44, 0.3);
           margin-bottom: 24px;
           max-width: 850px;
           margin-left: auto;
@@ -693,9 +709,9 @@ export function Home() {
         }
 
         .map-link {
-          background: rgba(14, 184, 208, 0.1);
+          background: rgba(224, 20, 44, 0.1);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(14, 184, 208, 0.3);
+          border: 1px solid rgba(224, 20, 44, 0.3);
           padding: 12px 26px;
           border-radius: 60px;
           font-size: 0.88rem;
@@ -708,9 +724,9 @@ export function Home() {
         }
 
         .map-link:hover {
-          background: rgba(14, 184, 208, 0.2);
-          border-color: #0eb8d0;
-          color: #0eb8d0;
+          background: rgba(224, 20, 44, 0.2);
+          border-color: #e0142c;
+          color: #e0142c;
           transform: translateY(-3px);
         }
 
@@ -726,9 +742,9 @@ export function Home() {
         }
 
         .lc-footer { 
-          background: rgba(6, 10, 20, 0.95); 
+          background: rgba(13, 13, 13, 0.95); 
           backdrop-filter: blur(10px); 
-          border-top: 1px solid rgba(14, 184, 208, 0.2); 
+          border-top: 1px solid rgba(224, 20, 44, 0.2); 
           padding: 2.5rem 2rem 2rem; 
           text-align: center; 
           margin-top: 2rem;
@@ -739,7 +755,7 @@ export function Home() {
           font-size: 1.2rem; 
           font-weight: 600; 
           margin-bottom: 0.8rem;
-          background: linear-gradient(135deg, #fff, #0eb8d0);
+          background: linear-gradient(135deg, #fff, #e0142c);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -779,12 +795,12 @@ export function Home() {
           transform: translateX(-50%);
           width: 0;
           height: 2px;
-          background: #0eb8d0;
+          background: #e0142c;
           transition: width 0.3s ease;
         }
 
         .lc-footer-links button:hover { 
-          color: #0eb8d0; 
+          color: #e0142c; 
           transform: translateY(-2px);
         }
 
@@ -847,7 +863,7 @@ export function Home() {
               <div className="lc-hours-item">
                 <div>
                   <div className="lc-hours-label">LUNES A SÁBADO</div>
-                  <div className="lc-hours-value" style={{ color: '#0eb8d0' }}>8:00am - 5:30pm</div>
+                  <div className="lc-hours-value" style={{ color: '#e0142c' }}>8:00am - 5:30pm</div>
                 </div>
               </div>
               <div className="lc-hours-divider" />
@@ -994,19 +1010,19 @@ export function Home() {
             }}>
               {/* Tarjeta de información de contacto */}
               <div style={{ 
-                background: 'rgba(17, 24, 39, 0.5)', 
+                background: 'rgba(28, 28, 28, 0.5)', 
                 backdropFilter: 'blur(12px)', 
                 border: '1px solid rgba(255, 255, 255, 0.12)', 
                 borderRadius: '24px', 
                 overflow: 'hidden',
               }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.08em', fontWeight: 600 }}>INFORMACIÓN DE CONTACTO</p>
+                <div style={{ background: 'linear-gradient(135deg, rgba(224, 20, 44,0.15), rgba(224, 20, 44,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#e0142c', letterSpacing: '0.08em', fontWeight: 600 }}>INFORMACIÓN DE CONTACTO</p>
                 </div>
                 
                 <div style={{ padding: '1.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(224, 20, 44,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span style={{ fontSize: '1.2rem' }}>📍</span>
                     </div>
                     <div>
@@ -1052,21 +1068,21 @@ export function Home() {
                   <a 
                     href="mailto:camarofraterno@gmail.com"
                     style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,184,208,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(224, 20, 44,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                   >
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="fas fa-envelope" style={{ fontSize: '1.1rem', color: '#0eb8d0' }}></i>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(224, 20, 44,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <i className="fas fa-envelope" style={{ fontSize: '1.1rem', color: '#e0142c' }}></i>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>CORREO</div>
-                      <div style={{ fontSize: '0.85rem', color: '#0eb8d0', fontWeight: 500 }}>camarofraterno@gmail.com</div>
+                      <div style={{ fontSize: '0.85rem', color: '#e0142c', fontWeight: 500 }}>camarofraterno@gmail.com</div>
                     </div>
                   </a>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.4rem', borderRadius: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(14,184,208,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="far fa-clock" style={{ fontSize: '1.1rem', color: '#0eb8d0' }}></i>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(224, 20, 44,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <i className="far fa-clock" style={{ fontSize: '1.1rem', color: '#e0142c' }}></i>
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>HORARIO</div>
@@ -1078,18 +1094,18 @@ export function Home() {
 
               {/* Tarjeta del mapa - CON BOTONES DE GOOGLE, WAZE Y APPLE MAPS */}
               <div style={{ 
-                background: 'rgba(17, 24, 39, 0.5)', 
+                background: 'rgba(28, 28, 28, 0.5)', 
                 backdropFilter: 'blur(12px)', 
                 border: '1px solid rgba(255, 255, 255, 0.12)', 
                 borderRadius: '24px', 
                 overflow: 'hidden',
               }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(14,184,208,0.15), rgba(26,111,212,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#0eb8d0', letterSpacing: '0.08em', fontWeight: 600 }}>UBICACIÓN</p>
+                <div style={{ background: 'linear-gradient(135deg, rgba(224, 20, 44,0.15), rgba(224, 20, 44,0.05))', padding: '0.8rem', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#e0142c', letterSpacing: '0.08em', fontWeight: 600 }}>UBICACIÓN</p>
                 </div>
                 
                 <div style={{ padding: '1rem' }}>
-                  <div style={{ marginBottom: '1rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(14,184,208,0.2)' }}>
+                  <div style={{ marginBottom: '1rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(224, 20, 44,0.2)' }}>
                     <iframe
                       src="https://www.google.com/maps?q=10.5218308,-85.2548387&z=16&output=embed"
                       width="100%"

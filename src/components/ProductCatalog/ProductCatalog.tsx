@@ -16,7 +16,7 @@ export function ProductCatalog() {
           <div key={product.id} className="bg-white rounded-lg shadow-md p-4 text-center">
             <div className="text-5xl mb-3">{product.image}</div>
             <h3 className="font-semibold text-lg">{product.name}</h3>
-            <p className="text-blue-600 font-bold my-2">{product.price}</p>
+            <p className="text-red-600 font-bold my-2">{product.price}</p>
             <a
               href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(product.whatsapp)}`}
               target="_blank"

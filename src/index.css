@@ -32,7 +32,7 @@ a,
 }
 
 body {
-  background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 60%, #0a0e1a 100%);
+  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -114,13 +114,13 @@ body {
 
 .swal-glass-popup {
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(14, 184, 208, 0.3);
+  border: 1px solid rgba(224, 20, 44, 0.3);
   border-radius: 24px !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .swal-confirm-btn {
-  background: linear-gradient(135deg, #1a6fd4, #0eb8d0) !important;
+  background: linear-gradient(135deg, #e0142c, #e0142c) !important;
   border-radius: 40px !important;
   padding: 0.5rem 1.5rem !important;
   font-weight: 600 !important;
@@ -129,7 +129,7 @@ body {
 
 .swal-confirm-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(14, 184, 208, 0.35);
+  box-shadow: 0 6px 18px rgba(224, 20, 44, 0.35);
 }
 
 .swal-cancel-btn {
