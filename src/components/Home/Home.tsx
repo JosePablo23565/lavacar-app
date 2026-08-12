@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl } from '../../lib/ubicacion'
 
 export function Home() {
   const navigate = useNavigate()
@@ -1048,23 +1049,7 @@ export function Home() {
                     </div>
                   </a>
 
-                  <a 
-                    href="https://wa.me/50689594947"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(37,211,102,0.15)'; e.currentTarget.style.transform = 'translateX(5px)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
-                  >
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', color: '#25d366' }}></i>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>WHATSAPP</div>
-                      <div style={{ fontSize: '0.9rem', color: '#25d366', fontWeight: 500 }}>+506 8959-4947</div>
-                    </div>
-                  </a>
-                  
+
                   <a 
                     href="mailto:camarofraterno@gmail.com"
                     style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem', padding: '0.4rem', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease', textDecoration: 'none' }}
@@ -1107,7 +1092,7 @@ export function Home() {
                 <div style={{ padding: '1rem' }}>
                   <div style={{ marginBottom: '1rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(224, 20, 44,0.2)' }}>
                     <iframe
-                      src="https://www.google.com/maps?q=10.5218308,-85.2548387&z=16&output=embed"
+                      src={googleMapsEmbedUrl}
                       width="100%"
                       height="280"
                       style={{ border: 0, display: 'block' }}
@@ -1122,7 +1107,7 @@ export function Home() {
                     
                     {/* Google Maps */}
                     <button 
-                      onClick={() => window.open('https://maps.google.com/?q=10.5218308,-85.2548387', '_blank')}
+                      onClick={() => window.open(googleMapsUrl, '_blank')}
                       style={{
                         width: '100%',
                         background: 'rgba(219, 68, 55, 0.12)',
@@ -1155,7 +1140,7 @@ export function Home() {
 
                     {/* Waze */}
                     <button 
-                      onClick={() => window.open('https://waze.com/ul?ll=10.5218308,-85.2548387&navigate=yes', '_blank')}
+                      onClick={() => window.open(wazeUrl, '_blank')}
                       style={{
                         width: '100%',
                         background: 'rgba(0, 179, 255, 0.12)',
@@ -1188,7 +1173,7 @@ export function Home() {
 
                     {/* Apple Maps */}
                     <button 
-                      onClick={() => window.open('https://maps.apple.com/?q=10.5218308,-85.2548387', '_blank')}
+                      onClick={() => window.open(appleMapsUrl, '_blank')}
                       style={{
                         width: '100%',
                         background: 'rgba(255, 255, 255, 0.08)',

@@ -763,3 +763,76 @@
   margin-left: 2px;
   opacity: 0.7;
 }
+/* ============================================ */
+/* AVISO: EL CLIENTE YA TIENE UNA CITA          */
+/* ============================================ */
+
+.af-limite {
+  background: rgba(224, 20, 44, 0.08);
+  border: 1px solid rgba(224, 20, 44, 0.35);
+  border-radius: 20px;
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.af-limite-icono {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 0.9rem;
+  border-radius: 50%;
+  background: rgba(224, 20, 44, 0.15);
+  border: 1px solid rgba(224, 20, 44, 0.3);
+  color: #e0142c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.af-limite h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.6rem;
+}
+
+.af-limite p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.55;
+  margin-bottom: 0.6rem;
+}
+
+.af-limite p strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.af-limite-nota {
+  font-size: 0.85rem !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.af-limite-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  border-radius: 40px;
+  color: #25d366;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.af-limite-wa:hover {
+  background: rgba(37, 211, 102, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.2);
+}

@@ -1,10 +1,7 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl } from '../../lib/ubicacion';
 
 export function Contact() {
-  // Coordenadas: Bagaces, Guanacaste, Costa Rica
-  const lat = 10.5218292;
-  const lng = -85.2548688;
-  const nombreLugar = "Autolavado Camaro Fraterno";
 
   return (
     <>
@@ -176,6 +173,8 @@ export function Contact() {
           font-size: 0.9rem;
           font-weight: 500;
           color: #ffffff;
+          line-height: 1.5;
+          overflow-wrap: anywhere;
         }
 
         .ct-wa-btn {
@@ -183,7 +182,9 @@ export function Contact() {
           text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
+          flex-wrap: wrap;
+          gap: 0.4rem 0.6rem;
+          line-height: 1.5;
         }
 
         .ct-wa-btn:hover {
@@ -197,8 +198,8 @@ export function Contact() {
           padding: 0.2rem 0.6rem;
           border-radius: 30px;
           font-size: 0.65rem;
-          margin-left: 0.5rem;
           font-weight: 500;
+          white-space: nowrap;
         }
 
         .ct-iframe {
@@ -273,7 +274,9 @@ export function Contact() {
             height: 32px;
           }
           .ct-item {
-            padding: 0.8rem;
+            padding: 0.9rem;
+            gap: 0.85rem;
+            margin-bottom: 0.85rem;
           }
           .ct-item-icon {
             width: 40px;
@@ -352,7 +355,7 @@ export function Contact() {
               </div>
               <div className="ct-items">
                 {/* Dirección */}
-                <div className="ct-item" onClick={() => window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank')}>
+                <div className="ct-item" onClick={() => window.open(googleMapsUrl, '_blank')}>
                   <div className="ct-item-icon">
                     <i className="fas fa-map-marker-alt" style={{ color: '#e0142c', fontSize: '24px' }}></i>
                   </div>
@@ -362,32 +365,16 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* WHATSAPP 1 */}
+                {/* WHATSAPP */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
                     <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
                   </div>
                   <div>
-                    <div className="ct-item-label">WHATSAPP 1</div>
+                    <div className="ct-item-label">WHATSAPP</div>
                     <div className="ct-item-value">
                       <a href="https://wa.me/50683606680" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">
                         +506 8360-6680
-                        <span className="ct-badge">WhatsApp</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* WHATSAPP 2 */}
-                <div className="ct-item">
-                  <div className="ct-item-icon">
-                    <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
-                  </div>
-                  <div>
-                    <div className="ct-item-label">WHATSAPP 2</div>
-                    <div className="ct-item-value">
-                      <a href="https://wa.me/50689594947" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">
-                        +506 8959-4947
                         <span className="ct-badge">WhatsApp</span>
                       </a>
                     </div>
@@ -430,7 +417,7 @@ export function Contact() {
               <div className="ct-items">
                 <div className="ct-iframe">
                   <iframe
-                    src={`https://www.google.com/maps?q=${lat},${lng}&output=embed`}
+                    src={googleMapsEmbedUrl}
                     width="100%"
                     height="200"
                     style={{ border: 0, borderRadius: '16px' }}
@@ -445,7 +432,7 @@ export function Contact() {
                   {/* Google Maps */}
                   <button
                     className="ct-maps-btn"
-                    onClick={() => window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank')}
+                    onClick={() => window.open(googleMapsUrl, '_blank')}
                     style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
                   >
                     <i className="fab fa-google"></i>
@@ -455,7 +442,7 @@ export function Contact() {
                   {/* Waze */}
                   <button
                     className="ct-maps-btn"
-                    onClick={() => window.open(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`, '_blank')}
+                    onClick={() => window.open(wazeUrl, '_blank')}
                     style={{ background: 'rgba(0, 179, 255, 0.12)', borderColor: 'rgba(0, 179, 255, 0.25)', color: '#00B3FF' }}
                   >
                     <i className="fab fa-waze"></i>
@@ -465,7 +452,7 @@ export function Contact() {
                   {/* Apple Maps */}
                   <button
                     className="ct-maps-btn"
-                    onClick={() => window.open(`https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(nombreLugar)}`, '_blank')}
+                    onClick={() => window.open(appleMapsUrl, '_blank')}
                     style={{ background: 'rgba(0, 0, 0, 0.2)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
                   >
                     <i className="fab fa-apple"></i>

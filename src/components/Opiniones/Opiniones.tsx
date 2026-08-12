@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { swalConfirm, swalSuccess, swalError, swalAviso } from '../../utils/swalConfig'
 
 type Opinion = {
   id: number
@@ -25,10 +26,22 @@ export function Opiniones() {
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [hoveredStar, setHoveredStar] = useState(0)
 
+  // Pestañas + "Mis opiniones"
+  const [vista, setVista] = useState<'opinar' | 'mis'>('opinar')
+  const [misOpiniones, setMisOpiniones] = useState<Opinion[]>([])
+  const [buscando, setBuscando] = useState(false)
+  const [editandoId, setEditandoId] = useState<number | null>(null)
+  const [editForm, setEditForm] = useState({ comentario: '', rating: 0 })
+
+  // Opiniones que puede dejar cada cliente
+  const MAX_OPINIONES = 2
+  const alcanzoLimite = misOpiniones.length >= MAX_OPINIONES
+
   // Cargar opiniones aprobadas y perfil del usuario
   useEffect(() => {
     fetchOpiniones()
     cargarPerfil()
+    cargarMisOpiniones()
   }, [])
 
   const fetchOpiniones = async () => {
@@ -86,23 +99,108 @@ export function Opiniones() {
     
     setEnviando(true)
     
-    const { error } = await supabase.from('testimonials').insert([{
-      customer_name: formData.nombre,
-      email: perfil.email, 
-      comment: formData.comentario,
-      rating: formData.rating,
-      is_approved: false
-    }])
+    // El tope de opiniones lo controla la base de datos
+    const { error } = await supabase.rpc('crear_opinion', {
+      p_comment: formData.comentario,
+      p_rating: formData.rating,
+    })
 
     if (error) {
-      setMensaje('Error al enviar: ' + error.message)
+      const motivo = error.message || ''
+      if (motivo.includes('LIMITE_OPINIONES')) {
+        await swalAviso(
+          'Ya dejaste tus opiniones',
+          `Cada cliente puede dejar ${MAX_OPINIONES} opiniones. Si querés escribir otra, entrá a "Mis opiniones" y eliminá una de las que ya tenés.`
+        )
+        await cargarMisOpiniones()
+      } else if (motivo.includes('NO_AUTORIZADO')) {
+        await swalError('Tu sesión expiró', 'Iniciá sesión de nuevo para dejar tu opinión.')
+      } else {
+        await swalError('No se pudo enviar', motivo)
+      }
     } else {
       setMensaje('Opinión enviada con éxito. Quedará visible tras ser aprobada.')
       setFormData({ ...formData, comentario: '', rating: 0 })
       fetchOpiniones()
+      await cargarMisOpiniones()
       setTimeout(() => setMensaje(''), 3000)
     }
     setEnviando(false)
+  }
+
+  // Las opiniones del cliente que tiene la sesión abierta. No se pide
+  // el teléfono: la base de datos sabe quién es y solo devuelve las suyas.
+  const cargarMisOpiniones = async () => {
+    setBuscando(true)
+    const { data } = await supabase.rpc('mis_opiniones')
+    setMisOpiniones((data || []) as Opinion[])
+    setBuscando(false)
+  }
+
+  const empezarEdicion = (op: Opinion) => {
+    setEditandoId(op.id)
+    setEditForm({ comentario: op.comment, rating: op.rating })
+  }
+
+  const guardarEdicion = async (id: number) => {
+    if (!editForm.comentario.trim()) {
+      await swalAviso('Falta el comentario', 'Escribí tu opinión antes de guardar.')
+      return
+    }
+    if (editForm.rating === 0) {
+      await swalAviso('Falta la calificación', 'Elegí de 1 a 5 estrellas.')
+      return
+    }
+
+    // Al editarla vuelve a quedar pendiente de aprobación
+    // El .select() devuelve las filas afectadas: si la base no dejó
+    // tocar esa opinión, vuelve vacío y hay que avisarlo (si no,
+    // diríamos "guardado" sin haber guardado nada).
+    const { data: actualizadas, error } = await supabase
+      .from('testimonials')
+      .update({ comment: editForm.comentario.trim(), rating: editForm.rating, is_approved: false })
+      .eq('id', id)
+      .select()
+
+    if (error) {
+      await swalError('No se pudo guardar', error.message)
+      return
+    }
+
+    if (!actualizadas || actualizadas.length === 0) {
+      await swalError('No se pudo guardar', 'Esa opinión no es tuya, así que no podés modificarla.')
+      return
+    }
+
+    setEditandoId(null)
+    await swalSuccess('Opinión actualizada', 'Quedará visible de nuevo tras ser aprobada.')
+    await cargarMisOpiniones()
+    fetchOpiniones()
+  }
+
+  const eliminarOpinion = async (op: Opinion) => {
+    const r = await swalConfirm('¿Eliminar esta opinión?', 'Esta acción no se puede deshacer.')
+    if (!r.isConfirmed) return
+
+    const { data: borradas, error } = await supabase
+      .from('testimonials')
+      .delete()
+      .eq('id', op.id)
+      .select()
+
+    if (error) {
+      await swalError('No se pudo eliminar', error.message)
+      return
+    }
+
+    if (!borradas || borradas.length === 0) {
+      await swalError('No se pudo eliminar', 'Esa opinión no es tuya, así que no podés eliminarla.')
+      return
+    }
+
+    await swalSuccess('Opinión eliminada', 'Ya podés escribir una nueva.')
+    await cargarMisOpiniones()
+    fetchOpiniones()
   }
 
   const renderRatingStars = () => {
@@ -258,7 +356,7 @@ export function Opiniones() {
         }
 
         .input-group {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.75rem;
         }
 
         .input-label {
@@ -266,8 +364,9 @@ export function Opiniones() {
           font-size: 0.7rem;
           font-weight: 600;
           color: rgba(255, 255, 255, 0.5);
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.6rem;
           letter-spacing: 0.08em;
+          line-height: 1.4;
           text-transform: uppercase;
           transition: all 0.2s ease;
         }
@@ -278,7 +377,8 @@ export function Opiniones() {
 
         .input-field {
           width: 100%;
-          padding: 0.85rem 1rem;
+          padding: 1rem 1.1rem;
+          line-height: 1.5;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 16px;
@@ -316,9 +416,9 @@ export function Opiniones() {
 
         .char-counter {
           text-align: right;
-          font-size: 0.65rem;
+          font-size: 0.7rem;
           color: rgba(255, 255, 255, 0.4);
-          margin-top: 0.3rem;
+          margin-top: 0.5rem;
         }
 
         .char-counter.near-limit {
@@ -580,6 +680,169 @@ export function Opiniones() {
           to { transform: rotate(360deg); }
         }
 
+        .op-limite {
+          background: rgba(224, 20, 44, 0.08);
+          border: 1px solid rgba(224, 20, 44, 0.35);
+          border-radius: 18px;
+          padding: 1.25rem;
+          margin-bottom: 1.5rem;
+          text-align: center;
+        }
+
+        .op-limite h3 {
+          font-family: 'Sora', sans-serif;
+          font-size: 1.05rem;
+          color: #fff;
+          margin-bottom: 0.5rem;
+        }
+
+        .op-limite p {
+          font-size: 0.88rem;
+          color: rgba(255, 255, 255, 0.75);
+          line-height: 1.5;
+          margin-bottom: 0.9rem;
+        }
+
+        .op-limite-btn {
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          border: none;
+          border-radius: 40px;
+          color: #fff;
+          font-weight: 600;
+          font-size: 0.85rem;
+          padding: 0.65rem 1.4rem;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+
+        .op-limite-btn:hover { transform: translateY(-2px); }
+
+        .op-buscar-btn {
+          padding: 0 1.4rem;
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          border: none;
+          border-radius: 24px;
+          color: #fff;
+          font-weight: 600;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          white-space: nowrap;
+        }
+
+        .op-buscar-btn:hover { transform: translateY(-2px); }
+
+        .op-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+        }
+
+        .op-item {
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 18px;
+          padding: 1.1rem;
+        }
+
+        .op-item-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 0.6rem;
+        }
+
+        .op-item-estrellas {
+          color: #f59e0b;
+          font-size: 1.05rem;
+          letter-spacing: 2px;
+        }
+
+        .op-estado {
+          font-size: 0.65rem;
+          font-weight: 500;
+          padding: 0.22rem 0.65rem;
+          border-radius: 20px;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .op-estado.aprobada {
+          background: rgba(16, 185, 129, 0.15);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          color: #34d399;
+        }
+
+        .op-estado.pendiente {
+          background: rgba(245, 158, 11, 0.15);
+          border: 1px solid rgba(245, 158, 11, 0.3);
+          color: #fbbf24;
+        }
+
+        .op-item-texto {
+          font-size: 0.95rem;
+          color: #fff;
+          line-height: 1.55;
+          font-style: italic;
+          margin-bottom: 0.9rem;
+        }
+
+        .op-item-acciones {
+          display: flex;
+          gap: 0.6rem;
+          justify-content: flex-end;
+          margin-top: 0.75rem;
+        }
+
+        .op-item-acciones button {
+          padding: 0.5rem 1.1rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .op-btn-editar {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        .op-btn-editar:hover { background: rgba(255, 255, 255, 0.16); }
+
+        .op-btn-eliminar {
+          background: rgba(239, 68, 68, 0.12);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #f87171;
+        }
+
+        .op-btn-eliminar:hover { background: rgba(239, 68, 68, 0.25); }
+
+        .op-btn-cancelar {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .op-btn-guardar {
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          border: none;
+          color: #fff;
+          font-weight: 600;
+        }
+
+        .op-edit-estrellas {
+          display: flex;
+          gap: 0.4rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .op-edit-estrellas .rating-star {
+          font-size: 1.6rem;
+        }
+
         @media (max-width: 640px) {
           .opiniones-root {
             padding: 2rem 1rem;
@@ -603,7 +866,13 @@ export function Opiniones() {
             padding: 1rem;
           }
           .form-body {
-            padding: 1.5rem;
+            padding: 1.5rem 1.25rem;
+          }
+          .input-group {
+            margin-bottom: 1.5rem;
+          }
+          .rating-stars {
+            gap: 0.5rem;
           }
         }
       `}</style>
@@ -620,11 +889,33 @@ export function Opiniones() {
             <p className="opiniones-sub">Comparta su experiencia y ayude a otros clientes</p>
           </div>
 
+          <div className="af-tabs" style={{ position: 'static', marginBottom: '1.5rem' }}>
+            <button className={`af-tab${vista === 'opinar' ? ' active' : ''}`} onClick={() => setVista('opinar')}>
+              Dejar opinión
+            </button>
+            <button className={`af-tab${vista === 'mis' ? ' active' : ''}`} onClick={() => setVista('mis')}>
+              Mis opiniones
+            </button>
+          </div>
+
+          {vista === 'opinar' && (
           <div className="form-card">
             <div className="form-card-header">
               <p>COMPARTE TU EXPERIENCIA</p>
             </div>
             <div className="form-body">
+              {alcanzoLimite && (
+                <div className="op-limite">
+                  <h3>Ya tenés {MAX_OPINIONES} opiniones</h3>
+                  <p>
+                    Cada cliente puede dejar {MAX_OPINIONES} opiniones. Si querés escribir otra,
+                    eliminá una de las que ya tenés.
+                  </p>
+                  <button type="button" className="op-limite-btn" onClick={() => setVista('mis')}>
+                    Ver mis opiniones
+                  </button>
+                </div>
+              )}
               {mensaje && (
                 <div className={`message ${mensaje.includes('éxito') ? 'success' : 'error'}`}>
                   {mensaje}
@@ -677,7 +968,7 @@ export function Opiniones() {
                   </div>
                 </div>
 
-                <button type="submit" className="submit-btn" disabled={enviando}>
+                <button type="submit" className="submit-btn" disabled={enviando || alcanzoLimite}>
                   {enviando ? (
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                       <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -692,7 +983,84 @@ export function Opiniones() {
               </form>
             </div>
           </div>
+          )}
 
+          {vista === 'mis' && (
+            <div className="form-card">
+              <div className="form-card-header">
+                <p>MIS OPINIONES</p>
+              </div>
+              <div className="form-body">
+                {buscando ? (
+                  <div className="empty-state"><p>Cargando tus opiniones...</p></div>
+                ) : misOpiniones.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">💬</div>
+                    <p>Todavía no has dejado ninguna opinión</p>
+                  </div>
+                ) : (
+                  <div className="op-lista">
+                    {misOpiniones.map((op) => (
+                      <div key={op.id} className="op-item">
+                        {editandoId === op.id ? (
+                          <>
+                            <div className="op-edit-estrellas">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  className={`rating-star ${i <= editForm.rating ? 'active' : ''}`}
+                                  onClick={() => setEditForm({ ...editForm, rating: i })}
+                                >
+                                  ★
+                                </button>
+                              ))}
+                            </div>
+                            <textarea
+                              className="input-field"
+                              value={editForm.comentario}
+                              maxLength={100}
+                              onChange={(e) => setEditForm({ ...editForm, comentario: e.target.value })}
+                            />
+                            <div className="op-item-acciones">
+                              <button type="button" className="op-btn-cancelar" onClick={() => setEditandoId(null)}>
+                                Cancelar
+                              </button>
+                              <button type="button" className="op-btn-guardar" onClick={() => guardarEdicion(op.id)}>
+                                Guardar
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="op-item-top">
+                              <span className="op-item-estrellas">{'★'.repeat(op.rating)}</span>
+                              <span className={`op-estado ${op.is_approved ? 'aprobada' : 'pendiente'}`}>
+                                {op.is_approved ? 'Publicada' : 'Pendiente'}
+                              </span>
+                            </div>
+                            <p className="op-item-texto">"{op.comment}"</p>
+                            <div className="op-item-acciones">
+                              <button type="button" className="op-btn-editar" onClick={() => empezarEdicion(op)}>
+                                Editar
+                              </button>
+                              <button type="button" className="op-btn-eliminar" onClick={() => eliminarOpinion(op)}>
+                                Eliminar
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Las opiniones de todos solo en la pestaña de opinar:
+              "Mis opiniones" es únicamente para las del propio cliente */}
+          {vista === 'opinar' && (
           <div className="reviews-card">
             <div className="reviews-header">
               <p>OPINIONES DE NUESTROS CLIENTES</p>
@@ -727,6 +1095,7 @@ export function Opiniones() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </>

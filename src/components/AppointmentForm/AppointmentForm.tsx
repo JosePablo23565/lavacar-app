@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { swalConfirm, swalSuccess, swalError } from '../../utils/swalConfig'
+import { swalConfirm, swalSuccess, swalError, swalAviso } from '../../utils/swalConfig'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import { whatsappNegocioUrl } from '../../lib/ubicacion'
 import './AppointmentForm.css'
 
 type Appointment = {
@@ -138,10 +139,11 @@ export function AppointmentForm() {
     notes: '',
   })
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
+  // Cita vigente del cliente: mientras exista, no puede agendar otra
+  const [citaActiva, setCitaActiva] = useState<Appointment | null>(null)
   const [customerHistory, setCustomerHistory] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
-  const [phoneToSearch, setPhoneToSearch] = useState('')
+  const [cargandoCitas, setCargandoCitas] = useState(false)
   const [successData, setSuccessData] = useState<{
     show: boolean; name: string; date: string; time: string; service: string; vehicleType: string; vehicleModel: string; notes: string
   }>({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })
@@ -161,6 +163,11 @@ export function AppointmentForm() {
     { value: 'camioneta', label: 'Camioneta / SUV' },
   ]
 
+  // Vehículos que se pueden atender en la misma hora.
+  // El límite de verdad lo aplica la base de datos (función crear_cita);
+  // acá solo sirve para no mostrar horas que ya están llenas.
+  const CUPOS_POR_HORA = 2
+
   // Cargar horarios desde Supabase
   useEffect(() => {
     const fetchHorarios = async () => {
@@ -174,27 +181,50 @@ export function AppointmentForm() {
   }, [])
 
   // Cargar los días que el negocio cerró (fechas específicas)
+  const recargarDiasCerrados = async () => {
+    const hoyLocal = new Date()
+    const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
+
+    const { data } = await supabase
+      .from('dias_cerrados')
+      .select('fecha')
+      .gte('fecha', hoy)
+
+    setDiasCerrados((data || []).map(d => d.fecha))
+  }
+
   useEffect(() => {
-    const fetchDiasCerrados = async () => {
-      const hoyLocal = new Date()
-      const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
-
-      const { data } = await supabase
-        .from('dias_cerrados')
-        .select('fecha')
-        .gte('fecha', hoy)
-
-      setDiasCerrados((data || []).map(d => d.fecha))
-    }
-    fetchDiasCerrados()
+    recargarDiasCerrados()
   }, [])
+
+  // La base de datos dice si el cliente ya tiene una cita vigente
+  const cargarCitaActiva = async () => {
+    const { data } = await supabase.rpc('mi_cita_activa')
+    const cita = Array.isArray(data) ? data[0] : data
+
+    // Cuando no hay cita, la base puede devolver un objeto con todos los
+    // campos vacíos en vez de nada. Eso no es una cita: si lo diéramos por
+    // bueno, al pintar la fecha y la hora reventaría la pantalla.
+    const esCitaReal = !!(cita && cita.id && cita.appointment_date && cita.appointment_time)
+    setCitaActiva(esCitaReal ? cita : null)
+  }
+
+  useEffect(() => {
+    cargarCitaActiva()
+  }, [])
+
+  // Las citas se cargan solas apenas se sabe quién es el cliente,
+  // y se refrescan al entrar a la pestaña "Mis Citas"
+  useEffect(() => {
+    if (userId) fetchCustomerHistory()
+  }, [userId, step])
 
   // Verificar autenticación al cargar
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        alert('Debes iniciar sesión para agendar una cita')
+        await swalAviso('Iniciá sesión', 'Necesitás una cuenta para agendar una cita.')
         navigate('/acceder')
       }
     }
@@ -289,7 +319,20 @@ export function AppointmentForm() {
     return `${hours}:${minutes}:00`
   }
 
+  // Deja cualquier hora en "HH:MM" de 24 horas ("9:00 AM", "09:00 AM"
+  // y "09:00:00" terminan igual), para poder compararlas sin errores.
+  const normalizarHora = (hora: string) => {
+    if (!hora) return ''
+    const m = hora.trim().toUpperCase().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/)
+    if (!m) return hora.trim().toUpperCase()
+    let h = parseInt(m[1], 10)
+    if (m[3] === 'PM' && h !== 12) h += 12
+    if (m[3] === 'AM' && h === 12) h = 0
+    return `${String(h).padStart(2, '0')}:${m[2]}`
+  }
+
   const convertTo12Hour = (time24h: string) => {
+    if (!time24h) return ''
     const [hours, minutes] = time24h.split(':')
     const hour = parseInt(hours)
     const ampm = hour >= 12 ? 'PM' : 'AM'
@@ -367,15 +410,20 @@ export function AppointmentForm() {
     const horaActual = ahora.getHours()
     const minutosActual = ahora.getMinutes()
     
-    const { data } = await supabase
-      .from('appointments')
-      .select('appointment_time')
-      .eq('appointment_date', dateStr)
+    // Cuántos vehículos hay reservados en cada hora de ese día
+    const { data } = await supabase.rpc('cupos_ocupados', { p_fecha: dateStr })
 
-    const bookedTimes24h = data?.map(a => a.appointment_time) || []
-    const bookedTimes12h = bookedTimes24h.map(t => convertTo12Hour(t))
-    
-    let available = horariosDelDia.filter(time => !bookedTimes12h.includes(time))
+    // Se comparan las horas ya normalizadas: la lista de horarios usa
+    // "9:00 AM" y la base devuelve "09:00:00", que como texto no coinciden.
+    const ocupadosPorHora = new Map<string, number>()
+    for (const fila of (data || []) as { hora: string; ocupados: number }[]) {
+      ocupadosPorHora.set(normalizarHora(fila.hora), Number(fila.ocupados))
+    }
+
+    // Una hora sigue disponible mientras no llegue al máximo de vehículos
+    let available = horariosDelDia.filter(
+      time => (ocupadosPorHora.get(normalizarHora(time)) || 0) < CUPOS_POR_HORA
+    )
     
     if (dateStr === hoyStr) {
       available = available.filter(time => {
@@ -399,11 +447,17 @@ export function AppointmentForm() {
     }
   }
 
-  const fetchCustomerHistory = async (phone: string) => {
+  // Las citas del cliente que tiene la sesión abierta. No se pide el
+  // teléfono: se sabe quién es por su sesión, y la base de datos solo
+  // le deja ver las suyas.
+  const fetchCustomerHistory = async () => {
+    if (!userId) return
+    setCargandoCitas(true)
+
     const { data } = await supabase
       .from('appointments')
       .select('*')
-      .eq('customer_phone', phone)
+      .eq('user_id', userId)
       .order('appointment_date', { ascending: true })
       .order('appointment_time', { ascending: true })
 
@@ -425,6 +479,7 @@ export function AppointmentForm() {
     })
 
     setCustomerHistory(citasPendientes)
+    setCargandoCitas(false)
   }
 
   const eliminarCita = async (cita: Appointment) => {
@@ -435,17 +490,28 @@ export function AppointmentForm() {
 
     if (!result.isConfirmed) return
 
-    const { error } = await supabase.from('appointments').delete().eq('id', cita.id)
+    // El .select() devuelve lo que realmente se borró: si la cita no es
+    // del cliente, la base no la toca y vuelve vacío, sin dar error.
+    const { data: borradas, error } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', cita.id)
+      .select()
 
     if (error) {
       swalError('Error', 'No se pudo eliminar la cita')
       return
     }
 
+    if (!borradas || borradas.length === 0) {
+      swalError('No se pudo eliminar', 'Esa cita no es tuya, así que no podés eliminarla.')
+      return
+    }
+
     swalSuccess('Cita eliminada', 'El horario quedó disponible nuevamente')
 
     // Refrescar la lista y liberar el horario en el calendario
-    await fetchCustomerHistory(cita.customer_phone)
+    await fetchCustomerHistory()
     await fetchAvailableTimes()
   }
 
@@ -468,32 +534,32 @@ export function AppointmentForm() {
     e.preventDefault()
 
     if (!formData.vehicle_type) {
-      alert('Por favor seleccione el tipo de vehículo')
+      swalAviso('Falta el tipo de vehículo', 'Seleccioná si es carro, moto o camioneta.')
       return
     }
 
     if (!formData.vehicle_model.trim()) {
-      alert('Por favor ingrese la marca y modelo del vehículo')
+      swalAviso('Falta la marca y modelo', 'Escribí la marca y el modelo del vehículo.')
       return
     }
 
     if (!formData.service_type) {
-      alert('Por favor seleccione un servicio')
+      swalAviso('Falta el servicio', 'Elegí el servicio que querés para tu vehículo.')
       return
     }
 
     if (!selectedDate) {
-      alert('Por favor seleccione una fecha')
+      swalAviso('Falta la fecha', 'Elegí en el calendario el día de tu cita.')
       return
     }
 
     if (!formData.appointment_time) {
-      alert('Por favor seleccioná una hora')
+      swalAviso('Falta la hora', 'Elegí uno de los horarios disponibles.')
       return
     }
 
     if (diasCerrados.includes(formData.appointment_date)) {
-      alert('Ese día el negocio permanecerá cerrado. Por favor elegí otra fecha.')
+      swalAviso('Ese día está cerrado', 'El negocio no abrirá ese día. Por favor elegí otra fecha.')
       return
     }
     
@@ -512,7 +578,7 @@ export function AppointmentForm() {
       if (modifier === 'AM' && hora24 === 12) hora24 = 0
       
       if (hora24 < horaActual || (hora24 === horaActual && parseInt(minuto) <= minutosActual)) {
-        alert('No puede agendar una cita en un horario que ya pasó')
+        swalAviso('Ese horario ya pasó', 'Elegí una hora que todavía no haya llegado.')
         return
       }
     }
@@ -520,22 +586,63 @@ export function AppointmentForm() {
     setLoading(true)
     
     if (!userId || !userEmail) {
-      alert('Error: No se pudo identificar al usuario. Por favor inicia sesión nuevamente.')
+      await swalError('No pudimos identificarte', 'Iniciá sesión de nuevo para agendar tu cita.')
       setLoading(false)
       navigate('/acceder')
       return
     }
     
-    const { error } = await supabase.from('appointments').insert([{ 
-      ...formData, 
-      appointment_time: convertTo24Hour(formData.appointment_time),
-      email: userEmail,
-      user_id: userId,
-      notes: formData.notes || null
-    }])
-    
+    // La reserva la hace la base de datos: ahí se revisa el cupo y el día
+    // cerrado dentro de una misma operación, para que dos personas no
+    // puedan tomar el último espacio al mismo tiempo.
+    const { error } = await supabase.rpc('crear_cita', {
+      p_customer_name: formData.customer_name,
+      p_customer_phone: formData.customer_phone,
+      p_service_type: formData.service_type,
+      p_vehicle_type: formData.vehicle_type,
+      p_vehicle_model: formData.vehicle_model,
+      p_appointment_date: formData.appointment_date,
+      p_appointment_time: convertTo24Hour(formData.appointment_time),
+      p_notes: formData.notes || null,
+      p_email: userEmail,
+      p_user_id: userId,
+    })
+
     if (error) {
-      alert('Error: ' + error.message)
+      const motivo = error.message || ''
+
+      if (motivo.includes('CUPO_LLENO')) {
+        await swalAviso(
+          'Ese cupo se acaba de ocupar',
+          'Otro cliente reservó ese espacio justo ahora. Por favor elegí otra de las horas disponibles.'
+        )
+        setFormData(prev => ({ ...prev, appointment_time: '' }))
+        await fetchAvailableTimes()
+      } else if (motivo.includes('DIA_CERRADO')) {
+        await swalAviso(
+          'Tu cita no se reservó',
+          'El negocio acaba de cerrar ese día. Por favor agendá en otro de los días y horas disponibles.'
+        )
+        setFormData(prev => ({ ...prev, appointment_time: '', appointment_date: '' }))
+        setSelectedDate(null)
+        await recargarDiasCerrados()
+      } else if (motivo.includes('FECHA_PASADA')) {
+        await swalAviso('Esa fecha ya pasó', 'Por favor elegí una fecha próxima.')
+        setFormData(prev => ({ ...prev, appointment_time: '', appointment_date: '' }))
+        setSelectedDate(null)
+      } else if (motivo.includes('NO_AUTORIZADO')) {
+        await swalError('Tu sesión expiró', 'Iniciá sesión de nuevo para agendar tu cita.')
+        navigate('/acceder')
+      } else if (motivo.includes('YA_TIENE_CITA')) {
+        await swalAviso(
+          'Ya tenés una cita agendada',
+          'Solo se puede tener una cita a la vez. Vas a poder agendar otra 2 horas después de la que ya tenés.'
+        )
+        await cargarCitaActiva()
+      } else {
+        await swalError('No se pudo agendar', motivo)
+      }
+
       setLoading(false)
     } else {
       const svc = services.find((s) => s.value === formData.service_type)
@@ -551,12 +658,21 @@ export function AppointmentForm() {
         notes: formData.notes || ''
       })
       
-      setFormData(prev => ({ 
-        ...prev, 
-        appointment_time: ''
+      // Se limpian los datos de la cita (el nombre y el teléfono del
+      // perfil se mantienen, porque no los escribe el cliente)
+      setFormData(prev => ({
+        ...prev,
+        service_type: '',
+        vehicle_type: '',
+        vehicle_model: '',
+        appointment_date: '',
+        appointment_time: '',
+        notes: '',
       }))
-      
-      await fetchAvailableTimes()
+      setSelectedDate(null)
+      setAvailableTimes([])
+
+      await cargarCitaActiva()
       
       setTimeout(() => setSuccessData({ 
         show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: ''
@@ -658,6 +774,42 @@ export function AppointmentForm() {
                 <p>Complete los datos para reservar su espacio</p>
               </div>
               <div className="af-body">
+                {citaActiva && (
+                  <div className="af-limite">
+                    <div className="af-limite-icono">
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                    </div>
+                    <h3>Ya tenés una cita agendada</h3>
+                    <p>
+                      Tu cita es el <strong>{formatDateDisplay(citaActiva.appointment_date)}</strong>
+                      {' a las '}
+                      <strong>{convertTo12Hour(citaActiva.appointment_time)}</strong>.
+                    </p>
+                    <p className="af-limite-nota">
+                      Solo se puede tener una cita a la vez. Vas a poder agendar otra
+                      {' '}2 horas después de que pase la que ya tenés.
+                    </p>
+                    <p className="af-limite-nota">
+                      ¿Tuviste algún problema con tu cita? Escribinos y te ayudamos.
+                    </p>
+                    <a
+                      href={whatsappNegocioUrl('Hola, tengo una consulta sobre mi cita en Autolavado Camaro Fraterno.')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="af-limite-wa"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11z"/>
+                      </svg>
+                      Escribir al WhatsApp del negocio
+                    </a>
+                  </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
                   <div className="af-row-compact">
                     <div className="af-compact-field">
@@ -783,6 +935,7 @@ export function AppointmentForm() {
                     className="af-submit"
                     disabled={
                       loading ||
+                      citaActiva !== null ||
                       !formData.vehicle_type ||
                       !formData.vehicle_model.trim() ||
                       !formData.service_type ||
@@ -809,39 +962,18 @@ export function AppointmentForm() {
             <div className="af-card">
               <div className="af-card-header">
                 <h2>Mis Citas</h2>
-                <p>Consulte sus citas agendadas</p>
+                <p>Estas son tus citas agendadas</p>
               </div>
               <div className="af-body">
-                <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem' }}>
-                  <input 
-                    className="af-input" 
-                    type="tel" 
-                    placeholder="Número de teléfono" 
-                    value={phoneToSearch} 
-                    onChange={(e) => {
-                      const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
-                      if (onlyNumbers.length <= 8) {
-                        setPhoneToSearch(onlyNumbers)
-                        // Buscar automáticamente al completar los 8 dígitos
-                        if (onlyNumbers.length === 8) {
-                          fetchCustomerHistory(onlyNumbers)
-                          setShowHistory(true)
-                        }
-                      }
-                    }}
-                    style={{ flex: 1 }} 
-                    maxLength={8}
-                  />
-                  <button onClick={() => { if (phoneToSearch) { fetchCustomerHistory(phoneToSearch); setShowHistory(true) } }} className="af-buscar-btn">
-                    Buscar
-                  </button>
-                </div>
-
-                {showHistory && (
+                {cargandoCitas ? (
+                  <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,.4)' }}>
+                    <p>Cargando tus citas...</p>
+                  </div>
+                ) : (
                   customerHistory.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(255,255,255,.4)' }}>
                       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
-                      <p>No hay citas registradas para ese número</p>
+                      <p>Todavía no tenés citas agendadas</p>
                     </div>
                   ) : (
                     <div>

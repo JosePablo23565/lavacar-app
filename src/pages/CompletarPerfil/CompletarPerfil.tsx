@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import './CompletarPerfil.css'
 
 export function CompletarPerfil() {
   const navigate = useNavigate()
@@ -136,41 +137,45 @@ export function CompletarPerfil() {
   }
 
   return (
-    <div className="app-loading" style={{ padding: '1rem' }}>
-      <div className="completar-perfil-card">
-        <h1 className="text-2xl font-bold text-white text-center mb-2">Completa tu perfil</h1>
-        <p className="text-gray-400 text-center mb-6">Necesitamos algunos datos para continuar</p>
-        
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-lg mb-4 text-sm">
-            {error}
-          </div>
-        )}
-        
-        <div className="bg-gray-700/50 rounded-lg p-3 mb-6 text-center">
-          <span className="text-gray-400 text-sm">📧 </span>
-          <span className="text-red-400 text-sm">{userEmail || 'Cargando...'}</span>
+    <div className="cp-page">
+      <div className="cp-card">
+        <div className="cp-header">
+          <h2>Completa tu perfil</h2>
+          <p>Necesitamos algunos datos para continuar</p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">NOMBRE COMPLETO</label>
+
+        <form onSubmit={handleSubmit} className="cp-body">
+          {error && <div className="cp-error">{error}</div>}
+
+          <div className="cp-correo">
+            <span className="cp-correo-label">Correo</span>
+            <span className="cp-correo-valor">{userEmail || 'Cargando...'}</span>
+          </div>
+
+          <div className="cp-field">
+            <label>Nombre completo</label>
             <input
               type="text"
-              placeholder="Ej: Juan Pérez"
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
+              placeholder="Tu nombre completo"
               value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value
+                const soloLetras = /^[a-zA-ZáéíóúñÑüÜ\s]*$/
+                if (soloLetras.test(value) && value.length <= 40) {
+                  setFormData({ ...formData, nombre: value })
+                }
+              }}
+              maxLength={40}
               required
             />
+            <p className="cp-hint">Máximo 40 caracteres, solo letras y espacios.</p>
           </div>
-          
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">TELÉFONO</label>
+
+          <div className="cp-field">
+            <label>Teléfono</label>
             <input
               type="tel"
-              placeholder="Ej: 88888888"
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500 transition"
+              placeholder="8 dígitos"
               value={formData.telefono}
               onChange={(e) => {
                 const onlyNumbers = e.target.value.replace(/[^0-9]/g, '')
@@ -178,19 +183,17 @@ export function CompletarPerfil() {
                   setFormData({ ...formData, telefono: onlyNumbers })
                 }
               }}
-              required
               maxLength={8}
+              required
             />
-            <p className="text-gray-500 text-xs mt-1">8 dígitos, solo números</p>
+            <p className="cp-hint">8 dígitos, solo números.</p>
           </div>
-          
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold py-2 px-4 rounded-lg hover:from-red-600 hover:to-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Guardando...' : 'CONTINUAR'}
-          </button>
+
+          <div className="cp-footer">
+            <button type="submit" className="cp-btn-save" disabled={loading}>
+              {loading ? 'Guardando...' : 'Continuar'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

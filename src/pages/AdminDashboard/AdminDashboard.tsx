@@ -65,6 +65,9 @@ export function AdminDashboard() {
   const [mostrarAvisos, setMostrarAvisos] = useState(false)
   const [cerrandoDias, setCerrandoDias] = useState(false)
   const [avisados, setAvisados] = useState<number[]>([])
+  // true cuando los días ya se cerraron y solo falta avisar a clientes
+  // que reservaron a último momento
+  const [cierreCompletado, setCierreCompletado] = useState(false)
 
   useEffect(() => {
     checkAdminAndFetch()
@@ -257,6 +260,7 @@ export function AdminDashboard() {
       if (result.isConfirmed) await confirmarCierre()
     } else {
       // Hay citas: mostrar la lista para avisar a cada cliente
+      setCierreCompletado(false)
       setMostrarAvisos(true)
     }
   }
@@ -275,46 +279,53 @@ export function AdminDashboard() {
 
     setCerrandoDias(true)
 
-    const { error: errorCierre } = await supabase
-      .from('dias_cerrados')
-      .upsert(
-        fechasSeleccionadas.map(fecha => ({ fecha })),
-        { onConflict: 'fecha' }
-      )
+    // La base de datos cierra los días y cancela las citas en una sola
+    // operación, y devuelve las citas realmente canceladas. Así aparecen
+    // también las que entraron mientras revisabas la lista.
+    const { data, error } = await supabase.rpc('cerrar_dias', {
+      p_fechas: fechasSeleccionadas
+    })
 
-    if (errorCierre) {
-      swalError('Error', 'No se pudieron guardar los días cerrados')
+    if (error) {
+      swalError(
+        'No se pudieron cerrar los días',
+        error.message.includes('NO_AUTORIZADO')
+          ? 'Tu sesión de administrador expiró. Iniciá sesión de nuevo.'
+          : error.message
+      )
       setCerrandoDias(false)
       return
     }
 
-    // Cancelar (borrar) las citas de esos días
-    if (citasAfectadas.length > 0) {
-      const { error: errorCitas } = await supabase
-        .from('appointments')
-        .delete()
-        .in('id', citasAfectadas.map(c => c.id))
+    const canceladas = (data || []) as Appointment[]
+    const diasCerradosCount = fechasSeleccionadas.length
 
-      if (errorCitas) {
-        swalError('Atención', 'Los días se cerraron, pero no se pudieron cancelar las citas')
-      }
+    setCerrandoDias(false)
+    setFechasSeleccionadas([])
+    await fetchDiasCerrados()
+    await fetchAppointments()
+
+    // Citas que entraron a último momento y todavía no recibieron aviso
+    const sinAvisarFinal = canceladas.filter(c => !avisados.includes(c.id))
+
+    if (sinAvisarFinal.length > 0) {
+      // Se dejan en pantalla para poder avisarles
+      setCitasAfectadas(sinAvisarFinal)
+      setCierreCompletado(true)
+      setMostrarAvisos(true)
+      return
     }
 
     swalSuccess(
       'Días cerrados',
-      citasAfectadas.length > 0
-        ? `Se cerraron ${fechasSeleccionadas.length} día(s) y se cancelaron ${citasAfectadas.length} cita(s)`
-        : `Se cerraron ${fechasSeleccionadas.length} día(s)`
+      canceladas.length > 0
+        ? `Se cerraron ${diasCerradosCount} día(s) y se cancelaron ${canceladas.length} cita(s)`
+        : `Se cerraron ${diasCerradosCount} día(s)`
     )
 
-    setFechasSeleccionadas([])
     setCitasAfectadas([])
     setMostrarAvisos(false)
-    setCerrandoDias(false)
     setAvisados([])
-
-    await fetchDiasCerrados()
-    await fetchAppointments()
   }
 
   // Abre en fila el chat de WhatsApp de cada cliente afectado.
@@ -918,10 +929,12 @@ export function AdminDashboard() {
         <div className="af-modal-overlay">
           <div className="af-modal" style={{ maxWidth: 560 }}>
             <h2 style={{ fontFamily: "'Sora',sans-serif", textAlign: 'center', fontSize: '1.25rem', marginBottom: '.4rem', color: '#fff' }}>
-              Avisar a los clientes
+              {cierreCompletado ? 'Reservaron a último momento' : 'Avisar a los clientes'}
             </h2>
             <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1rem' }}>
-              Hay {citasAfectadas.length} cita(s) en esos días. Abrí los chats, presioná enviar en cada uno y luego confirmá el cierre.
+              {cierreCompletado
+                ? `Los días ya quedaron cerrados. ${citasAfectadas.length} cita(s) entraron mientras revisabas y también se cancelaron: avisales por WhatsApp.`
+                : `Hay ${citasAfectadas.length} cita(s) en esos días. Abrí los chats, presioná enviar en cada uno y luego confirmá el cierre.`}
             </p>
 
             <button type="button" className="aviso-abrir-todos" onClick={abrirTodosLosChats}>
@@ -966,20 +979,27 @@ export function AdminDashboard() {
 
             <div style={{ display: 'flex', gap: '.75rem', marginTop: '1.5rem' }}>
               <button
-                onClick={() => { setMostrarAvisos(false); setCitasAfectadas([]); setAvisados([]) }}
+                onClick={() => {
+                  setMostrarAvisos(false)
+                  setCitasAfectadas([])
+                  setAvisados([])
+                  setCierreCompletado(false)
+                }}
                 className="cierre-btn-cancelar"
                 disabled={cerrandoDias}
               >
-                Cancelar
+                {cierreCompletado ? 'Listo' : 'Cancelar'}
               </button>
-              <button
-                onClick={confirmarCierre}
-                className="cierre-btn-confirmar"
-                style={{ marginTop: 0 }}
-                disabled={cerrandoDias}
-              >
-                {cerrandoDias ? 'Cerrando...' : 'Confirmar cierre'}
-              </button>
+              {!cierreCompletado && (
+                <button
+                  onClick={confirmarCierre}
+                  className="cierre-btn-confirmar"
+                  style={{ marginTop: 0 }}
+                  disabled={cerrandoDias}
+                >
+                  {cerrandoDias ? 'Cerrando...' : 'Confirmar cierre'}
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap');
+
+/* Misma identidad visual que el modal "Configurar perfil" del menu.
+   Esta pagina no monta el NavBar, por eso lleva sus propios estilos. */
+
+.cp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.cp-card {
+  background: rgba(25, 25, 25, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 450px;
+}
+
+.cp-header {
+  padding: 28px 28px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cp-header h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-family: 'Sora', sans-serif;
+}
+
+.cp-header p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.cp-body {
+  padding: 24px 28px;
+}
+
+.cp-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.cp-correo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.cp-correo-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cp-correo-valor {
+  font-size: 0.9rem;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.cp-field {
+  margin-bottom: 20px;
+}
+
+.cp-field label {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.cp-field input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.cp-field input:focus {
+  outline: none;
+  border-color: #e0142c;
+  background: rgba(10, 10, 10, 0.8);
+  box-shadow: 0 0 0 3px rgba(224, 20, 44, 0.2);
+}
+
+.cp-field input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.cp-hint {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 4px;
+}
+
+.cp-footer {
+  padding-top: 4px;
+}
+
+.cp-btn-save {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #e0142c, #a10e1f);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Sora', sans-serif;
+}
+
+.cp-btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(224, 20, 44, 0.3);
+}
+
+.cp-btn-save:disabled {
+  opacity: 0.6;
+  transform: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .cp-card {
+    border-radius: 26px;
+  }
+  .cp-header {
+    padding: 24px 20px 14px;
+  }
+  .cp-header h2 {
+    font-size: 1.3rem;
+  }
+  .cp-body {
+    padding: 20px;
+  }
+}
