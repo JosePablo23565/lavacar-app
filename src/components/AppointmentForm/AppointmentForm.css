@@ -237,15 +237,17 @@
   box-shadow: 0 0 0 3px rgba(224, 20, 44, 0.1);
 }
 
-.af-input:active {
-  transform: scale(1.02);
-  transition: transform 0.1s ease;
-}
+
 
 .af-input:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   background: rgba(255, 255, 255, 0.02);
+}
+
+.af-input:active {
+  transform: scale(1.02);
+  transition: transform 0.1s ease;
 }
 
 .af-field {
