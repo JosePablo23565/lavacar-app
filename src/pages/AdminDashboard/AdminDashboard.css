@@ -1139,3 +1139,43 @@
     border-bottom: 1px solid #ccc !important;
   }
 }
+
+.estado-cita {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 30px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  margin-bottom: 0.4rem;
+}
+
+.estado-cita.pendiente {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.estado-cita.en-curso {
+  background: rgba(224, 20, 44, 0.15);
+  border: 1px solid rgba(224, 20, 44, 0.4);
+  color: #f87171;
+  animation: latido 1.8s ease-in-out infinite;
+}
+
+.estado-cita.finalizada {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+@keyframes latido {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.admin-table .estado-cita {
+  margin-bottom: 0;
+}

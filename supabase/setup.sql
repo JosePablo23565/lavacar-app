@@ -453,7 +453,9 @@ begin
     update public.appointments
     set estado = 'completada'
     where estado = 'pendiente'
-      and (appointment_date + appointment_time)
+      -- Se cuenta la hora de FIN: una cita en curso todavia no se cierra
+      and (appointment_date + appointment_time
+           + make_interval(mins => duracion_minutos))
           < (now() at time zone 'America/Costa_Rica')
     returning 1
   )

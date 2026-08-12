@@ -80,6 +80,24 @@ export function AdminDashboard() {
     checkAdminAndFetch()
   }, [])
 
+  // El estado de cada cita depende de la hora, asi que hay que
+  // volver a mirarlo cada tanto sin recargar la pagina
+  const [ahora, setAhora] = useState(() => new Date())
+
+  useEffect(() => {
+    const reloj = setInterval(() => setAhora(new Date()), 30000)
+    return () => clearInterval(reloj)
+  }, [])
+
+  const estadoCita = (cita: Appointment) => {
+    const inicio = new Date(`${cita.appointment_date}T${cita.appointment_time}`)
+    const fin = new Date(inicio.getTime() + (cita.duracion_minutos || 30) * 60000)
+
+    if (ahora < inicio) return { clave: 'pendiente', texto: 'Pendiente' }
+    if (ahora < fin) return { clave: 'en-curso', texto: 'En curso' }
+    return { clave: 'finalizada', texto: 'Finalizada' }
+  }
+
   const completarCitasPasadas = async () => {
     const { data, error } = await supabase.rpc('completar_citas_pasadas')
 
@@ -142,33 +160,20 @@ export function AdminDashboard() {
     const { data } = await supabase
       .from('appointments')
       .select('*')
+      .eq('estado', 'pendiente')
       .order('appointment_date', { ascending: true })
       .order('appointment_time', { ascending: true })
-    
+
     const citas = data || []
-    
+    setAppointments(citas)
+
     const hoyLocal = new Date()
-    const year = hoyLocal.getFullYear()
-    const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
-    const day = String(hoyLocal.getDate()).padStart(2, '0')
-    const hoy = `${year}-${month}-${day}`
-    
-    const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
-    
-    const citasFuturas = citas.filter(c => {
-      if (c.appointment_date > hoy) return true
-      if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
-      return false
-    })
-    
-    setAppointments(citasFuturas)
-    
-    const citasHoy = citasFuturas.filter(c => c.appointment_date === hoy)
-    
+    const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
+
     setStats({
-      total: citasFuturas.length,
-      hoy: citasHoy.length,
-      proximas: citasFuturas.length - citasHoy.length
+      total: citas.length,
+      hoy: citas.filter(c => c.appointment_date === hoy).length,
+      proximas: citas.filter(c => c.appointment_date > hoy).length,
     })
     setLoading(false)
   }
@@ -633,6 +638,9 @@ export function AdminDashboard() {
                   <div key={apt.id} className="cita-card">
                     <div className="cita-header">
                       <div className="cita-cliente">
+                        <span className={`estado-cita ${estadoCita(apt).clave}`}>
+                          {estadoCita(apt).texto}
+                        </span>
                         <p className="cita-nombre">{apt.customer_name}</p>
                         <p className="cita-telefono">{apt.customer_phone}</p>
                         <p className="cita-email">{apt.email}</p>
@@ -689,15 +697,20 @@ export function AdminDashboard() {
                 <table className="admin-table">
                   <thead>
                     <tr>
-                      <th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Vehículo</th><th>Modelo</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Detalles</th><th style={{ textAlign: 'center' }}>Acciones</th>
+                      <th>Estado</th><th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Vehículo</th><th>Modelo</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Detalles</th><th style={{ textAlign: 'center' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAppointments.length === 0 ? (
-                      <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td></tr>
+                      <tr><td colSpan={11} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td></tr>
                     ) : (
                       filteredAppointments.map((apt) => (
                         <tr key={apt.id}>
+                          <td>
+                            <span className={`estado-cita ${estadoCita(apt).clave}`}>
+                              {estadoCita(apt).texto}
+                            </span>
+                          </td>
                           <td style={{ fontWeight: '500' }}>{apt.customer_name}</td>
                           <td>{apt.customer_phone}</td>
                           <td style={{ fontSize: '0.8rem', color: '#a6a6a6' }}>{apt.email}</td>
