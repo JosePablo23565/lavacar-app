@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { Icono } from '../Icono/Icono'
 import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion'
 
 export function Home() {
@@ -8,7 +9,6 @@ export function Home() {
   const [testimonials, setTestimonials] = useState<any[]>([])
   const [loadingTestimonials, setLoadingTestimonials] = useState(true)
   
-  // Estado para el slideshow del fondo de servicios
   const [currentBgIndex, setCurrentBgIndex] = useState(0)
   
   const bgImages = [
@@ -18,7 +18,6 @@ export function Home() {
     '/tapizado.jpg'
   ]
 
-  // Slideshow automático para el fondo de servicios
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBgIndex((prev) => (prev + 1) % bgImages.length)
@@ -28,27 +27,22 @@ export function Home() {
 
   const fetchTestimonials = async () => {
     try {
-      console.log('Cargando testimonios desde Supabase...')
       
       const { data, error } = await supabase
         .from('testimonials')
         .select('*')
         .eq('is_approved', true)
         .order('created_at', { ascending: false })
-        .limit(3)
+        .limit(4)
       
       if (error) {
-        console.error('Error cargando testimonios:', error)
         setTestimonials([])
       } else if (data && data.length > 0) {
-        console.log('Testimonios cargados en Home:', data)
         setTestimonials(data)
       } else {
-        console.log('No hay testimonios aprobados en Supabase')
         setTestimonials([])
       }
     } catch (err) {
-      console.error('Error inesperado:', err)
       setTestimonials([])
     }
     setLoadingTestimonials(false)
@@ -60,7 +54,6 @@ export function Home() {
 
   useEffect(() => {
     const handleUpdate = () => {
-      console.log('Actualizando testimonios por evento')
       setLoadingTestimonials(true)
       fetchTestimonials()
     }
@@ -174,8 +167,6 @@ export function Home() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
         .lc-root { font-family:'DM Sans',sans-serif; background:#121212; color:#fff; overflow-x:hidden; }
         .lc-root h1,.lc-root h2,.lc-root h3 { font-family:'Sora',sans-serif; }
@@ -276,7 +267,6 @@ export function Home() {
         
         .lc-hours-card { background:rgba(255,255,255,0.05); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.8rem 1.5rem; display:inline-flex; align-items:center; gap:1.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.5rem; margin-bottom:1rem; animation:lcFadeUp .8s .4s ease both; }
         .lc-hours-item { display:flex; align-items:center; gap:0.5rem; }
-        .lc-hours-icon { font-size:1.3rem; }
         .lc-hours-label { font-size:0.65rem; color:rgba(255,255,255,0.5); letter-spacing:1px; }
         .lc-hours-value { font-size:0.85rem; font-weight:600; }
         .lc-hours-divider { width:1px; height:25px; background:rgba(255,255,255,0.2); }
@@ -669,31 +659,8 @@ export function Home() {
         }
 
         /* Estilos para la sección de ubicación con 3 mapas */
-        .ubicacion-section {
-          text-align: center;
-          position: relative;
-          z-index: 2;
-          background: linear-gradient(135deg, rgba(13, 13, 13, 0.95), rgba(18, 18, 18, 0.98));
-          border-top: 1px solid rgba(224, 20, 44, 0.2);
-          border-bottom: 1px solid rgba(224, 20, 44, 0.2);
-        }
 
-        .ubicacion-desc {
-          color: rgba(255, 255, 255, 0.7);
-          margin-bottom: 32px;
-          font-size: 1rem;
-        }
 
-        .map-container {
-          border-radius: 32px;
-          overflow: hidden;
-          border: 1px solid rgba(224, 20, 44, 0.3);
-          margin-bottom: 24px;
-          max-width: 850px;
-          margin-left: auto;
-          margin-right: auto;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
 
         .map-container iframe {
           display: block;
@@ -701,45 +668,14 @@ export function Home() {
           height: 420px;
         }
 
-        .map-links {
-          display: flex;
-          justify-content: center;
-          gap: 14px;
-          flex-wrap: wrap;
-          margin-top: 24px;
-        }
 
-        .map-link {
-          background: rgba(224, 20, 44, 0.1);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(224, 20, 44, 0.3);
-          padding: 12px 26px;
-          border-radius: 60px;
-          font-size: 0.88rem;
-          font-weight: 600;
-          transition: all 0.3s;
-          color: #fff;
-          text-decoration: none;
-          display: inline-block;
-          cursor: pointer;
-        }
 
-        .map-link:hover {
-          background: rgba(224, 20, 44, 0.2);
-          border-color: #e0142c;
-          color: #e0142c;
-          transform: translateY(-3px);
-        }
 
         @media (max-width: 768px) {
           .map-container iframe {
             height: 300px;
           }
           
-          .map-link {
-            padding: 10px 20px;
-            font-size: 0.8rem;
-          }
         }
 
         .lc-footer { 
@@ -751,16 +687,6 @@ export function Home() {
           margin-top: 2rem;
         }
 
-        .lc-footer-logo { 
-          font-family: 'Sora', sans-serif; 
-          font-size: 1.2rem; 
-          font-weight: 600; 
-          margin-bottom: 0.8rem;
-          background: linear-gradient(135deg, #fff, #e0142c);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
 
         .lc-footer-sub { 
           font-size: 0.8rem; 
@@ -817,7 +743,6 @@ export function Home() {
 
         @media (max-width: 768px) {
           .lc-footer { padding: 2rem 1rem 1.5rem; }
-          .lc-footer-logo { font-size: 1rem; }
           .lc-footer-sub { font-size: 0.7rem; }
           .lc-footer-links { gap: 1.2rem; }
           .lc-footer-links button { font-size: 0.75rem; }
@@ -977,7 +902,6 @@ export function Home() {
           </div>
         </section>
 
-        {/* SECCIÓN DE CONTACTO */}
         <section id="contacto" style={{ 
           padding: '4rem 1.5rem', 
           backgroundImage: 'url("/fondo-contacto.jpg")',
@@ -1009,7 +933,6 @@ export function Home() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
               gap: '1.5rem'
             }}>
-              {/* Tarjeta de información de contacto */}
               <div style={{ 
                 background: 'rgba(28, 28, 28, 0.5)', 
                 backdropFilter: 'blur(12px)', 
@@ -1041,7 +964,7 @@ export function Home() {
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                   >
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(37,211,102,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="fab fa-whatsapp" style={{ fontSize: '1.3rem', color: '#25d366' }}></i>
+                      <Icono nombre="whatsapp" size={21} color="#25d366" />
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>WHATSAPP</div>
@@ -1057,17 +980,17 @@ export function Home() {
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'translateX(0)' }}
                   >
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(224, 20, 44,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="fas fa-envelope" style={{ fontSize: '1.1rem', color: '#e0142c' }}></i>
+                      <Icono nombre="sobre" size={18} color="#e0142c" />
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>CORREO</div>
-                      <div style={{ fontSize: '0.85rem', color: '#e0142c', fontWeight: 500 }}>camarofraterno@gmail.com</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>camarofraterno@gmail.com</div>
                     </div>
                   </a>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.4rem', borderRadius: '12px' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(224, 20, 44,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <i className="far fa-clock" style={{ fontSize: '1.1rem', color: '#e0142c' }}></i>
+                      <Icono nombre="reloj" size={18} color="#e0142c" />
                     </div>
                     <div>
                       <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>HORARIO</div>
@@ -1075,7 +998,6 @@ export function Home() {
                     </div>
                   </div>
 
-                  {/* Redes sociales */}
                   <div style={{ marginTop: '1.2rem', paddingTop: '1.2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                     <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', marginBottom: '0.9rem', lineHeight: 1.5 }}>
                       Podés encontrarnos en nuestras redes sociales
@@ -1087,7 +1009,7 @@ export function Home() {
                         rel="noopener noreferrer"
                         style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'rgba(24,119,242,0.12)', border: '1px solid rgba(24,119,242,0.35)', color: '#1877F2', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
                       >
-                        <i className="fab fa-facebook-f" style={{ fontSize: '1.1rem' }}></i>
+                        <Icono nombre="facebook" size={18} />
                         Facebook
                       </a>
                       <a
@@ -1096,7 +1018,7 @@ export function Home() {
                         rel="noopener noreferrer"
                         style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'rgba(225,48,108,0.12)', border: '1px solid rgba(225,48,108,0.35)', color: '#E1306C', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
                       >
-                        <i className="fab fa-instagram" style={{ fontSize: '1.1rem' }}></i>
+                        <Icono nombre="instagram" size={18} />
                         Instagram
                       </a>
                     </div>
@@ -1104,7 +1026,6 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Tarjeta del mapa - CON BOTONES DE GOOGLE, WAZE Y APPLE MAPS */}
               <div style={{ 
                 background: 'rgba(28, 28, 28, 0.5)', 
                 backdropFilter: 'blur(12px)', 
@@ -1129,10 +1050,8 @@ export function Home() {
                     />
                   </div>
                   
-                  {/* BOTONES DE MAPAS CON ÍCONOS Y COLORES */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
                     
-                    {/* Google Maps */}
                     <a 
                       href={googleMapsUrl}
                       target="_blank"
@@ -1165,11 +1084,10 @@ export function Home() {
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      <i className="fab fa-google" style={{ fontSize: '1.1rem' }}></i>
+                      <Icono nombre="google" size={18} />
                       Abrir en Google Maps
                     </a>
 
-                    {/* Waze */}
                     <a 
                       href={wazeUrl}
                       target="_blank"
@@ -1202,11 +1120,10 @@ export function Home() {
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      <i className="fab fa-waze" style={{ fontSize: '1.1rem' }}></i>
+                      <Icono nombre="waze" size={18} />
                       Abrir en Waze
                     </a>
 
-                    {/* Apple Maps */}
                     <a 
                       href={appleMapsUrl}
                       target="_blank"
@@ -1239,7 +1156,7 @@ export function Home() {
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
-                      <i className="fab fa-apple" style={{ fontSize: '1.1rem' }}></i>
+                      <Icono nombre="apple" size={18} />
                       Abrir en Apple Maps
                     </a>
                   </div>

@@ -1,15 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap');
         
 .admin-root {
   font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
-  min-height: 100vh;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
   padding: 2rem;
 }
         
 .admin-loading {
   font-family: 'DM Sans', sans-serif;
-  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
+  background: #1a1a1a;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -75,9 +74,7 @@
   background: rgba(224, 20, 44, 0.05);
 }
 
-/* ============================================ */
 /* ESTILOS PARA SELECTS EN TABLA DE HORARIOS */
-/* ============================================ */
 
 .admin-table select {
   background: #2d2d2d !important;
@@ -122,9 +119,7 @@
   cursor: not-allowed;
 }
 
-/* ============================================ */
 /* ESTILOS PARA BOTONES Y OTROS ELEMENTOS */
-/* ============================================ */
         
 .badge-blue {
   background: rgba(224, 20, 44, 0.15);
@@ -306,9 +301,7 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* ============================================ */
 /* ESTILOS PARA OPINIONES */
-/* ============================================ */
 
 .testimonios-container {
   padding: 1.75rem !important;
@@ -532,9 +525,7 @@
     padding: 1.25rem !important;
   }
 }
-/* ============================================ */
 /* CIERRE DE DÍAS ESPECÍFICOS                   */
-/* ============================================ */
 
 .cierre-layout {
   display: grid;
@@ -842,9 +833,7 @@
   text-transform: uppercase;
 }
 
-/* ============================================ */
 /* TARJETA DE CITA (vista de telefono)          */
-/* ============================================ */
 
 .cita-header {
   display: flex;
@@ -990,5 +979,163 @@
   }
   .cita-nombre {
     font-size: 1.05rem;
+  }
+}
+
+.admin-resumen {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.admin-resumen > div {
+  flex: 1;
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-resumen-num {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #e0142c;
+}
+
+.admin-resumen-lbl {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-btn-nueva {
+  padding: 0.8rem 1.4rem;
+  border: none;
+  border-radius: 40px;
+  background: linear-gradient(135deg, #e0142c, #a10e1f);
+  color: #fff;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-btn-nueva:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(224, 20, 44, 0.3);
+}
+
+.admin-btn-nueva:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.admin-subtabs {
+  display: inline-flex;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  padding: 0.3rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-subtab {
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: 40px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-subtab:hover:not(.active) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-subtab.active {
+  background: linear-gradient(135deg, #e0142c, #a10e1f);
+  color: #fff;
+}
+
+.admin-acciones-historial {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.admin-btn-suave {
+  padding: 0.6rem 1.3rem;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-suave:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* Al imprimir solo interesa la tabla, en papel blanco */
+@media print {
+  body,
+  .admin-root,
+  .admin-card {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .navbar-modern,
+  .navbar-spacer,
+  .af-tabs,
+  .no-imprimir,
+  .admin-btn-nueva,
+  .btn-clean {
+    display: none !important;
+  }
+
+  .admin-card {
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-card h3,
+  .admin-resumen-num,
+  .admin-table th,
+  .admin-table td {
+    color: #000 !important;
+  }
+
+  .admin-resumen > div {
+    background: none !important;
+    border: 1px solid #999 !important;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    border-bottom: 1px solid #ccc !important;
   }
 }

@@ -26,18 +26,15 @@ export function Opiniones() {
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [hoveredStar, setHoveredStar] = useState(0)
 
-  // Pestañas + "Mis opiniones"
   const [vista, setVista] = useState<'opinar' | 'mis'>('opinar')
   const [misOpiniones, setMisOpiniones] = useState<Opinion[]>([])
   const [buscando, setBuscando] = useState(false)
   const [editandoId, setEditandoId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState({ comentario: '', rating: 0 })
 
-  // Opiniones que puede dejar cada cliente
   const MAX_OPINIONES = 2
   const alcanzoLimite = misOpiniones.length >= MAX_OPINIONES
 
-  // Cargar opiniones aprobadas y perfil del usuario
   useEffect(() => {
     fetchOpiniones()
     cargarPerfil()
@@ -55,7 +52,6 @@ export function Opiniones() {
     setLoading(false)
   }
 
-  // Cargar perfil del usuario logueado
   const cargarPerfil = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     
@@ -73,7 +69,6 @@ export function Opiniones() {
     }
   }
 
-  // Función para validar máximo 100 caracteres en el comentario
   const handleComentarioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
     if (value.length <= 100) {
@@ -99,7 +94,7 @@ export function Opiniones() {
     
     setEnviando(true)
     
-    // El tope de opiniones lo controla la base de datos
+    // El tope lo controla la base de datos
     const { error } = await supabase.rpc('crear_opinion', {
       p_comment: formData.comentario,
       p_rating: formData.rating,
@@ -128,8 +123,6 @@ export function Opiniones() {
     setEnviando(false)
   }
 
-  // Las opiniones del cliente que tiene la sesión abierta. No se pide
-  // el teléfono: la base de datos sabe quién es y solo devuelve las suyas.
   const cargarMisOpiniones = async () => {
     setBuscando(true)
     const { data } = await supabase.rpc('mis_opiniones')
@@ -152,10 +145,7 @@ export function Opiniones() {
       return
     }
 
-    // Al editarla vuelve a quedar pendiente de aprobación
-    // El .select() devuelve las filas afectadas: si la base no dejó
-    // tocar esa opinión, vuelve vacío y hay que avisarlo (si no,
-    // diríamos "guardado" sin haber guardado nada).
+    // Al editarla vuelve a quedar pendiente de aprobacion
     const { data: actualizadas, error } = await supabase
       .from('testimonials')
       .update({ comment: editForm.comentario.trim(), rating: editForm.rating, is_approved: false })
@@ -228,12 +218,11 @@ export function Opiniones() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
         .opiniones-root {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #121212 0%, #181818 50%, #121212 100%);
-          padding: 3rem 1.5rem;
+          min-height: calc(100vh - 80px);
+                  background: #1a1a1a;
+          padding: 2rem 1rem 4rem;
           font-family: 'Inter', sans-serif;
           position: relative;
           /* 'clip' recorta los adornos que se salen a los lados igual que
@@ -269,38 +258,15 @@ export function Opiniones() {
         }
 
         .opiniones-container {
-          max-width: 1100px;
+          max-width: 680px;
           margin: 0 auto;
           position: relative;
           z-index: 2;
         }
 
-        .opiniones-header {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
 
-        .opiniones-icon {
-          width: 80px;
-          height: 80px;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 1.5rem;
-          box-shadow: 0 10px 25px rgba(224, 20, 44, 0.2);
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
 
-        .opiniones-icon:hover {
-          transform: scale(1.05);
-          box-shadow: 0 15px 35px rgba(224, 20, 44, 0.3);
-        }
 
-        .opiniones-icon:active {
-          transform: scale(0.95);
-        }
 
         .opiniones-icon svg {
           width: 40px;
@@ -308,44 +274,10 @@ export function Opiniones() {
           color: white;
         }
 
-        .opiniones-title {
-          font-family: 'Sora', sans-serif;
-          font-size: 2.5rem;
-          font-weight: 700;
-          background: linear-gradient(135deg, #fff, #e0142c);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 0.5rem;
-        }
 
-        .opiniones-sub {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 0.95rem;
-        }
 
-        .form-card {
-          background: rgba(25, 25, 25, 0.35);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 28px;
-          overflow: hidden;
-          margin-bottom: 2rem;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
 
-        .form-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(224, 20, 44, 0.3);
-          box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
-        }
 
-        .form-card-header {
-          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
-          padding: 1rem 1.5rem;
-          text-align: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
 
         .form-card-header p {
           font-size: 0.75rem;
@@ -356,9 +288,6 @@ export function Opiniones() {
           margin: 0;
         }
 
-        .form-body {
-          padding: 2rem;
-        }
 
         .input-group {
           margin-bottom: 1.75rem;
@@ -552,20 +481,7 @@ export function Opiniones() {
           border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .reviews-card {
-          background: rgba(25, 25, 25, 0.35);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 28px;
-          overflow: hidden;
-        }
 
-        .reviews-header {
-          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
-          padding: 1rem 1.5rem;
-          text-align: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
 
         .reviews-header p {
           font-size: 0.75rem;
@@ -722,20 +638,7 @@ export function Opiniones() {
 
         .op-limite-btn:hover { transform: translateY(-2px); }
 
-        .op-buscar-btn {
-          padding: 0 1.4rem;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
-          border: none;
-          border-radius: 24px;
-          color: #fff;
-          font-weight: 600;
-          font-size: 0.85rem;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          white-space: nowrap;
-        }
 
-        .op-buscar-btn:hover { transform: translateY(-2px); }
 
         .op-lista {
           display: flex;
@@ -850,14 +753,7 @@ export function Opiniones() {
 
         @media (max-width: 640px) {
           .opiniones-root {
-            padding: 2rem 1rem;
-          }
-          .opiniones-title {
-            font-size: 1.8rem;
-          }
-          .opiniones-icon {
-            width: 65px;
-            height: 65px;
+            padding: 1.5rem 1rem 3rem;
           }
           .opiniones-icon svg {
             width: 32px;
@@ -870,9 +766,6 @@ export function Opiniones() {
             grid-template-columns: 1fr;
             padding: 1rem;
           }
-          .form-body {
-            padding: 1.5rem 1.25rem;
-          }
           .input-group {
             margin-bottom: 1.5rem;
           }
@@ -884,17 +777,7 @@ export function Opiniones() {
 
       <div className="opiniones-root">
         <div className="opiniones-container">
-          <div className="opiniones-header">
-            <div className="opiniones-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            </div>
-            <h1 className="opiniones-title">Opiniones</h1>
-            <p className="opiniones-sub">Comparta su experiencia y ayude a otros clientes</p>
-          </div>
-
-          <div className="af-tabs" style={{ position: 'static', marginBottom: '1.5rem' }}>
+          <div className="af-tabs">
             <button className={`af-tab${vista === 'opinar' ? ' active' : ''}`} onClick={() => setVista('opinar')}>
               Dejar opinión
             </button>
@@ -904,11 +787,12 @@ export function Opiniones() {
           </div>
 
           {vista === 'opinar' && (
-          <div className="form-card">
-            <div className="form-card-header">
-              <p>COMPARTE TU EXPERIENCIA</p>
+          <div className="af-card">
+            <div className="af-card-header">
+              <h2>Dejar Opinión</h2>
+              <p>Comparta su experiencia y ayude a otros clientes</p>
             </div>
-            <div className="form-body">
+            <div className="af-body">
               {alcanzoLimite && (
                 <div className="op-limite">
                   <h3>Ya tenés {MAX_OPINIONES} opiniones</h3>
@@ -991,11 +875,12 @@ export function Opiniones() {
           )}
 
           {vista === 'mis' && (
-            <div className="form-card">
-              <div className="form-card-header">
-                <p>MIS OPINIONES</p>
+            <div className="af-card">
+              <div className="af-card-header">
+                <h2>Mis Opiniones</h2>
+                <p>Estas son las opiniones que has dejado</p>
               </div>
-              <div className="form-body">
+              <div className="af-body">
                 {buscando ? (
                   <div className="empty-state"><p>Cargando tus opiniones...</p></div>
                 ) : misOpiniones.length === 0 ? (
@@ -1063,12 +948,11 @@ export function Opiniones() {
             </div>
           )}
 
-          {/* Las opiniones de todos solo en la pestaña de opinar:
-              "Mis opiniones" es únicamente para las del propio cliente */}
           {vista === 'opinar' && (
-          <div className="reviews-card">
-            <div className="reviews-header">
-              <p>OPINIONES DE NUESTROS CLIENTES</p>
+          <div className="af-card" style={{ marginTop: '2rem' }}>
+            <div className="af-card-header">
+              <h2>Opiniones de nuestros clientes</h2>
+              <p>Lo que dicen quienes ya nos visitaron</p>
             </div>
             <div className="reviews-grid">
               {loading ? (

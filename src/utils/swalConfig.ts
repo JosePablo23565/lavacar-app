@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2'
 
-// Estilo común a todos los mensajes, para que se vean igual en toda la página
+// Estilo comun a todos los mensajes
 const base = {
   background: '#2d2d2d',
   color: '#e9e9e9',
@@ -51,8 +51,7 @@ export const swalError = (title: string, text?: string) => {
   })
 }
 
-// Para avisar algo que no es un error del sistema: falta un dato,
-// el cupo se acabó, el día se cerró...
+// Avisos que no son errores del sistema
 export const swalAviso = (title: string, text?: string) => {
   return Swal.fire({
     ...base,

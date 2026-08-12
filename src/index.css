@@ -34,12 +34,16 @@ a,
 /* El fondo del html es lo que se ve al "rebotar" el scroll:
    sin esto aparece una franja blanca al bajar/subir/deslizar de más */
 html {
-  background: #121212;
+  background: #1a1a1a;
   overscroll-behavior: none;
 }
 
+.app-shell {
+  min-height: 100vh;
+}
+
 body {
-  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
+  background: #1a1a1a;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -56,9 +60,7 @@ table {
   max-width: 100%;
 }
 
-/* ============================================ */
 /* PANTALLA DE CARGA GLOBAL                     */
-/* ============================================ */
 
 .app-loading {
   min-height: 100vh;
@@ -67,7 +69,7 @@ table {
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
+  background: #1a1a1a;
   font-family: 'DM Sans', sans-serif;
 }
 
@@ -198,9 +200,7 @@ table {
   transform: translateY(-2px);
 }
 
-/* ============================================ */
 /* AJUSTES PARA TELEFONO                        */
-/* ============================================ */
 
 /* iOS hace zoom automatico al tocar un campo con letra menor a 16px.
    Ese zoom deja la pagina mas ancha que la pantalla y se puede arrastrar. */

@@ -1,4 +1,4 @@
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Icono } from '../Icono/Icono';
 import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion';
 
 export function Contact() {
@@ -6,12 +6,11 @@ export function Contact() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
         .ct-root {
-          background: linear-gradient(135deg, #121212 0%, #181818 50%, #121212 100%);
+          background: #1a1a1a;
           padding: 2rem 1.5rem;
-          font-family: 'Inter', sans-serif;
+                  font-family: 'Inter', sans-serif;
           position: relative;
           /* 'clip' recorta los adornos que se salen a los lados igual que
              'hidden', pero sin convertir esto en una segunda zona de scroll.
@@ -310,7 +309,7 @@ export function Contact() {
         }
 
         .ct-email-link {
-          color: #e0142c;
+          color: #fff;
         }
 
         .ct-email-link:hover {
@@ -411,36 +410,33 @@ export function Contact() {
             <p className="ct-sub">Estamos aquí para ayudarle</p>
           </div>
 
-          {/* Redes sociales: lo primero que ve el cliente */}
           <div className="ct-redes">
             <p className="ct-redes-titulo">
               Podés encontrarnos en nuestras redes sociales
             </p>
             <div className="ct-redes-btns">
               <a className="ct-red fb" href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-facebook-f"></i>
+                <Icono nombre="facebook" size={20} />
                 Facebook
               </a>
               <a className="ct-red ig" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-instagram"></i>
+                <Icono nombre="instagram" size={20} />
                 Instagram
               </a>
             </div>
           </div>
 
           <div className="ct-grid">
-            {/* Tarjeta de información de contacto */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>INFORMACIÓN DE CONTACTO</p>
               </div>
               <div className="ct-items">
-                {/* Dirección */}
                 <a className="ct-item" href={googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer">
                   <div className="ct-item-icon">
-                    <i className="fas fa-map-marker-alt" style={{ color: '#e0142c', fontSize: '24px' }}></i>
+                    <Icono nombre="mapa" size={22} color="#e0142c" />
                   </div>
                   <div>
                     <div className="ct-item-label">DIRECCIÓN</div>
@@ -448,10 +444,9 @@ export function Contact() {
                   </div>
                 </a>
 
-                {/* WHATSAPP */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <i className="fab fa-whatsapp" style={{ color: '#25D366', fontSize: '28px' }}></i>
+                    <Icono nombre="whatsapp" size={26} color="#25D366" />
                   </div>
                   <div>
                     <div className="ct-item-label">WHATSAPP</div>
@@ -464,10 +459,9 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* CORREO */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <i className="fas fa-envelope" style={{ color: '#EA4335', fontSize: '24px' }}></i>
+                    <Icono nombre="sobre" size={22} color="#EA4335" />
                   </div>
                   <div>
                     <div className="ct-item-label">CORREO</div>
@@ -479,10 +473,9 @@ export function Contact() {
                   </div>
                 </div>
 
-                {/* Horario */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <i className="far fa-clock" style={{ color: '#e0142c', fontSize: '24px' }}></i>
+                    <Icono nombre="reloj" size={22} color="#e0142c" />
                   </div>
                   <div>
                     <div className="ct-item-label">HORARIO</div>
@@ -492,7 +485,6 @@ export function Contact() {
               </div>
             </div>
 
-            {/* Tarjeta del mapa - CON BOTONES DE GOOGLE, WAZE Y APPLE MAPS */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>UBICACIÓN</p>
@@ -510,9 +502,7 @@ export function Contact() {
                   />
                 </div>
                 
-                {/* BOTONES DE MAPAS */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {/* Google Maps */}
                   <a
                     className="ct-maps-btn"
                     href={googleMapsUrl}
@@ -520,11 +510,10 @@ export function Contact() {
                       rel="noopener noreferrer"
                     style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
                   >
-                    <i className="fab fa-google"></i>
+                    <Icono nombre="google" size={17} />
                     Google Maps
                   </a>
 
-                  {/* Waze */}
                   <a
                     className="ct-maps-btn"
                     href={wazeUrl}
@@ -532,11 +521,10 @@ export function Contact() {
                       rel="noopener noreferrer"
                     style={{ background: 'rgba(0, 179, 255, 0.12)', borderColor: 'rgba(0, 179, 255, 0.25)', color: '#00B3FF' }}
                   >
-                    <i className="fab fa-waze"></i>
+                    <Icono nombre="waze" size={17} />
                     Waze
                   </a>
 
-                  {/* Apple Maps */}
                   <a
                     className="ct-maps-btn"
                     href={appleMapsUrl}
@@ -544,7 +532,7 @@ export function Contact() {
                       rel="noopener noreferrer"
                     style={{ background: 'rgba(0, 0, 0, 0.2)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
                   >
-                    <i className="fab fa-apple"></i>
+                    <Icono nombre="apple" size={17} />
                     Apple Maps
                   </a>
                 </div>

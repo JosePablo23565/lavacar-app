@@ -11,18 +11,15 @@ export function ClienteAuth() {
   const [error, setError] = useState('')
   const [isFlipping, setIsFlipping] = useState(false)
 
-  // Login state
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
 
-  // Registro state
   const [regNombre, setRegNombre] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regTelefono, setRegTelefono] = useState('')
   const [regPassword, setRegPassword] = useState('')
   const [regConfirmPassword, setRegConfirmPassword] = useState('')
 
-  // Reset password state
   const [showResetModal, setShowResetModal] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
   const [resetMessage, setResetMessage] = useState('')
@@ -134,7 +131,6 @@ export function ClienteAuth() {
     setLoading(false)
   }
 
-  // Función para iniciar sesión con Google - REDIRIGE A completar-perfil
   const signInWithGoogle = async () => {
     setError('')
     setGoogleLoading(true)

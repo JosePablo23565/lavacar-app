@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { swalConfirm, swalSuccess, swalError, swalAviso } from '../../utils/swalConfig'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import { CustomSelect } from '../CustomSelect/CustomSelect'
 import { whatsappNegocioUrl } from '../../lib/ubicacion'
+import { SERVICIOS, TIPOS_VEHICULO } from '../../lib/servicios'
 import './AppointmentForm.css'
 
 type Appointment = {
@@ -28,90 +30,6 @@ type Horario = {
   hora_fin: string
   intervalo_minutos: number
   activo: boolean
-}
-
-interface CustomSelectProps {
-  value: string
-  onChange: (value: string) => void
-  options: { value: string; label: string }[]
-  placeholder: string
-  label?: string
-  required?: boolean
-}
-
-function CustomSelect({ value, onChange, options, placeholder, label }: CustomSelectProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const selectRef = useRef<HTMLDivElement>(null)
-
-  const selectedOption = options.find(opt => opt.value === value)
-
-  const handleToggle = () => {
-    if (isOpen) {
-      setIsAnimating(true)
-      setTimeout(() => {
-        setIsOpen(false)
-        setIsAnimating(false)
-      }, 200)
-    } else {
-      setIsOpen(true)
-    }
-  }
-
-  const handleSelect = (optValue: string) => {
-    onChange(optValue)
-    setIsAnimating(true)
-    setTimeout(() => {
-      setIsOpen(false)
-      setIsAnimating(false)
-    }, 200)
-  }
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        if (isOpen) {
-          setIsAnimating(true)
-          setTimeout(() => {
-            setIsOpen(false)
-            setIsAnimating(false)
-          }, 200)
-        }
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
-
-  return (
-    <div ref={selectRef} style={{ position: 'relative', width: '100%' }}>
-      {label && <label className="af-label">{label}</label>}
-      
-      <div
-        className={`custom-select-trigger ${isOpen ? 'open' : ''} ${isAnimating ? 'closing' : ''}`}
-        onClick={handleToggle}
-      >
-        <span className="custom-select-value">
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
-        <span className="custom-select-arrow">▼</span>
-      </div>
-
-      {isOpen && (
-        <div className={`custom-select-options ${isAnimating ? 'fade-out' : 'fade-in'}`}>
-          {options.map((opt) => (
-            <div
-              key={opt.value}
-              className={`custom-select-option ${value === opt.value ? 'selected' : ''}`}
-              onClick={() => handleSelect(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
 }
 
 export function AppointmentForm() {
@@ -139,7 +57,7 @@ export function AppointmentForm() {
     notes: '',
   })
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
-  // Cita vigente del cliente: mientras exista, no puede agendar otra
+  // Mientras exista no puede agendar otra
   const [citaActiva, setCitaActiva] = useState<Appointment | null>(null)
   const [customerHistory, setCustomerHistory] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(false)
@@ -148,27 +66,12 @@ export function AppointmentForm() {
     show: boolean; name: string; date: string; time: string; service: string; vehicleType: string; vehicleModel: string; notes: string
   }>({ show: false, name: '', date: '', time: '', service: '', vehicleType: '', vehicleModel: '', notes: '' })
 
-  const services = [
-    { value: 'basico', label: 'Lavado y Aspirado', price: '$10', duration: 30 },
-    { value: 'completo', label: 'Lavado prémium', price: '$20', duration: 45 },
-    { value: 'encerado', label: 'Full Prémium', price: '$35', duration: 60 },
-    { value: 'tapizado', label: 'Pulido de Focos', price: '$25', duration: 40 },
-    { value: 'parabrisas', label: 'Pulido de Parabrisas', price: '$15', duration: 25 },
-    { value: 'ceramico', label: 'Tratamiento Cerámico', price: '$50', duration: 90 },
-  ]
+  const services = SERVICIOS
+  const vehicleTypes = TIPOS_VEHICULO
 
-  const vehicleTypes = [
-    { value: 'carro', label: 'Carro' },
-    { value: 'moto', label: 'Moto' },
-    { value: 'camioneta', label: 'Camioneta / SUV' },
-  ]
-
-  // Vehículos que se pueden atender en la misma hora.
-  // El límite de verdad lo aplica la base de datos (función crear_cita);
-  // acá solo sirve para no mostrar horas que ya están llenas.
+  // El limite real lo aplica crear_cita en la base de datos
   const CUPOS_POR_HORA = 2
 
-  // Cargar horarios desde Supabase
   useEffect(() => {
     const fetchHorarios = async () => {
       const { data } = await supabase
@@ -180,7 +83,6 @@ export function AppointmentForm() {
     fetchHorarios()
   }, [])
 
-  // Cargar los días que el negocio cerró (fechas específicas)
   const recargarDiasCerrados = async () => {
     const hoyLocal = new Date()
     const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
@@ -197,14 +99,11 @@ export function AppointmentForm() {
     recargarDiasCerrados()
   }, [])
 
-  // La base de datos dice si el cliente ya tiene una cita vigente
   const cargarCitaActiva = async () => {
     const { data } = await supabase.rpc('mi_cita_activa')
     const cita = Array.isArray(data) ? data[0] : data
 
-    // Cuando no hay cita, la base puede devolver un objeto con todos los
-    // campos vacíos en vez de nada. Eso no es una cita: si lo diéramos por
-    // bueno, al pintar la fecha y la hora reventaría la pantalla.
+    // Sin cita la base puede devolver una fila de campos vacios
     const esCitaReal = !!(cita && cita.id && cita.appointment_date && cita.appointment_time)
     setCitaActiva(esCitaReal ? cita : null)
   }
@@ -213,13 +112,12 @@ export function AppointmentForm() {
     cargarCitaActiva()
   }, [])
 
-  // Las citas se cargan solas apenas se sabe quién es el cliente,
-  // y se refrescan al entrar a la pestaña "Mis Citas"
   useEffect(() => {
-    if (userId) fetchCustomerHistory()
+    if (!userId) return
+    fetchCustomerHistory()
+    cargarCitaActiva()
   }, [userId, step])
 
-  // Verificar autenticación al cargar
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -231,7 +129,6 @@ export function AppointmentForm() {
     checkAuth()
   }, [navigate])
 
-  // Obtener usuario logueado
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -243,7 +140,6 @@ export function AppointmentForm() {
     getUser()
   }, [])
 
-  // Cargar perfil del usuario logueado
   useEffect(() => {
     const cargarPerfil = async () => {
       const { data: { user } } = await supabase.auth.getUser()
@@ -267,7 +163,6 @@ export function AppointmentForm() {
     cargarPerfil()
   }, [])
 
-  // Mostrar el formulario desde arriba al entrar (ej: al tocar un servicio en Home)
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -319,8 +214,7 @@ export function AppointmentForm() {
     return `${hours}:${minutes}:00`
   }
 
-  // Deja cualquier hora en "HH:MM" de 24 horas ("9:00 AM", "09:00 AM"
-  // y "09:00:00" terminan igual), para poder compararlas sin errores.
+  // Lleva cualquier formato de hora a HH:MM de 24 horas
   const normalizarHora = (hora: string) => {
     if (!hora) return ''
     const m = hora.trim().toUpperCase().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/)
@@ -340,7 +234,6 @@ export function AppointmentForm() {
     return `${hour12.toString().padStart(2, '0')}:${minutes} ${ampm}`
   }
 
-  // Generar horarios según inicio, fin e intervalo
   const generateTimeSlots = (start12h: string, end12h: string, intervalMinutes: number): string[] => {
     const slots: string[] = []
     
@@ -370,7 +263,6 @@ export function AppointmentForm() {
     return slots
   }
 
-  // Obtener horarios para un día específico
   const getHorariosPorDia = (diaSemana: number): string[] => {
     const horario = horarios.find(h => h.dia_semana === diaSemana)
     if (!horario || !horario.activo) {
@@ -385,14 +277,15 @@ export function AppointmentForm() {
     } else {
       setAvailableTimes([])
     }
-  }, [selectedDate, horarios])
+  }, [selectedDate, horarios, formData.service_type])
 
   const fetchAvailableTimes = async () => {
     if (!selectedDate) return
     
     const diaSemana = selectedDate.getDay()
     const horariosDelDia = getHorariosPorDia(diaSemana)
-    
+    const horarioDelDia = horarios.find(h => h.dia_semana === diaSemana && h.activo)
+
     if (horariosDelDia.length === 0) {
       setAvailableTimes([])
       return
@@ -410,20 +303,34 @@ export function AppointmentForm() {
     const horaActual = ahora.getHours()
     const minutosActual = ahora.getMinutes()
     
-    // Cuántos vehículos hay reservados en cada hora de ese día
-    const { data } = await supabase.rpc('cupos_ocupados', { p_fecha: dateStr })
+    const { data } = await supabase.rpc('citas_del_dia', { p_fecha: dateStr })
 
-    // Se comparan las horas ya normalizadas: la lista de horarios usa
-    // "9:00 AM" y la base devuelve "09:00:00", que como texto no coinciden.
-    const ocupadosPorHora = new Map<string, number>()
-    for (const fila of (data || []) as { hora: string; ocupados: number }[]) {
-      ocupadosPorHora.set(normalizarHora(fila.hora), Number(fila.ocupados))
+    const enMinutos = (hora: string) => {
+      const [h, m] = normalizarHora(hora).split(':').map(Number)
+      return h * 60 + m
     }
 
-    // Una hora sigue disponible mientras no llegue al máximo de vehículos
-    let available = horariosDelDia.filter(
-      time => (ocupadosPorHora.get(normalizarHora(time)) || 0) < CUPOS_POR_HORA
-    )
+    const ocupadas = ((data || []) as { hora: string; duracion: number }[]).map(c => ({
+      inicio: enMinutos(c.hora),
+      fin: enMinutos(c.hora) + Number(c.duracion || 30),
+    }))
+
+    // Un servicio de 90 min ocupa varias franjas: se cuentan las citas
+    // que se cruzan con el rango, no solo las que empiezan a la misma hora
+    const servicio = services.find(sv => sv.value === formData.service_type)
+    const duracion = servicio?.duration || 30
+    const cierre = enMinutos(horarioDelDia?.hora_fin || '10:00 PM')
+
+    let available = horariosDelDia.filter(time => {
+      const inicio = enMinutos(time)
+      const fin = inicio + duracion
+
+      // El trabajo tiene que caber antes de cerrar
+      if (fin > cierre) return false
+
+      const cruzadas = ocupadas.filter(c => c.inicio < fin && inicio < c.fin).length
+      return cruzadas < CUPOS_POR_HORA
+    })
     
     if (dateStr === hoyStr) {
       available = available.filter(time => {
@@ -447,9 +354,6 @@ export function AppointmentForm() {
     }
   }
 
-  // Las citas del cliente que tiene la sesión abierta. No se pide el
-  // teléfono: se sabe quién es por su sesión, y la base de datos solo
-  // le deja ver las suyas.
   const fetchCustomerHistory = async () => {
     if (!userId) return
     setCargandoCitas(true)
@@ -463,7 +367,6 @@ export function AppointmentForm() {
 
     const citas = data || []
 
-    // Mostrar SOLO las citas pendientes (las que ya pasaron se ocultan)
     const hoyLocal = new Date()
     const year = hoyLocal.getFullYear()
     const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
@@ -490,8 +393,7 @@ export function AppointmentForm() {
 
     if (!result.isConfirmed) return
 
-    // El .select() devuelve lo que realmente se borró: si la cita no es
-    // del cliente, la base no la toca y vuelve vacío, sin dar error.
+    // El select confirma que se borro de verdad
     const { data: borradas, error } = await supabase
       .from('appointments')
       .delete()
@@ -510,7 +412,7 @@ export function AppointmentForm() {
 
     swalSuccess('Cita eliminada', 'El horario quedó disponible nuevamente')
 
-    // Refrescar la lista y liberar el horario en el calendario
+    await cargarCitaActiva()
     await fetchCustomerHistory()
     await fetchAvailableTimes()
   }
@@ -592,9 +494,7 @@ export function AppointmentForm() {
       return
     }
     
-    // La reserva la hace la base de datos: ahí se revisa el cupo y el día
-    // cerrado dentro de una misma operación, para que dos personas no
-    // puedan tomar el último espacio al mismo tiempo.
+    // La base valida cupo y dia cerrado en una sola operacion
     const { error } = await supabase.rpc('crear_cita', {
       p_customer_name: formData.customer_name,
       p_customer_phone: formData.customer_phone,
@@ -606,6 +506,7 @@ export function AppointmentForm() {
       p_notes: formData.notes || null,
       p_email: userEmail,
       p_user_id: userId,
+      p_duracion: services.find(sv => sv.value === formData.service_type)?.duration || 30,
     })
 
     if (error) {
@@ -633,6 +534,17 @@ export function AppointmentForm() {
       } else if (motivo.includes('NO_AUTORIZADO')) {
         await swalError('Tu sesión expiró', 'Iniciá sesión de nuevo para agendar tu cita.')
         navigate('/acceder')
+      } else if (motivo.includes('NO_ALCANZA_EL_TIEMPO')) {
+        await swalAviso(
+          'No alcanza el tiempo',
+          'Ese servicio no alcanza a terminar antes de la hora de cierre. Elegí una hora más temprana.'
+        )
+        setFormData(prev => ({ ...prev, appointment_time: '' }))
+        await fetchAvailableTimes()
+      } else if (motivo.includes('DIA_NO_DISPONIBLE')) {
+        await swalAviso('Ese día no se atiende', 'Por favor elegí otra fecha.')
+        setFormData(prev => ({ ...prev, appointment_time: '', appointment_date: '' }))
+        setSelectedDate(null)
       } else if (motivo.includes('YA_TIENE_CITA')) {
         await swalAviso(
           'Ya tenés una cita agendada',
@@ -658,8 +570,7 @@ export function AppointmentForm() {
         notes: formData.notes || ''
       })
       
-      // Se limpian los datos de la cita (el nombre y el teléfono del
-      // perfil se mantienen, porque no los escribe el cliente)
+      // El nombre y el telefono vienen del perfil y se mantienen
       setFormData(prev => ({
         ...prev,
         service_type: '',
@@ -683,7 +594,6 @@ export function AppointmentForm() {
 
   const selectedService = services.find((s) => s.value === formData.service_type)
 
-  // Formato de fecha con zona horaria
   const formatDateDisplay = (date: string) => {
     if (!date) return ''
     const d = new Date(date + 'T00:00:00')
@@ -696,7 +606,6 @@ export function AppointmentForm() {
     })
   }
 
-  // Formato de fecha simple con zona horaria
   const formatDateSimple = (date: string) => {
     if (!date) return ''
     const d = new Date(date + 'T00:00:00')
@@ -716,15 +625,12 @@ export function AppointmentForm() {
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
-    // Días pasados
     if (compareDate < todayMidnight) return true
 
-    // Días deshabilitados desde la tabla horarios
     const diaSemana = date.getDay()
     const horario = horarios.find(h => h.dia_semana === diaSemana)
     if (!horario || !horario.activo) return true
 
-    // Días cerrados por el negocio (fechas específicas)
     if (diasCerrados.includes(toFechaStr(date))) return true
 
     return false
@@ -737,15 +643,12 @@ export function AppointmentForm() {
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
     
-    // Días pasados → candado
     if (compareDate < todayMidnight) return 'blocked-day'
     
-    // Días deshabilitados desde horarios
     const diaSemana = date.getDay()
     const horario = horarios.find(h => h.dia_semana === diaSemana)
     if (!horario || !horario.activo) return 'blocked-day'
 
-    // Días cerrados por el negocio (fechas específicas)
     if (diasCerrados.includes(toFechaStr(date))) return 'blocked-day'
 
     return null

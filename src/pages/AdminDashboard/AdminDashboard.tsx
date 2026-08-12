@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { swalConfirm, swalSuccess, swalError } from '../../utils/swalConfig'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import { nombreServicio } from '../../lib/servicios'
+import { NuevaCitaAdmin } from '../../components/NuevaCitaAdmin/NuevaCitaAdmin'
 import './AdminDashboard.css'
 
 type Appointment = {
@@ -18,6 +20,9 @@ type Appointment = {
   appointment_time: string
   notes: string
   created_at: string
+  estado?: string
+  origen?: string
+  duracion_minutos?: number
 }
 
 type Testimonial = {
@@ -47,7 +52,11 @@ type DiaCerrado = {
 }
 
 export function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'citas' | 'testimonios' | 'horarios'>('citas')
+  const [activeTab, setActiveTab] = useState<'citas' | 'historial' | 'testimonios' | 'horarios'>('citas')
+  const [historial, setHistorial] = useState<Appointment[]>([])
+  const [mostrarNuevaCita, setMostrarNuevaCita] = useState(false)
+  const [cargandoHistorial, setCargandoHistorial] = useState(false)
+  const [origenHistorial, setOrigenHistorial] = useState<'web' | 'local'>('web')
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [horarios, setHorarios] = useState<Horario[]>([])
@@ -58,75 +67,49 @@ export function AdminDashboard() {
   const [limpiezaMsg, setLimpiezaMsg] = useState('')
   const navigate = useNavigate()
 
-  // Días cerrados (fechas específicas)
   const [diasCerrados, setDiasCerrados] = useState<DiaCerrado[]>([])
   const [fechasSeleccionadas, setFechasSeleccionadas] = useState<string[]>([])
   const [citasAfectadas, setCitasAfectadas] = useState<Appointment[]>([])
   const [mostrarAvisos, setMostrarAvisos] = useState(false)
   const [cerrandoDias, setCerrandoDias] = useState(false)
   const [avisados, setAvisados] = useState<number[]>([])
-  // true cuando los días ya se cerraron y solo falta avisar a clientes
-  // que reservaron a último momento
+  // Ya se cerraron los dias y solo falta avisar
   const [cierreCompletado, setCierreCompletado] = useState(false)
 
   useEffect(() => {
     checkAdminAndFetch()
   }, [])
 
-  // Función para limpiar citas pasadas (ahora usa fecha local)
-  const limpiarCitasPasadas = async () => {
-    // Usar fecha local, no UTC
-    const hoyLocal = new Date()
-    const year = hoyLocal.getFullYear()
-    const month = String(hoyLocal.getMonth() + 1).padStart(2, '0')
-    const day = String(hoyLocal.getDate()).padStart(2, '0')
-    const hoy = `${year}-${month}-${day}`
-    
-    const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
-    
-    const { data: citasPasadas, error: selectError } = await supabase
-      .from('appointments')
-      .select('id, appointment_date, appointment_time')
-      .or(`appointment_date.lt.${hoy},and(appointment_date.eq.${hoy},appointment_time.lt.${horaActual})`)
-    
-    if (selectError) {
-      console.error('Error al buscar citas pasadas:', selectError)
+  const completarCitasPasadas = async () => {
+    const { data, error } = await supabase.rpc('completar_citas_pasadas')
+
+    if (error) {
+      swalError('No se pudo cerrar el dia', error.message)
       return 0
     }
-    
-    if (citasPasadas && citasPasadas.length > 0) {
-      const idsAEliminar = citasPasadas.map(c => c.id)
-      const { error: deleteError } = await supabase
-        .from('appointments')
-        .delete()
-        .in('id', idsAEliminar)
-      
-      if (!deleteError) {
-        const mensaje = `✅ Se eliminaron ${idsAEliminar.length} cita(s) vencida(s)`
-        setLimpiezaMsg(mensaje)
-        setTimeout(() => setLimpiezaMsg(''), 4000)
-        return idsAEliminar.length
-      } else {
-        console.error('Error al eliminar:', deleteError)
-      }
+
+    const total = Number(data) || 0
+    if (total > 0) {
+      setLimpiezaMsg(`Se marcaron ${total} cita(s) como completadas`)
+      setTimeout(() => setLimpiezaMsg(''), 4000)
     }
-    return 0
+    return total
   }
 
   const limpiarManual = async () => {
     const resultado = await swalConfirm(
-      'Limpiar citas vencidas', 
-      'Se eliminarán todas las citas con fecha anterior a hoy y las de hoy que ya pasaron la hora actual. ¿Continuar?'
+      'Cerrar citas ya atendidas',
+      'Las citas que ya pasaron se marcarán como completadas y saldrán de la lista, pero quedan guardadas en el historial. ¿Continuar?'
     )
-    
-    if (resultado.isConfirmed) {
-      const eliminadas = await limpiarCitasPasadas()
-      if (eliminadas > 0) {
-        swalSuccess('Limpieza completada', `Se eliminaron ${eliminadas} cita(s) vencida(s)`)
-        await fetchAppointments()
-      } else {
-        swalSuccess('Sin cambios', 'No hay citas vencidas para eliminar')
-      }
+
+    if (!resultado.isConfirmed) return
+
+    const total = await completarCitasPasadas()
+    if (total > 0) {
+      swalSuccess('Listo', `Se completaron ${total} cita(s)`)
+      await fetchAppointments()
+    } else {
+      swalSuccess('Sin cambios', 'No hay citas pendientes que ya hayan pasado')
     }
   }
 
@@ -149,10 +132,6 @@ export function AdminDashboard() {
       return
     }
 
-    // IMPORTANTE: YA NO se eliminan citas automáticamente al cargar
-    // La limpieza ahora es SOLO manual con el botón
-    // await limpiarCitasPasadas()  // <--- ELIMINADO
-    
     fetchAppointments()
     fetchTestimonials()
     fetchHorarios()
@@ -176,7 +155,6 @@ export function AdminDashboard() {
     
     const horaActual = `${hoyLocal.getHours().toString().padStart(2, '0')}:${hoyLocal.getMinutes().toString().padStart(2, '0')}:00`
     
-    // Mostrar SOLO citas futuras (no vencidas)
     const citasFuturas = citas.filter(c => {
       if (c.appointment_date > hoy) return true
       if (c.appointment_date === hoy && c.appointment_time >= horaActual) return true
@@ -194,6 +172,24 @@ export function AdminDashboard() {
     })
     setLoading(false)
   }
+
+  const fetchHistorial = async () => {
+    setCargandoHistorial(true)
+    const { data } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('estado', 'completada')
+      .order('appointment_date', { ascending: false })
+      .order('appointment_time', { ascending: false })
+      .limit(300)
+
+    setHistorial(data || [])
+    setCargandoHistorial(false)
+  }
+
+  useEffect(() => {
+    if (activeTab === 'historial') fetchHistorial()
+  }, [activeTab])
 
   const fetchTestimonials = async () => {
     const { data } = await supabase
@@ -217,7 +213,6 @@ export function AdminDashboard() {
     const hoyLocal = new Date()
     const hoy = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`
 
-    // Solo interesan los cierres de hoy en adelante
     const { data } = await supabase
       .from('dias_cerrados')
       .select('*')
@@ -227,7 +222,6 @@ export function AdminDashboard() {
     setDiasCerrados(data || [])
   }
 
-  // Marca / desmarca una fecha en el calendario de cierres
   const toggleFechaSeleccionada = (date: Date) => {
     const fecha = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
@@ -237,7 +231,7 @@ export function AdminDashboard() {
     setMostrarAvisos(false)
   }
 
-  // Paso 1: revisar qué citas se verían afectadas antes de cerrar
+  // Paso 1 revisar las citas afectadas antes de cerrar
   const revisarCierre = async () => {
     if (fechasSeleccionadas.length === 0) return
 
@@ -252,22 +246,19 @@ export function AdminDashboard() {
     setCitasAfectadas(afectadas)
 
     if (afectadas.length === 0) {
-      // No hay citas: se puede cerrar directo
       const result = await swalConfirm(
         `¿Cerrar ${fechasSeleccionadas.length} día(s)?`,
         'No hay citas agendadas en esas fechas. Los clientes no podrán agendar esos días.'
       )
       if (result.isConfirmed) await confirmarCierre()
     } else {
-      // Hay citas: mostrar la lista para avisar a cada cliente
       setCierreCompletado(false)
       setMostrarAvisos(true)
     }
   }
 
-  // Paso 2: guardar los cierres y cancelar las citas afectadas
+  // Paso 2 guardar los cierres y cancelar las citas
   const confirmarCierre = async () => {
-    // Avisar si quedan clientes sin notificar
     const sinAvisar = citasAfectadas.filter(c => !avisados.includes(c.id))
     if (sinAvisar.length > 0) {
       const seguir = await swalConfirm(
@@ -279,9 +270,7 @@ export function AdminDashboard() {
 
     setCerrandoDias(true)
 
-    // La base de datos cierra los días y cancela las citas en una sola
-    // operación, y devuelve las citas realmente canceladas. Así aparecen
-    // también las que entraron mientras revisabas la lista.
+    // Devuelve las canceladas incluidas las que entraron al final
     const { data, error } = await supabase.rpc('cerrar_dias', {
       p_fechas: fechasSeleccionadas
     })
@@ -305,11 +294,9 @@ export function AdminDashboard() {
     await fetchDiasCerrados()
     await fetchAppointments()
 
-    // Citas que entraron a último momento y todavía no recibieron aviso
     const sinAvisarFinal = canceladas.filter(c => !avisados.includes(c.id))
 
     if (sinAvisarFinal.length > 0) {
-      // Se dejan en pantalla para poder avisarles
       setCitasAfectadas(sinAvisarFinal)
       setCierreCompletado(true)
       setMostrarAvisos(true)
@@ -328,8 +315,7 @@ export function AdminDashboard() {
     setAvisados([])
   }
 
-  // Abre en fila el chat de WhatsApp de cada cliente afectado.
-  // Se abren de una sola vez (dentro del clic) para que el navegador no los bloquee.
+  // Se abren dentro del clic para que el navegador no los bloquee
   const abrirTodosLosChats = () => {
     const abiertos: number[] = []
     let bloqueados = 0
@@ -371,7 +357,6 @@ export function AdminDashboard() {
     await fetchDiasCerrados()
   }
 
-  // Mensaje de cancelación que se le envía a cada cliente afectado
   const getWhatsappCancelacion = (apt: Appointment) => {
     const mensaje = `Hola ${apt.customer_name}, Somos Autolavado y Servicios Camaro Fraterno, tienes una cita el ${formatDateLong(apt.appointment_date)} a las ${convertTo12Hour(apt.appointment_time)} pero, por motivos personales no abriremos ese día, tu cita ha quedado cancelada, agenda una cita nueva en el siguiente enlace https://lavacar-app-ashen.vercel.app/   estamos para servirte`
     return `https://wa.me/${getWhatsappNumero(apt.customer_phone)}?text=${encodeURIComponent(mensaje)}`
@@ -435,15 +420,49 @@ export function AdminDashboard() {
     }
   }
 
-  const getServiceLabel = (type: string) => {
-    const services: Record<string, string> = {
-      basico: 'Lavado Básico',
-      completo: 'Lavado Completo',
-      encerado: 'Encerado',
-      tapizado: 'Tapizado'
+  const getServiceLabel = (type: string) => nombreServicio(type)
+
+  const historialFiltrado = historial.filter(c => (c.origen || 'web') === origenHistorial)
+
+  const resumenServicio = (() => {
+    if (historialFiltrado.length === 0) return { nombre: '-' }
+    const cuenta: Record<string, number> = {}
+    for (const c of historialFiltrado) cuenta[c.service_type] = (cuenta[c.service_type] || 0) + 1
+    const top = Object.entries(cuenta).sort((a, b) => b[1] - a[1])[0]
+    return { nombre: getServiceLabel(top[0]) }
+  })()
+
+  const imprimirHistorial = () => window.print()
+
+  const compartirHistorial = async () => {
+    const titulo = origenHistorial === 'web' ? 'pagina web' : 'local'
+    const lineas = historialFiltrado.map(c =>
+      `${formatDateDisplay(c.appointment_date)} ${convertTo12Hour(c.appointment_time)} - ${c.customer_name} - ${getServiceLabel(c.service_type)}`
+    )
+    const texto = [
+      `Historial de citas (${titulo}) - Autolavado Camaro Fraterno`,
+      `${historialFiltrado.length} lavados atendidos`,
+      '',
+      ...lineas,
+    ].join(String.fromCharCode(10))
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Historial de citas', text: texto })
+        return
+      } catch {
+        return
+      }
     }
-    return services[type] || type
+
+    try {
+      await navigator.clipboard.writeText(texto)
+      swalSuccess('Copiado', 'El historial se copió y ya lo podés pegar donde quieras')
+    } catch {
+      swalError('No se pudo compartir', 'Tu navegador no permite compartir ni copiar desde aca')
+    }
   }
+
 
   const getVehicleLabel = (type: string) => {
     const vehicles: Record<string, string> = {
@@ -477,13 +496,12 @@ export function AdminDashboard() {
     return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
   }
 
-  // Los teléfonos se guardan con 8 dígitos: wa.me necesita el código de país (506)
+  // wa.me necesita el codigo de pais
   const getWhatsappNumero = (telefono: string) => {
     const soloNumeros = (telefono || '').replace(/\D/g, '')
     return soloNumeros.length === 8 ? `506${soloNumeros}` : soloNumeros
   }
 
-  // Enlace de WhatsApp con el mensaje de recordatorio de la cita
   const getWhatsappLink = (apt: Appointment) => {
     const mensaje = `Hola ${apt.customer_name}, Somos Autolavado y Servicios Camaro Fraterno, tienes una cita el ${formatDateLong(apt.appointment_date)} a las ${convertTo12Hour(apt.appointment_time)}.`
     return `https://wa.me/${getWhatsappNumero(apt.customer_phone)}?text=${encodeURIComponent(mensaje)}`
@@ -499,11 +517,11 @@ export function AdminDashboard() {
   const pendingTestimonials = testimonials.filter(t => !t.is_approved)
   const approvedTestimonials = testimonials.filter(t => t.is_approved)
 
-  // El domingo es el único día que se activa/desactiva de forma permanente
+  // Domingo es el unico dia que se activa o desactiva fijo
   const domingo = horarios.find(h => h.dia_semana === 0)
   const domingoActivo = domingo?.activo === true
 
-  // Horas disponibles: desde las 07:00 AM hasta las 10:00 PM (en intervalos de 30 min)
+  // De 7 AM a 10 PM cada 30 minutos
   const HORA_MIN = 7   // 07:00 AM
   const HORA_MAX = 22  // 10:00 PM
 
@@ -533,7 +551,7 @@ export function AdminDashboard() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {limpiezaMsg && (
-          <div className="mb-4 p-3 rounded-lg text-center" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7' }}>
+          <div style={{ marginBottom: '1rem', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7' }}>
             {limpiezaMsg}
           </div>
         )}
@@ -541,6 +559,9 @@ export function AdminDashboard() {
         <div className="af-tabs">
           <button onClick={() => setActiveTab('citas')} className={`af-tab ${activeTab === 'citas' ? 'active' : ''}`}>
             Citas ({appointments.length})
+          </button>
+          <button onClick={() => setActiveTab('historial')} className={`af-tab ${activeTab === 'historial' ? 'active' : ''}`}>
+            Historial
           </button>
           <button onClick={() => setActiveTab('testimonios')} className={`af-tab ${activeTab === 'testimonios' ? 'active' : ''}`}>
             Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
@@ -552,6 +573,18 @@ export function AdminDashboard() {
 
         {activeTab === 'citas' && (
           <>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <button className="admin-btn-nueva" onClick={() => setMostrarNuevaCita(v => !v)}>
+                {mostrarNuevaCita ? 'Cancelar' : '+ Agendar cita a un cliente'}
+              </button>
+            </div>
+
+            {mostrarNuevaCita && (
+              <NuevaCitaAdmin
+                onCreada={() => { setMostrarNuevaCita(false); fetchAppointments() }}
+              />
+            )}
+
             <div className="stats-row">
               <div className="stat-pill">
                 <p className="stat-pill-num" style={{ color: '#e0142c' }}>{stats.total}</p>
@@ -567,7 +600,7 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            <div className="mb-4">
+            <div style={{ marginBottom: '1rem' }}>
               <button onClick={limpiarManual} className="btn-clean" style={{
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -583,7 +616,7 @@ export function AdminDashboard() {
                 gap: '8px',
                 fontFamily: 'inherit'
               }}>
-                Limpiar citas vencidas
+                Cerrar citas atendidas
               </button>
             </div>
 
@@ -594,7 +627,7 @@ export function AdminDashboard() {
 
             <div className="block md:hidden space-y-4">
               {filteredAppointments.length === 0 ? (
-                <div className="admin-card p-8 text-center text-white/40">No hay citas registradas</div>
+                <div className="admin-card" style={{ padding: '2rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</div>
               ) : (
                 filteredAppointments.map((apt) => (
                   <div key={apt.id} className="cita-card">
@@ -694,6 +727,85 @@ export function AdminDashboard() {
               </div>
             </div>
           </>
+        )}
+
+        {activeTab === 'historial' && (
+          <div className="admin-card" style={{ padding: '1.5rem' }}>
+            <h3 style={{ fontFamily: "'Sora',sans-serif", color: '#fff', marginBottom: '.4rem' }}>
+              Trabajo realizado
+            </h3>
+            <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1.25rem' }}>
+              Citas ya atendidas. Se conservan como registro del negocio.
+            </p>
+
+            <div className="admin-subtabs no-imprimir">
+              <button
+                className={`admin-subtab ${origenHistorial === 'web' ? 'active' : ''}`}
+                onClick={() => setOrigenHistorial('web')}
+              >
+                Página web
+              </button>
+              <button
+                className={`admin-subtab ${origenHistorial === 'local' ? 'active' : ''}`}
+                onClick={() => setOrigenHistorial('local')}
+              >
+                Local
+              </button>
+            </div>
+
+            {cargandoHistorial ? (
+              <p style={{ color: 'rgba(255,255,255,.4)', textAlign: 'center', padding: '2rem 0' }}>Cargando...</p>
+            ) : historialFiltrado.length === 0 ? (
+              <p style={{ color: 'rgba(255,255,255,.4)', textAlign: 'center', padding: '2rem 0' }}>
+                {origenHistorial === 'web'
+                  ? 'Todavía no hay citas completadas agendadas desde la página'
+                  : 'Todavía no hay citas completadas hechas en el local'}
+              </p>
+            ) : (
+              <>
+                <div className="admin-acciones-historial no-imprimir">
+                  <button className="admin-btn-suave" onClick={imprimirHistorial}>Imprimir</button>
+                  <button className="admin-btn-suave" onClick={compartirHistorial}>Compartir</button>
+                </div>
+
+                <div className="admin-resumen">
+                  <div>
+                    <span className="admin-resumen-num">{historialFiltrado.length}</span>
+                    <span className="admin-resumen-lbl">lavados atendidos</span>
+                  </div>
+                  <div>
+                    <span className="admin-resumen-num">{resumenServicio.nombre}</span>
+                    <span className="admin-resumen-lbl">servicio más pedido</span>
+                  </div>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Vehículo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historialFiltrado.map(c => (
+                        <tr key={c.id}>
+                          <td>{formatDateDisplay(c.appointment_date)}</td>
+                          <td>{convertTo12Hour(c.appointment_time)}</td>
+                          <td>{c.customer_name}</td>
+                          <td>{getServiceLabel(c.service_type)}</td>
+                          <td>{c.vehicle_model}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
         )}
 
         {activeTab === 'testimonios' && (
@@ -924,7 +1036,7 @@ export function AdminDashboard() {
         )}
       </div>
 
-      {/* Modal: avisar a los clientes con cita en los días que se van a cerrar */}
+      {/* Aviso a los clientes de los dias que se cierran */}
       {mostrarAvisos && (
         <div className="af-modal-overlay">
           <div className="af-modal" style={{ maxWidth: 560 }}>

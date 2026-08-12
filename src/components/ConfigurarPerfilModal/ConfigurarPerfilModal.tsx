@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { ToastNotification } from '../ToastNotification/ToastNotification'
 
-// Componente para el modal de configurar perfil (con animación suave)
 export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -37,7 +36,6 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
     }, 300)
   }
 
-  // Función para validar nombre (solo letras y espacios, máximo 30 caracteres)
   const validarNombre = (nombre: string): { valido: boolean; mensaje: string } => {
     if (!nombre.trim()) {
       return { valido: false, mensaje: 'El nombre es obligatorio' }
@@ -47,7 +45,6 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
       return { valido: false, mensaje: 'El nombre no puede tener más de 30 caracteres' }
     }
 
-    // Solo letras (incluyendo acentos y ñ) y espacios
     const soloLetrasYEspacios = /^[a-zA-ZáéíóúñÑüÜ\s]+$/
     if (!soloLetrasYEspacios.test(nombre)) {
       return { valido: false, mensaje: 'El nombre solo puede contener letras y espacios' }
@@ -56,7 +53,6 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
     return { valido: true, mensaje: '' }
   }
 
-  // Función para validar teléfono (exactamente 8 números)
   const validarTelefono = (telefono: string): { valido: boolean; mensaje: string } => {
     if (!telefono.trim()) {
       return { valido: false, mensaje: 'El teléfono es obligatorio' }
@@ -75,14 +71,12 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
   }
 
   const guardarPerfil = async () => {
-    // Validar nombre
     const nombreValidation = validarNombre(nombre)
     if (!nombreValidation.valido) {
       setToast({ show: true, message: nombreValidation.mensaje, type: 'error' })
       return
     }
 
-    // Validar teléfono
     const telefonoValidation = validarTelefono(telefono)
     if (!telefonoValidation.valido) {
       setToast({ show: true, message: telefonoValidation.mensaje, type: 'error' })

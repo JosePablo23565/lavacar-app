@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 
-// Componente de notificación personalizada (centro de pantalla)
 export function ToastNotification({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
   const [isClosing, setIsClosing] = useState(false)
 

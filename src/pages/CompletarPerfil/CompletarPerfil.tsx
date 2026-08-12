@@ -17,56 +17,38 @@ export function CompletarPerfil() {
 
   useEffect(() => {
     const getUser = async () => {
-      console.log('1. Obteniendo usuario de Supabase...')
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      
-      if (userError) {
-        console.error('❌ Error al obtener usuario:', userError)
-      }
-      
+      const { data: { user } } = await supabase.auth.getUser()
+
       if (!user) {
-        console.log('❌ No hay usuario, redirigiendo a /acceder')
         navigate('/acceder')
         return
       }
-      
-      console.log('✅ Usuario encontrado:', user.id, user.email)
+
       setUserId(user.id)
       setUserEmail(user.email || '')
-      
-      // Cargar datos existentes del perfil
-      console.log('2. Cargando perfil existente...')
-      const { data: perfil, error: perfilError } = await supabase
+
+      const { data: perfil } = await supabase
         .from('perfiles')
         .select('nombre, telefono')
         .eq('id', user.id)
         .single()
-      
-      if (perfilError) {
-        console.error('❌ Error al cargar perfil:', perfilError)
-      }
-      
+
       if (perfil) {
-        console.log('Perfil cargado:', perfil)
-        
-        // 🔥 NUEVO: Verificar si el perfil ya está completo
         const tieneNombre = perfil.nombre && perfil.nombre.trim() !== ''
         const tieneTelefono = perfil.telefono && perfil.telefono.trim() !== ''
-        
+
+        // Si ya lo tiene completo no hay nada que pedirle
         if (tieneNombre && tieneTelefono) {
-          console.log('✅ Perfil ya completo, redirigiendo a home')
-          window.location.href = '/'
+          navigate('/', { replace: true })
           return
         }
-        
+
         setFormData({
           nombre: perfil.nombre || '',
           telefono: perfil.telefono || ''
         })
-      } else {
-        console.log('No hay perfil existente, usando valores vacíos')
       }
-      
+
       setChecking(false)
     }
     
@@ -76,13 +58,7 @@ export function CompletarPerfil() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
-    console.log('3. Enviando formulario...')
-    console.log('   userId:', userId)
-    console.log('   userEmail:', userEmail)
-    console.log('   nombre:', formData.nombre)
-    console.log('   telefono:', formData.telefono)
-    
+
     if (!formData.nombre.trim()) {
       setError('El nombre es obligatorio')
       return
@@ -105,8 +81,7 @@ export function CompletarPerfil() {
     
     setLoading(true)
     
-    console.log('4. Guardando en Supabase...')
-    const { data, error: dbError } = await supabase
+    const { error: dbError } = await supabase
       .from('perfiles')
       .upsert({
         id: userId,
@@ -114,17 +89,15 @@ export function CompletarPerfil() {
         telefono: formData.telefono,
         email: userEmail
       })
-    
-    console.log('Respuesta de Supabase:', { data, error: dbError })
-    
+
     if (dbError) {
-      console.error('❌ Error al guardar:', dbError)
       setError('Error al guardar: ' + dbError.message)
       setLoading(false)
-    } else {
-      console.log('✅ Guardado exitoso! Redirigiendo...')
-      window.location.href = '/'
+      return
     }
+
+    // Recarga completa para que el menu tome el nombre nuevo
+    window.location.href = '/'
   }
 
   if (checking) {

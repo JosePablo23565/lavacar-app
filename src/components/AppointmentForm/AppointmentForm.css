@@ -115,11 +115,10 @@
   color: #e0142c;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 .af-root {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #121212 0%, #181818 50%, #121212 100%);
+  min-height: calc(100vh - 80px);
+  background: #1a1a1a;
   padding: 2rem 1rem 4rem;
   font-family: 'Inter', sans-serif;
 }
@@ -362,27 +361,8 @@
   cursor: not-allowed;
 }
 
-.af-buscar-btn {
-  background: linear-gradient(135deg, #e0142c, #a10e1f) !important;
-  color: #fff !important;
-  border: none !important;
-  padding: 0.85rem 1.5rem !important;
-  border-radius: 50px !important;
-  cursor: pointer !important;
-  font-weight: 500 !important;
-  font-family: 'Inter', sans-serif !important;
-  white-space: nowrap !important;
-  transition: all 0.25s ease !important;
-}
 
-.af-buscar-btn:active {
-  transform: scale(0.97) !important;
-}
 
-.af-buscar-btn:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(224, 20, 44, 0.4) !important;
-}
 
 .custom-calendar {
   background: rgba(18, 18, 18, 0.4) !important;
@@ -499,19 +479,6 @@
   transform: scale(0.99);
 }
 
-.af-confirmed {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: rgba(224, 20, 44, 0.1);
-  color: #e0142c;
-  border: 1px solid rgba(224, 20, 44, 0.2);
-  padding: 0.3rem 0.9rem;
-  border-radius: 30px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-}
 
 .af-delete-btn {
   flex-shrink: 0;
@@ -618,9 +585,7 @@
   .af-time-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ============================================ */
 /* ESTILOS PARA DOMINGOS DESHABILITADOS */
-/* ============================================ */
 
 .custom-calendar .react-calendar__tile.sunday-disabled {
   background: rgba(239, 68, 68, 0.15) !important;
@@ -668,17 +633,6 @@
 }
 
 /* Estilo para los valores de texto (nombre y teléfono) */
-.af-display-value {
-  width: 100%;
-  padding: 0.85rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  font-family: 'Inter', sans-serif;
-  cursor: default;
-}
 
 /* Estilo para el textarea de detalles */
 .af-textarea {
@@ -763,9 +717,7 @@
   margin-left: 2px;
   opacity: 0.7;
 }
-/* ============================================ */
 /* AVISO: EL CLIENTE YA TIENE UNA CITA          */
-/* ============================================ */
 
 .af-limite {
   background: rgba(224, 20, 44, 0.08);

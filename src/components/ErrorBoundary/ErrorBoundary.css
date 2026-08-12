@@ -1,0 +1,118 @@
+.eb-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #1a1a1a;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.eb-card {
+  background: rgba(25, 25, 25, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+  padding: 2.25rem 2rem;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.eb-icono {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.1rem;
+  border-radius: 50%;
+  background: rgba(224, 20, 44, 0.15);
+  border: 1px solid rgba(224, 20, 44, 0.3);
+  color: #e0142c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eb-card h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.6rem;
+}
+
+.eb-card p {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.eb-acciones {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.eb-btn {
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 40px;
+  background: linear-gradient(135deg, #e0142c, #a10e1f);
+  color: #fff;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eb-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(224, 20, 44, 0.3);
+}
+
+.eb-btn-suave {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.eb-btn-suave:hover {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+
+.eb-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 40px;
+  background: rgba(37, 211, 102, 0.12);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #25d366;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.eb-wa:hover {
+  background: rgba(37, 211, 102, 0.22);
+}
+
+@media (max-width: 480px) {
+  .eb-card {
+    border-radius: 26px;
+    padding: 1.75rem 1.25rem;
+  }
+  .eb-acciones {
+    flex-direction: column;
+  }
+  .eb-btn {
+    width: 100%;
+  }
+}
