@@ -236,7 +236,12 @@ export function Opiniones() {
           padding: 3rem 1.5rem;
           font-family: 'Inter', sans-serif;
           position: relative;
-          overflow-x: hidden;
+          /* 'clip' recorta los adornos que se salen a los lados igual que
+             'hidden', pero sin convertir esto en una segunda zona de scroll.
+             Con 'hidden' el navegador vuelve el eje vertical desplazable y
+             la pagina rebota al bajar y subir en el telefono. */
+          overflow-x: hidden; /* respaldo para navegadores viejos */
+          overflow-x: clip;
         }
 
         .opiniones-root::before {

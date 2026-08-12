@@ -1,5 +1,5 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl } from '../../lib/ubicacion';
+import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion';
 
 export function Contact() {
 
@@ -13,7 +13,12 @@ export function Contact() {
           padding: 2rem 1.5rem;
           font-family: 'Inter', sans-serif;
           position: relative;
-          overflow-x: hidden;
+          /* 'clip' recorta los adornos que se salen a los lados igual que
+             'hidden', pero sin convertir esto en una segunda zona de scroll.
+             Con 'hidden' el navegador vuelve el eje vertical desplazable y
+             la pagina rebota al bajar y subir en el telefono. */
+          overflow-x: hidden; /* respaldo para navegadores viejos */
+          overflow-x: clip;
         }
 
         .ct-root::before {
@@ -218,6 +223,8 @@ export function Contact() {
 
         .ct-maps-btn {
           width: 100%;
+          box-sizing: border-box;
+          text-decoration: none;
           background: rgba(224, 20, 44, 0.12);
           color: #e0142c;
           border: 1px solid rgba(224, 20, 44, 0.25);
@@ -243,6 +250,63 @@ export function Contact() {
 
         a {
           text-decoration: none;
+        }
+
+        .ct-redes {
+          margin-bottom: 2rem;
+        }
+
+        .ct-redes-titulo {
+          text-align: center;
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.75);
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
+
+        .ct-redes-btns {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .ct-red {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.8rem 1.4rem;
+          border-radius: 40px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          transition: all 0.25s ease;
+          box-sizing: border-box;
+        }
+
+        .ct-red i {
+          font-size: 1.3rem;
+        }
+
+        .ct-red.fb {
+          background: rgba(24, 119, 242, 0.12);
+          border: 1px solid rgba(24, 119, 242, 0.35);
+          color: #1877F2;
+        }
+
+        .ct-red.fb:hover {
+          background: rgba(24, 119, 242, 0.22);
+          transform: translateY(-2px);
+        }
+
+        .ct-red.ig {
+          background: rgba(225, 48, 108, 0.12);
+          border: 1px solid rgba(225, 48, 108, 0.35);
+          color: #E1306C;
+        }
+
+        .ct-red.ig:hover {
+          background: rgba(225, 48, 108, 0.22);
+          transform: translateY(-2px);
         }
 
         .ct-email-link {
@@ -347,6 +411,23 @@ export function Contact() {
             <p className="ct-sub">Estamos aquí para ayudarle</p>
           </div>
 
+          {/* Redes sociales: lo primero que ve el cliente */}
+          <div className="ct-redes">
+            <p className="ct-redes-titulo">
+              Podés encontrarnos en nuestras redes sociales
+            </p>
+            <div className="ct-redes-btns">
+              <a className="ct-red fb" href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-facebook-f"></i>
+                Facebook
+              </a>
+              <a className="ct-red ig" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+                <i className="fab fa-instagram"></i>
+                Instagram
+              </a>
+            </div>
+          </div>
+
           <div className="ct-grid">
             {/* Tarjeta de información de contacto */}
             <div className="ct-card">
@@ -355,7 +436,9 @@ export function Contact() {
               </div>
               <div className="ct-items">
                 {/* Dirección */}
-                <div className="ct-item" onClick={() => window.open(googleMapsUrl, '_blank')}>
+                <a className="ct-item" href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer">
                   <div className="ct-item-icon">
                     <i className="fas fa-map-marker-alt" style={{ color: '#e0142c', fontSize: '24px' }}></i>
                   </div>
@@ -363,7 +446,7 @@ export function Contact() {
                     <div className="ct-item-label">DIRECCIÓN</div>
                     <div className="ct-item-value">Bagaces, Guanacaste, Costa Rica</div>
                   </div>
-                </div>
+                </a>
 
                 {/* WHATSAPP */}
                 <div className="ct-item">
@@ -430,34 +513,40 @@ export function Contact() {
                 {/* BOTONES DE MAPAS */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {/* Google Maps */}
-                  <button
+                  <a
                     className="ct-maps-btn"
-                    onClick={() => window.open(googleMapsUrl, '_blank')}
+                    href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
                   >
                     <i className="fab fa-google"></i>
                     Google Maps
-                  </button>
+                  </a>
 
                   {/* Waze */}
-                  <button
+                  <a
                     className="ct-maps-btn"
-                    onClick={() => window.open(wazeUrl, '_blank')}
+                    href={wazeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     style={{ background: 'rgba(0, 179, 255, 0.12)', borderColor: 'rgba(0, 179, 255, 0.25)', color: '#00B3FF' }}
                   >
                     <i className="fab fa-waze"></i>
                     Waze
-                  </button>
+                  </a>
 
                   {/* Apple Maps */}
-                  <button
+                  <a
                     className="ct-maps-btn"
-                    onClick={() => window.open(appleMapsUrl, '_blank')}
+                    href={appleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     style={{ background: 'rgba(0, 0, 0, 0.2)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
                   >
                     <i className="fab fa-apple"></i>
                     Apple Maps
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

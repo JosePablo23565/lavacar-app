@@ -12,6 +12,10 @@ export const LNG = -85.2548688
 export const WHATSAPP_NEGOCIO = '50683606680'
 export const WHATSAPP_NEGOCIO_VISIBLE = '+506 8360-6680'
 
+// Redes sociales del negocio
+export const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=100064073801428&locale=es_LA'
+export const INSTAGRAM_URL = 'https://www.instagram.com/camaro_fraterno'
+
 export const whatsappNegocioUrl = (mensaje?: string) =>
   mensaje
     ? `https://wa.me/${WHATSAPP_NEGOCIO}?text=${encodeURIComponent(mensaje)}`

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl } from '../../lib/ubicacion'
+import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion'
 
 export function Home() {
   const navigate = useNavigate()
@@ -72,7 +72,7 @@ export function Home() {
   useEffect(() => {
     const counters = [
       { id: 'counter-clientes', target: 500, suffix: '+' },
-      { id: 'counter-anos', target: 3, suffix: '' }
+      { id: 'counter-anos', target: 5, suffix: '' }
     ]
 
     const counterObserver = new IntersectionObserver((entries) => {
@@ -1074,6 +1074,33 @@ export function Home() {
                       <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>Lunes a Sábado: 8:00am - 5:30pm</div>
                     </div>
                   </div>
+
+                  {/* Redes sociales */}
+                  <div style={{ marginTop: '1.2rem', paddingTop: '1.2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                    <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', marginBottom: '0.9rem', lineHeight: 1.5 }}>
+                      Podés encontrarnos en nuestras redes sociales
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                      <a
+                        href={FACEBOOK_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'rgba(24,119,242,0.12)', border: '1px solid rgba(24,119,242,0.35)', color: '#1877F2', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
+                      >
+                        <i className="fab fa-facebook-f" style={{ fontSize: '1.1rem' }}></i>
+                        Facebook
+                      </a>
+                      <a
+                        href={INSTAGRAM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'rgba(225,48,108,0.12)', border: '1px solid rgba(225,48,108,0.35)', color: '#E1306C', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
+                      >
+                        <i className="fab fa-instagram" style={{ fontSize: '1.1rem' }}></i>
+                        Instagram
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1106,10 +1133,14 @@ export function Home() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
                     
                     {/* Google Maps */}
-                    <button 
-                      onClick={() => window.open(googleMapsUrl, '_blank')}
+                    <a 
+                      href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         width: '100%',
+                        textDecoration: 'none',
+                        boxSizing: 'border-box',
                         background: 'rgba(219, 68, 55, 0.12)',
                         border: '1px solid rgba(219, 68, 55, 0.25)',
                         color: '#DB4437',
@@ -1136,13 +1167,17 @@ export function Home() {
                     >
                       <i className="fab fa-google" style={{ fontSize: '1.1rem' }}></i>
                       Abrir en Google Maps
-                    </button>
+                    </a>
 
                     {/* Waze */}
-                    <button 
-                      onClick={() => window.open(wazeUrl, '_blank')}
+                    <a 
+                      href={wazeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         width: '100%',
+                        textDecoration: 'none',
+                        boxSizing: 'border-box',
                         background: 'rgba(0, 179, 255, 0.12)',
                         border: '1px solid rgba(0, 179, 255, 0.25)',
                         color: '#00B3FF',
@@ -1169,13 +1204,17 @@ export function Home() {
                     >
                       <i className="fab fa-waze" style={{ fontSize: '1.1rem' }}></i>
                       Abrir en Waze
-                    </button>
+                    </a>
 
                     {/* Apple Maps */}
-                    <button 
-                      onClick={() => window.open(appleMapsUrl, '_blank')}
+                    <a 
+                      href={appleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         width: '100%',
+                        textDecoration: 'none',
+                        boxSizing: 'border-box',
                         background: 'rgba(255, 255, 255, 0.08)',
                         border: '1px solid rgba(255, 255, 255, 0.15)',
                         color: '#ffffff',
@@ -1202,7 +1241,7 @@ export function Home() {
                     >
                       <i className="fab fa-apple" style={{ fontSize: '1.1rem' }}></i>
                       Abrir en Apple Maps
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
