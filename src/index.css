@@ -31,11 +31,64 @@ a,
   cursor: pointer;
 }
 
+/* El fondo del html es lo que se ve al "rebotar" el scroll:
+   sin esto aparece una franja blanca al bajar/subir/deslizar de más */
+html {
+  background: #121212;
+  overscroll-behavior: none;
+}
+
 body {
   background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  overscroll-behavior: none;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Nada debe sobresalir del ancho de la pantalla */
+img,
+video,
+iframe,
+table {
+  max-width: 100%;
+}
+
+/* ============================================ */
+/* PANTALLA DE CARGA GLOBAL                     */
+/* ============================================ */
+
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: linear-gradient(135deg, #121212 0%, #252525 60%, #121212 100%);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.app-loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #e0142c;
+  border-radius: 50%;
+  animation: appLoadingSpin 0.8s linear infinite;
+  box-shadow: 0 0 24px rgba(224, 20, 44, 0.25);
+}
+
+.app-loading-text {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+}
+
+@keyframes appLoadingSpin {
+  to { transform: rotate(360deg); }
 }
 
 .menu-btn {
@@ -143,4 +196,43 @@ body {
 .swal-cancel-btn:hover {
   background: #991b1b !important;
   transform: translateY(-2px);
+}
+/* Tarjeta de "Completar perfil" */
+.completar-perfil-card {
+  background: rgba(28, 28, 28, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.35);
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+@media (max-width: 480px) {
+  .completar-perfil-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 20px;
+  }
+}
+
+/* ============================================ */
+/* AJUSTES PARA TELEFONO                        */
+/* ============================================ */
+
+/* iOS hace zoom automatico al tocar un campo con letra menor a 16px.
+   Ese zoom deja la pagina mas ancha que la pantalla y se puede arrastrar. */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Respeta el notch y la barra inferior de los telefonos */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

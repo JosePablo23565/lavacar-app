@@ -587,27 +587,53 @@ export function AdminDashboard() {
               ) : (
                 filteredAppointments.map((apt) => (
                   <div key={apt.id} className="cita-card">
-                    <div className="flex justify-between items-start mb-3 pb-3 border-b border-white/10">
-                      <div>
-                        <p className="font-semibold text-white text-base">{apt.customer_name}</p>
-                        <p className="text-sm text-white/50 mt-0.5">{apt.customer_phone}</p>
-                        <p className="text-xs text-white/40 mt-0.5 break-all">{apt.email}</p>
+                    <div className="cita-header">
+                      <div className="cita-cliente">
+                        <p className="cita-nombre">{apt.customer_name}</p>
+                        <p className="cita-telefono">{apt.customer_phone}</p>
+                        <p className="cita-email">{apt.email}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 text-lg px-2 py-1 transition">🗑️</button>
-                        <a href={getWhatsappLink(apt)} target="_blank" className="text-green-400 hover:text-green-300 transition" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                      <div className="cita-acciones">
+                        <button onClick={() => deleteAppointment(apt.id)} className="cita-btn-borrar" title="Eliminar cita">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
+                        </button>
+                        <a href={getWhatsappLink(apt)} target="_blank" className="cita-btn-wa" title="Enviar WhatsApp">
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
                           </svg>
                         </a>
                       </div>
                     </div>
-                    <div className="space-y-2.5 text-sm">
-                      <div className="flex"><span className="text-white/40 w-24">Vehículo:</span><span className="text-white/80">{getVehicleLabel(apt.vehicle_type)}</span></div>
-                      <div className="flex"><span className="text-white/40 w-24">Modelo:</span><span className="text-white/80">{apt.vehicle_model || '—'}</span></div>
-                      <div className="flex"><span className="text-white/40 w-24">Servicio:</span><span className="text-white/80">{getServiceLabel(apt.service_type)}</span></div>
-                      <div className="flex"><span className="text-white/40 w-24">Fecha y hora:</span><span className="text-white/80">{formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span></div>
-                      {apt.notes && (<div className="flex mt-2 border-white/10"><span className="text-white/40 w-24">Detalles:</span><span className="text-white/80 text-sm" style={{ color: '#e0142c' }}>{apt.notes}</span></div>)}
+                    <div className="cita-datos">
+                      <div className="cita-fila">
+                        <span className="cita-etiqueta">Vehículo</span>
+                        <span className="cita-valor">{getVehicleLabel(apt.vehicle_type)}</span>
+                      </div>
+                      <div className="cita-fila">
+                        <span className="cita-etiqueta">Modelo</span>
+                        <span className="cita-valor">{apt.vehicle_model || '—'}</span>
+                      </div>
+                      <div className="cita-fila">
+                        <span className="cita-etiqueta">Servicio</span>
+                        <span className="cita-valor">{getServiceLabel(apt.service_type)}</span>
+                      </div>
+                      <div className="cita-fila">
+                        <span className="cita-etiqueta">Fecha y hora</span>
+                        <span className="cita-valor cita-valor-fecha">
+                          {formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}
+                        </span>
+                      </div>
+                      {apt.notes && (
+                        <div className="cita-detalles">
+                          <span className="cita-etiqueta">Detalles</span>
+                          <span className="cita-valor">{apt.notes}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -636,8 +662,8 @@ export function AdminDashboard() {
                           <td>{getServiceLabel(apt.service_type)}</td>
                           <td><span className="badge-blue">{formatDateDisplay(apt.appointment_date)}</span></td>
                           <td><span className="badge-green">{convertTo12Hour(apt.appointment_time)}</span></td>
-                          <td style={{ maxWidth: '200px', fontSize: '0.75rem', color: '#e0142c' }}>
-                            {apt.notes ? <span style={{ background: 'rgba(224, 20, 44,0.1)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>{apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}</span> : <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>}
+                          <td style={{ maxWidth: '200px', fontSize: '0.8rem', color: '#fff' }}>
+                            {apt.notes ? <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>{apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}</span> : <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>}
                           </td>
                           <td style={{ textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>

@@ -128,15 +128,16 @@ export function CompletarPerfil() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-        <div className="text-white">Verificando...</div>
+      <div className="app-loading">
+        <div className="app-loading-spinner" />
+        <div className="app-loading-text">Verificando...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full border border-gray-700">
+    <div className="app-loading" style={{ padding: '1rem' }}>
+      <div className="completar-perfil-card">
         <h1 className="text-2xl font-bold text-white text-center mb-2">Completa tu perfil</h1>
         <p className="text-gray-400 text-center mb-6">Necesitamos algunos datos para continuar</p>
         
