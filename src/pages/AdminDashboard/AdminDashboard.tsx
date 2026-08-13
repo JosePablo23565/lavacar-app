@@ -437,39 +437,70 @@ export function AdminDashboard() {
     return { nombre: getServiceLabel(top[0]) }
   })()
 
+  // Documento propio para imprimir y para el PDF: no depende de los
+  // estilos de la pagina, que es lo que lo hacia fallar
+  const filasHistorial = () => historialFiltrado.map(c => [
+    formatDateDisplay(c.appointment_date),
+    convertTo12Hour(c.appointment_time),
+    c.customer_name,
+    getServiceLabel(c.service_type),
+    c.vehicle_model || '-',
+  ])
+
+  const tituloHistorial = () =>
+    origenHistorial === 'web' ? 'Citas agendadas desde la pagina web' : 'Citas agendadas en el local'
+
   const imprimirHistorial = () => window.print()
 
   const compartirHistorial = async () => {
-    const titulo = origenHistorial === 'web' ? 'pagina web' : 'local'
-    const lineas = historialFiltrado.map(c =>
-      `${formatDateDisplay(c.appointment_date)} ${convertTo12Hour(c.appointment_time)} - ${c.customer_name} - ${getServiceLabel(c.service_type)}`
-    )
-    const texto = [
-      `Historial de citas (${titulo}) - Autolavado Camaro Fraterno`,
-      `${historialFiltrado.length} lavados atendidos`,
-      '',
-      ...lineas,
-    ].join(String.fromCharCode(10))
+    const filas = filasHistorial()
 
-    if (navigator.share) {
+    if (filas.length === 0) {
+      swalError('Nada que compartir', 'No hay citas en esta lista.')
+      return
+    }
+
+    const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ])
+
+    const doc = new jsPDF()
+
+    doc.setFontSize(15)
+    doc.text('Auto Lavado y Servicios Camaro Fraterno', 14, 18)
+    doc.setFontSize(10)
+    doc.setTextColor(110)
+    doc.text(tituloHistorial(), 14, 25)
+    doc.text(`${filas.length} lavados atendidos  |  Servicio mas pedido: ${resumenServicio.nombre}`, 14, 31)
+
+    autoTable(doc, {
+      startY: 38,
+      head: [['Fecha', 'Hora', 'Cliente', 'Servicio', 'Vehiculo']],
+      body: filas,
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [224, 20, 44], textColor: 255 },
+      alternateRowStyles: { fillColor: [247, 247, 247] },
+    })
+
+    const nombre = `historial-${origenHistorial}-${new Date().toISOString().slice(0, 10)}.pdf`
+    const archivo = new File([doc.output('blob')], nombre, { type: 'application/pdf' })
+
+    // En el telefono abre el menu de compartir; en computadora se descarga
+    if (navigator.canShare?.({ files: [archivo] })) {
       try {
-        await navigator.share({ title: 'Historial de citas', text: texto })
+        await navigator.share({ files: [archivo], title: 'Historial de citas' })
         return
       } catch {
         return
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(texto)
-      swalSuccess('Copiado', 'El historial se copió y ya lo podés pegar donde quieras')
-    } catch {
-      swalError('No se pudo compartir', 'Tu navegador no permite compartir ni copiar desde aca')
-    }
+    doc.save(nombre)
+    swalSuccess('PDF listo', 'Se descargo el archivo y ya lo podes enviar a donde quieras.')
   }
 
-
-  const getVehicleLabel = (type: string) => {
+const getVehicleLabel = (type: string) => {
     const vehicles: Record<string, string> = {
       carro: 'Carro',
       moto: 'Moto',
@@ -578,14 +609,9 @@ export function AdminDashboard() {
 
         {activeTab === 'citas' && (
           <>
-            <div style={{ marginBottom: '1.25rem' }}>
-              <button className="admin-btn-nueva" onClick={() => setMostrarNuevaCita(v => !v)}>
-                {mostrarNuevaCita ? 'Cancelar' : '+ Agendar cita a un cliente'}
-              </button>
-            </div>
-
             {mostrarNuevaCita && (
               <NuevaCitaAdmin
+                onCerrar={() => setMostrarNuevaCita(false)}
                 onCreada={() => { setMostrarNuevaCita(false); fetchAppointments() }}
               />
             )}
@@ -605,7 +631,10 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
+            <div className="admin-acciones-citas">
+              <button className="admin-btn-nueva" onClick={() => setMostrarNuevaCita(true)}>
+                + Agendar cita a un cliente
+              </button>
               <button onClick={limpiarManual} className="btn-clean" style={{
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -778,7 +807,7 @@ export function AdminDashboard() {
               <>
                 <div className="admin-acciones-historial no-imprimir">
                   <button className="admin-btn-suave" onClick={imprimirHistorial}>Imprimir</button>
-                  <button className="admin-btn-suave" onClick={compartirHistorial}>Compartir</button>
+                  <button className="admin-btn-suave" onClick={compartirHistorial}>Descargar PDF</button>
                 </div>
 
                 <div className="admin-resumen">

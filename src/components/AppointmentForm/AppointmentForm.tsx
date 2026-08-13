@@ -5,6 +5,8 @@ import { swalConfirm, swalSuccess, swalError, swalAviso } from '../../utils/swal
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import { CustomSelect } from '../CustomSelect/CustomSelect'
+import { AvisoLimite } from '../AvisoLimite/AvisoLimite'
+import { Icono } from '../Icono/Icono'
 import { whatsappNegocioUrl } from '../../lib/ubicacion'
 import { SERVICIOS, TIPOS_VEHICULO } from '../../lib/servicios'
 import './AppointmentForm.css'
@@ -678,39 +680,25 @@ export function AppointmentForm() {
               </div>
               <div className="af-body">
                 {citaActiva && (
-                  <div className="af-limite">
-                    <div className="af-limite-icono">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                    </div>
-                    <h3>Ya tenés una cita agendada</h3>
-                    <p>
-                      Tu cita es el <strong>{formatDateDisplay(citaActiva.appointment_date)}</strong>
-                      {' a las '}
-                      <strong>{convertTo12Hour(citaActiva.appointment_time)}</strong>.
-                    </p>
-                    <p className="af-limite-nota">
-                      Solo se puede tener una cita a la vez. Vas a poder agendar otra
-                      {' '}2 horas después de que pase la que ya tenés.
-                    </p>
-                    <p className="af-limite-nota">
-                      ¿Tuviste algún problema con tu cita? Escribinos y te ayudamos.
-                    </p>
+                  <AvisoLimite
+                    titulo="Ya tenés una cita agendada"
+                    destacado={{
+                      etiqueta: 'Tu cita',
+                      valor: formatDateDisplay(citaActiva.appointment_date),
+                      extra: convertTo12Hour(citaActiva.appointment_time),
+                    }}
+                    nota="Solo se puede tener una cita a la vez. Vas a poder agendar otra 2 horas después de que pase la que ya tenés."
+                  >
                     <a
                       href={whatsappNegocioUrl('Hola, tengo una consulta sobre mi cita en Autolavado Camaro Fraterno.')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="af-limite-wa"
+                      className="avl-btn avl-btn-wa"
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11z"/>
-                      </svg>
-                      Escribir al WhatsApp del negocio
+                      <Icono nombre="whatsapp" size={16} />
+                      Escribinos por WhatsApp
                     </a>
-                  </div>
+                  </AvisoLimite>
                 )}
 
                 <form onSubmit={handleSubmit}>

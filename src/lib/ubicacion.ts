@@ -24,9 +24,11 @@ export const googleMapsUrl = PLACE_ID
   ? `https://www.google.com/maps/search/?api=1&query=${nombre}&query_place_id=${PLACE_ID}`
   : `https://www.google.com/maps/search/?api=1&query=${nombre}`
 
+// El mapa incrustado va por coordenadas: buscar por nombre deja el pin
+// donde Google quiera, y no siempre cae en el local
 export const googleMapsEmbedUrl = PLACE_ID
   ? `https://www.google.com/maps?q=place_id:${PLACE_ID}&z=17&output=embed`
-  : `https://www.google.com/maps?q=${nombre}&z=17&output=embed`
+  : `https://www.google.com/maps?q=${LAT},${LNG}&z=17&output=embed`
 
 // Con coordenadas para que lleguen al punto exacto
 export const wazeUrl = `https://waze.com/ul?ll=${LAT},${LNG}&q=${nombre}&navigate=yes`

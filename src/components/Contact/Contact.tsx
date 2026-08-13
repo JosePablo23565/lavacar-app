@@ -82,10 +82,7 @@ export function Contact() {
           font-family: 'Sora', sans-serif;
           font-size: 2.5rem;
           font-weight: 700;
-          background: linear-gradient(135deg, #fff, #e0142c);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          color: #e0142c;
           margin-bottom: 0.5rem;
         }
 
@@ -195,17 +192,6 @@ export function Contact() {
           opacity: 0.8;
         }
 
-        .ct-badge {
-          background: rgba(224, 20, 44, 0.12);
-          color: #e0142c;
-          border: 1px solid rgba(224, 20, 44, 0.2);
-          padding: 0.2rem 0.6rem;
-          border-radius: 30px;
-          font-size: 0.65rem;
-          font-weight: 500;
-          white-space: nowrap;
-        }
-
         .ct-iframe {
           border-radius: 18px;
           overflow: hidden;
@@ -298,13 +284,13 @@ export function Contact() {
         }
 
         .ct-red.ig {
-          background: rgba(225, 48, 108, 0.12);
-          border: 1px solid rgba(225, 48, 108, 0.35);
-          color: #E1306C;
+          background: linear-gradient(45deg, rgba(249, 206, 52, 0.14) 0%, rgba(238, 42, 123, 0.16) 45%, rgba(98, 40, 215, 0.16) 100%);
+          border: 1px solid rgba(238, 42, 123, 0.35);
+          color: #f06292;
         }
 
         .ct-red.ig:hover {
-          background: rgba(225, 48, 108, 0.22);
+          background: linear-gradient(45deg, rgba(249, 206, 52, 0.24) 0%, rgba(238, 42, 123, 0.26) 45%, rgba(98, 40, 215, 0.26) 100%);
           transform: translateY(-2px);
         }
 
@@ -384,10 +370,6 @@ export function Contact() {
           .ct-item-value {
             font-size: 0.75rem;
           }
-          .ct-badge {
-            font-size: 0.55rem;
-            padding: 0.15rem 0.5rem;
-          }
           .ct-maps-btn {
             padding: 0.6rem;
             font-size: 0.75rem;
@@ -453,7 +435,6 @@ export function Contact() {
                     <div className="ct-item-value">
                       <a href="https://wa.me/50683606680" target="_blank" rel="noopener noreferrer" className="ct-wa-btn">
                         +506 8360-6680
-                        <span className="ct-badge">WhatsApp</span>
                       </a>
                     </div>
                   </div>

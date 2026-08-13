@@ -1016,7 +1016,7 @@ export function Home() {
                         href={INSTAGRAM_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'rgba(225,48,108,0.12)', border: '1px solid rgba(225,48,108,0.35)', color: '#E1306C', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.2rem', borderRadius: '40px', background: 'linear-gradient(45deg, rgba(249,206,52,0.14) 0%, rgba(238,42,123,0.16) 45%, rgba(98,40,215,0.16) 100%)', border: '1px solid rgba(238,42,123,0.35)', color: '#f06292', fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', boxSizing: 'border-box' }}
                       >
                         <Icono nombre="instagram" size={18} />
                         Instagram

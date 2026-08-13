@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { swalConfirm, swalSuccess, swalError, swalAviso } from '../../utils/swalConfig'
+import { AvisoLimite } from '../AvisoLimite/AvisoLimite'
 
 type Opinion = {
   id: number
@@ -601,42 +602,10 @@ export function Opiniones() {
           to { transform: rotate(360deg); }
         }
 
-        .op-limite {
-          background: rgba(224, 20, 44, 0.08);
-          border: 1px solid rgba(224, 20, 44, 0.35);
-          border-radius: 18px;
-          padding: 1.25rem;
-          margin-bottom: 1.5rem;
-          text-align: center;
-        }
 
-        .op-limite h3 {
-          font-family: 'Sora', sans-serif;
-          font-size: 1.05rem;
-          color: #fff;
-          margin-bottom: 0.5rem;
-        }
 
-        .op-limite p {
-          font-size: 0.88rem;
-          color: rgba(255, 255, 255, 0.75);
-          line-height: 1.5;
-          margin-bottom: 0.9rem;
-        }
 
-        .op-limite-btn {
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
-          border: none;
-          border-radius: 40px;
-          color: #fff;
-          font-weight: 600;
-          font-size: 0.85rem;
-          padding: 0.65rem 1.4rem;
-          cursor: pointer;
-          transition: all 0.25s ease;
-        }
 
-        .op-limite-btn:hover { transform: translateY(-2px); }
 
 
 
@@ -794,16 +763,18 @@ export function Opiniones() {
             </div>
             <div className="af-body">
               {alcanzoLimite && (
-                <div className="op-limite">
-                  <h3>Ya tenés {MAX_OPINIONES} opiniones</h3>
-                  <p>
-                    Cada cliente puede dejar {MAX_OPINIONES} opiniones. Si querés escribir otra,
-                    eliminá una de las que ya tenés.
-                  </p>
-                  <button type="button" className="op-limite-btn" onClick={() => setVista('mis')}>
+                <AvisoLimite
+                  titulo="Ya dejaste todas tus opiniones"
+                  destacado={{
+                    etiqueta: 'Opiniones usadas',
+                    valor: `${misOpiniones.length} de ${MAX_OPINIONES}`,
+                  }}
+                  nota="Si querés escribir otra, primero eliminá una de las que ya tenés."
+                >
+                  <button type="button" className="avl-btn avl-btn-rojo" onClick={() => setVista('mis')}>
                     Ver mis opiniones
                   </button>
-                </div>
+                </AvisoLimite>
               )}
               {mensaje && (
                 <div className={`message ${mensaje.includes('éxito') ? 'success' : 'error'}`}>

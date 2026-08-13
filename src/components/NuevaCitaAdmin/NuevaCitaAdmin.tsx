@@ -12,11 +12,11 @@ import {
 
 const CUPOS_POR_HORA = 2
 
-type Props = { onCreada: () => void }
+type Props = { onCreada: () => void; onCerrar: () => void }
 
 // Mismo formulario que ven los clientes, pero sin el limite de una cita
 // por persona: aca el negocio agenda para quien llega al local
-export function NuevaCitaAdmin({ onCreada }: Props) {
+export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
   const [horarios, setHorarios] = useState<Horario[]>([])
   const [diasCerrados, setDiasCerrados] = useState<string[]>([])
   const [fecha, setFecha] = useState<Date | null>(null)
@@ -196,10 +196,17 @@ export function NuevaCitaAdmin({ onCreada }: Props) {
   const servicio = SERVICIOS.find(s => s.value === datos.service_type)
 
   return (
-    <div className="af-card" style={{ marginBottom: '1.5rem' }}>
-      <div className="af-card-header">
+    <div className="af-card nca-card">
+      <div className="af-card-header nca-header">
         <h2>Agendar para un cliente</h2>
         <p>Para quien llega al local o llama por teléfono</p>
+
+        <button type="button" className="nca-cerrar" onClick={onCerrar} aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
       <div className="af-body">

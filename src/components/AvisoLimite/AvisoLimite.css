@@ -1,0 +1,136 @@
+.avl {
+  position: relative;
+  background: linear-gradient(180deg, rgba(224, 20, 44, 0.07), rgba(224, 20, 44, 0));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.avl-titulo h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.1rem;
+}
+
+/* El dato importante como una ficha, que es lo que el cliente busca */
+.avl-destacado {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid rgba(224, 20, 44, 0.28);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.avl-etiqueta {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 0.95rem;
+  background: rgba(224, 20, 44, 0.14);
+  color: #e0142c;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.avl-valores {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.avl-valores strong {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.avl-separador {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.avl-nota {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 42ch;
+  margin: 0 auto;
+}
+
+.avl-acciones {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.avl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.72rem 1.35rem;
+  border-radius: 40px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.avl-btn-wa {
+  background: rgba(37, 211, 102, 0.1);
+  border-color: rgba(37, 211, 102, 0.3);
+  color: #25d366;
+}
+
+.avl-btn-wa:hover {
+  background: rgba(37, 211, 102, 0.2);
+}
+
+.avl-btn-rojo {
+  background: rgba(224, 20, 44, 0.12);
+  border-color: rgba(224, 20, 44, 0.35);
+  color: #f87171;
+}
+
+.avl-btn-rojo:hover {
+  background: rgba(224, 20, 44, 0.22);
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .avl {
+    padding: 1.25rem 1rem;
+  }
+  .avl-destacado {
+    flex-direction: column;
+    width: 100%;
+  }
+  .avl-etiqueta {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+  .avl-acciones .avl-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
