@@ -56,7 +56,7 @@ export function AdminDashboard() {
   const [historial, setHistorial] = useState<Appointment[]>([])
   const [mostrarNuevaCita, setMostrarNuevaCita] = useState(false)
   const [cargandoHistorial, setCargandoHistorial] = useState(false)
-  const [origenHistorial, setOrigenHistorial] = useState<'web' | 'local'>('web')
+  const [origenHistorial, setOrigenHistorial] = useState<'todas' | 'web' | 'local'>('todas')
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [horarios, setHorarios] = useState<Horario[]>([])
@@ -123,8 +123,6 @@ export function AdminDashboard() {
     if (total > 0) {
       swalSuccess('Listo', `Se completaron ${total} cita(s)`)
       await fetchAppointments()
-    } else {
-      swalSuccess('Sin cambios', 'No hay citas pendientes que ya hayan pasado')
     }
   }
 
@@ -420,7 +418,10 @@ export function AdminDashboard() {
 
   const getServiceLabel = (type: string) => nombreServicio(type)
 
-  const historialFiltrado = historial.filter(c => (c.origen || 'web') === origenHistorial)
+  const historialFiltrado = historial.filter(c => {
+    if (origenHistorial === 'todas') return true
+    return (c.origen || 'web') === origenHistorial
+  })
 
   const resumenServicio = (() => {
     if (historialFiltrado.length === 0) return { nombre: '—' }
@@ -438,8 +439,10 @@ export function AdminDashboard() {
     c.vehicle_model || '-',
   ])
 
-  const tituloHistorial = () =>
-    origenHistorial === 'web' ? 'Citas agendadas desde la página web' : 'Citas agendadas en el local'
+  const tituloHistorial = () => {
+    if (origenHistorial === 'todas') return 'Todas las citas agendadas (Web y Físicas)'
+    return origenHistorial === 'web' ? 'Citas agendadas desde la página web' : 'Citas agendadas en el local'
+  }
 
   const imprimirHistorial = () => window.print()
 
@@ -544,6 +547,12 @@ export function AdminDashboard() {
 
   const domingo = horarios.find(h => h.dia_semana === 0)
   const domingoActivo = domingo?.activo === true
+
+  const horariosOrdenados = [...horarios].sort((a, b) => {
+    const ordenA = a.dia_semana === 0 ? 7 : a.dia_semana
+    const ordenB = b.dia_semana === 0 ? 7 : b.dia_semana
+    return ordenA - ordenB
+  })
 
   const HORA_MIN = 7
   const HORA_MAX = 22
@@ -850,21 +859,27 @@ export function AdminDashboard() {
           <div className="clean-content-panel">
             <div className="clean-panel-top">
               <div>
-                <h3 className="clean-panel-title">Historial de Trabajos Atendidos</h3>
+                <h3 className="clean-panel-title">Historial de Citas Agendadas</h3>
               </div>
 
               <div className="clean-channel-tabs no-imprimir">
                 <button
+                  className={`clean-channel-btn ${origenHistorial === 'todas' ? 'active' : ''}`}
+                  onClick={() => setOrigenHistorial('todas')}
+                >
+                  Todas
+                </button>
+                <button
                   className={`clean-channel-btn ${origenHistorial === 'web' ? 'active' : ''}`}
                   onClick={() => setOrigenHistorial('web')}
                 >
-                  Canal Web
+                  Web
                 </button>
                 <button
                   className={`clean-channel-btn ${origenHistorial === 'local' ? 'active' : ''}`}
                   onClick={() => setOrigenHistorial('local')}
                 >
-                  Local Físico
+                  Físicas
                 </button>
               </div>
             </div>
@@ -873,9 +888,11 @@ export function AdminDashboard() {
               <div className="admin-empty-box">Cargando registros históricos...</div>
             ) : historialFiltrado.length === 0 ? (
               <div className="admin-empty-box">
-                {origenHistorial === 'web'
+                {origenHistorial === 'todas'
+                  ? 'No hay registros de citas completadas aún.'
+                  : origenHistorial === 'web'
                   ? 'No hay registros de citas web completadas aún.'
-                  : 'No hay registros de citas presenciales aún.'}
+                  : 'No hay registros de citas físicas aún.'}
               </div>
             ) : (
               <>
@@ -1017,55 +1034,78 @@ export function AdminDashboard() {
 
               {/* Vista Mobile: Tarjetas por Día (sin desplazamiento horizontal) */}
               <div className="md:hidden clean-schedule-cards">
-                {horarios.map((horario) => (
-                  <div key={horario.id} className="clean-schedule-card">
-                    <div className="clean-schedule-card-header">
-                      <span className="clean-schedule-day-name">{horario.nombre_dia}</span>
-                      <div className="clean-schedule-interval">
-                        <span>Intervalo:</span>
-                        <select 
-                          value={horario.intervalo_minutos} 
-                          onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
-                          className="clean-select clean-select-sm" 
-                          disabled={savingHorarios}
-                        >
-                          <option value={30}>30 min</option>
-                          <option value={60}>60 min</option>
-                          <option value={90}>90 min</option>
-                          <option value={120}>120 min</option>
-                        </select>
+                {horariosOrdenados.map((horario) => {
+                  const esDomingoDeshabilitado = horario.dia_semana === 0 && !domingoActivo
+                  return (
+                    <div 
+                      key={horario.id} 
+                      className={`clean-schedule-card ${esDomingoDeshabilitado ? 'schedule-card-disabled' : ''}`}
+                    >
+                      <div className="clean-schedule-card-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <span className="clean-schedule-day-name">{horario.nombre_dia}</span>
+                          {horario.dia_semana === 0 && (
+                            <span 
+                              className={`clean-status-pill ${domingoActivo ? 'active' : 'inactive'}`} 
+                              style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', cursor: 'pointer' }}
+                              onClick={() => domingo && updateHorario(domingo.id, 'activo', !domingoActivo)}
+                              title="Toca para abrir o cerrar domingos"
+                            >
+                              {domingoActivo ? 'Abierto' : 'Deshabilitado'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="clean-schedule-interval">
+                          <span>Intervalo:</span>
+                          <select 
+                            value={horario.intervalo_minutos} 
+                            onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
+                            className="clean-select clean-select-sm" 
+                            disabled={savingHorarios || esDomingoDeshabilitado}
+                          >
+                            <option value={30}>30 min</option>
+                            <option value={60}>60 min</option>
+                            <option value={90}>90 min</option>
+                            <option value={120}>120 min</option>
+                          </select>
+                        </div>
                       </div>
+                      <div className="clean-schedule-times-grid">
+                        <div className="clean-schedule-time-field">
+                          <span className="clean-schedule-time-lbl">Apertura</span>
+                          <select 
+                            value={horario.hora_inicio} 
+                            onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
+                            className="clean-select" 
+                            disabled={savingHorarios || esDomingoDeshabilitado}
+                          >
+                            {generateTimeOptions().map(time => (
+                              <option key={time} value={time}>{time}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="clean-schedule-time-field">
+                          <span className="clean-schedule-time-lbl">Cierre</span>
+                          <select 
+                            value={horario.hora_fin} 
+                            onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
+                            className="clean-select" 
+                            disabled={savingHorarios || esDomingoDeshabilitado}
+                          >
+                            {generateTimeOptions().map(time => (
+                              <option key={time} value={time}>{time}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {esDomingoDeshabilitado && (
+                        <div style={{ fontSize: '0.72rem', color: '#888888', marginTop: '0.2rem' }}>
+                          Domingo cerrado. Habilítalo para modificar sus horarios.
+                        </div>
+                      )}
                     </div>
-                    <div className="clean-schedule-times-grid">
-                      <div className="clean-schedule-time-field">
-                        <span className="clean-schedule-time-lbl">Apertura</span>
-                        <select 
-                          value={horario.hora_inicio} 
-                          onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
-                          className="clean-select" 
-                          disabled={savingHorarios}
-                        >
-                          {generateTimeOptions().map(time => (
-                            <option key={time} value={time}>{time}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="clean-schedule-time-field">
-                        <span className="clean-schedule-time-lbl">Cierre</span>
-                        <select 
-                          value={horario.hora_fin} 
-                          onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
-                          className="clean-select" 
-                          disabled={savingHorarios}
-                        >
-                          {generateTimeOptions().map(time => (
-                            <option key={time} value={time}>{time}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               {/* Vista Desktop: Tabla Tradicional */}
@@ -1080,48 +1120,65 @@ export function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {horarios.map((horario) => (
-                      <tr key={horario.id}>
-                        <td className="cell-client-name">{horario.nombre_dia}</td>
-                        <td>
-                          <select 
-                            value={horario.hora_inicio} 
-                            onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
-                            className="clean-select" 
-                            disabled={savingHorarios}
-                          >
-                            {generateTimeOptions().map(time => (
-                              <option key={time} value={time}>{time}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td>
-                          <select 
-                            value={horario.hora_fin} 
-                            onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
-                            className="clean-select" 
-                            disabled={savingHorarios}
-                          >
-                            {generateTimeOptions().map(time => (
-                              <option key={time} value={time}>{time}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td>
-                          <select 
-                            value={horario.intervalo_minutos} 
-                            onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
-                            className="clean-select" 
-                            disabled={savingHorarios}
-                          >
-                            <option value={30}>30 min</option>
-                            <option value={60}>60 min</option>
-                            <option value={90}>90 min</option>
-                            <option value={120}>120 min</option>
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
+                    {horariosOrdenados.map((horario) => {
+                      const esDomingoDeshabilitado = horario.dia_semana === 0 && !domingoActivo
+                      return (
+                        <tr key={horario.id} className={esDomingoDeshabilitado ? 'schedule-row-disabled' : ''}>
+                          <td className="cell-client-name">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                              <span>{horario.nombre_dia}</span>
+                              {horario.dia_semana === 0 && (
+                                <span 
+                                  className={`clean-status-pill ${domingoActivo ? 'active' : 'inactive'}`} 
+                                  style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', cursor: 'pointer' }}
+                                  onClick={() => domingo && updateHorario(domingo.id, 'activo', !domingoActivo)}
+                                  title="Toca para abrir o cerrar domingos"
+                                >
+                                  {domingoActivo ? 'Abierto' : 'Deshabilitado'}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            <select 
+                              value={horario.hora_inicio} 
+                              onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
+                              className="clean-select" 
+                              disabled={savingHorarios || esDomingoDeshabilitado}
+                            >
+                              {generateTimeOptions().map(time => (
+                                <option key={time} value={time}>{time}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td>
+                            <select 
+                              value={horario.hora_fin} 
+                              onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
+                              className="clean-select" 
+                              disabled={savingHorarios || esDomingoDeshabilitado}
+                            >
+                              {generateTimeOptions().map(time => (
+                                <option key={time} value={time}>{time}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td>
+                            <select 
+                              value={horario.intervalo_minutos} 
+                              onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
+                              className="clean-select" 
+                              disabled={savingHorarios || esDomingoDeshabilitado}
+                            >
+                              <option value={30}>30 min</option>
+                              <option value={60}>60 min</option>
+                              <option value={90}>90 min</option>
+                              <option value={120}>120 min</option>
+                            </select>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>

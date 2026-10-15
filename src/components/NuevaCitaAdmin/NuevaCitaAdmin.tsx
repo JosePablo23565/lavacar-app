@@ -220,7 +220,6 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
         <div className="nca-header">
           <span className="nca-badge-pill">Cita Presencial / Telefónica</span>
           <h2 className="nca-title">Agendar Cita en el Local</h2>
-          <p className="nca-subtitle">Registro de citas sin límite para clientes que llegan al local o llaman.</p>
 
           <button 
             type="button" 
