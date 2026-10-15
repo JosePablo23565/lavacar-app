@@ -751,7 +751,68 @@ export function AppointmentForm() {
                       options={services.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
                       placeholder="Seleccione un servicio"
                     />
-                    {selectedService && <p className="af-hint">Duración estimada: {selectedService.duration} minutos</p>}
+                    {selectedService && (
+                      <div
+                        style={{
+                          marginTop: '0.65rem',
+                          padding: '0.75rem 0.95rem',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.4rem',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.35rem' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.86rem', color: '#ffffff' }}>{selectedService.label}</span>
+                          <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#ff334b', background: 'rgba(224, 20, 44, 0.12)', padding: '0.15rem 0.55rem', borderRadius: '6px' }}>
+                            {selectedService.price}
+                          </span>
+                        </div>
+                        {selectedService.tag && (
+                          <div style={{
+                            background: 'linear-gradient(135deg, rgba(224, 20, 44, 0.22) 0%, rgba(140, 10, 25, 0.35) 100%)',
+                            border: '1px solid rgba(224, 20, 44, 0.45)',
+                            color: '#ff8593',
+                            fontWeight: 700,
+                            fontSize: '0.78rem',
+                            padding: '0.3rem 0.65rem',
+                            borderRadius: '8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            width: 'fit-content',
+                            marginTop: '0.1rem'
+                          }}>
+                            {selectedService.tag}
+                          </div>
+                        )}
+                        {selectedService.caracteristicas && selectedService.caracteristicas.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.35rem' }}>
+                            {selectedService.caracteristicas.map((c, i) => (
+                              <span
+                                key={i}
+                                style={{
+                                  fontSize: '0.74rem',
+                                  color: '#e2e8f0',
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '6px',
+                                  fontWeight: 500
+                                }}
+                              >
+                                {c}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#777777', marginTop: '0.25rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '0.4rem' }}>
+                          <span>⏱️ Duración estimada: {selectedService.duration} min</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="af-field">

@@ -9,13 +9,12 @@ import {
   franjasDelDia, horarioDelDia, franjasDisponibles,
   fechaATexto, a24Horas,
 } from '../../lib/horarios'
+import './NuevaCitaAdmin.css'
 
 const CUPOS_POR_HORA = 2
 
 type Props = { onCreada: () => void; onCerrar: () => void }
 
-// Mismo formulario que ven los clientes, pero sin el limite de una cita
-// por persona: aca el negocio agenda para quien llega al local
 export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
   const [horarios, setHorarios] = useState<Horario[]>([])
   const [diasCerrados, setDiasCerrados] = useState<string[]>([])
@@ -26,12 +25,21 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
   const [datos, setDatos] = useState({
     customer_name: '',
     customer_phone: '',
-    vehicle_type: '',
+    vehicle_type: 'carro',
     vehicle_model: '',
-    service_type: '',
+    service_type: SERVICIOS[0]?.value || '',
     appointment_time: '',
     notes: '',
   })
+
+  // Cerrar con la tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCerrar()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onCerrar])
 
   useEffect(() => {
     const cargar = async () => {
@@ -184,8 +192,13 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
     await swalSuccess('Cita agendada', `Queda registrada a nombre de ${datos.customer_name.trim()}`)
 
     setDatos({
-      customer_name: '', customer_phone: '', vehicle_type: '',
-      vehicle_model: '', service_type: '', appointment_time: '', notes: '',
+      customer_name: '',
+      customer_phone: '',
+      vehicle_type: 'carro',
+      vehicle_model: '',
+      service_type: SERVICIOS[0]?.value || '',
+      appointment_time: '',
+      notes: '',
     })
     setFecha(null)
     onCreada()
@@ -195,176 +208,267 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
   const fechaMinima = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
   const servicio = SERVICIOS.find(s => s.value === datos.service_type)
 
+  const fechaSeleccionadaTexto = fecha
+    ? fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
+    : null
+
   return (
-    <div className="af-card nca-card">
-      <div className="af-card-header nca-header">
-        <h2>Agendar para un cliente</h2>
-        <p>Para quien llega al local o llama por teléfono</p>
+    <div className="nca-overlay" onClick={onCerrar}>
+      <div className="nca-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        
+        {/* Encabezado con X ubicada arriba a la derecha */}
+        <div className="nca-header">
+          <span className="nca-badge-pill">Cita Presencial / Telefónica</span>
+          <h2 className="nca-title">Agendar Cita en el Local</h2>
+          <p className="nca-subtitle">Registro de citas sin límite para clientes que llegan al local o llaman.</p>
 
-        <button type="button" className="nca-cerrar" onClick={onCerrar} aria-label="Cerrar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="af-body">
-        <form onSubmit={guardar}>
-          <div className="af-grid-2">
-            <div>
-              <label className="af-label">NOMBRE DEL CLIENTE</label>
-              <input
-                className="af-input"
-                value={datos.customer_name}
-                onChange={(e) => {
-                  const v = e.target.value
-                  if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]*$/.test(v) && v.length <= 40) {
-                    setDatos({ ...datos, customer_name: v })
-                  }
-                }}
-                placeholder="Nombre y apellido"
-              />
-              <p className="af-hint">Solo letras, máximo 40</p>
-            </div>
-
-            <div>
-              <label className="af-label">TELÉFONO (OPCIONAL)</label>
-              <input
-                className="af-input"
-                type="tel"
-                value={datos.customer_phone}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/[^0-9]/g, '')
-                  if (v.length <= 8) setDatos({ ...datos, customer_phone: v })
-                }}
-                placeholder="8 dígitos"
-                maxLength={8}
-              />
-              <p className="af-hint">Para poder avisarle por WhatsApp</p>
-            </div>
-          </div>
-
-          <div className="af-grid-2">
-            <div>
-              <CustomSelect
-                label="TIPO DE VEHÍCULO"
-                value={datos.vehicle_type}
-                onChange={(v) => setDatos({ ...datos, vehicle_type: v })}
-                options={TIPOS_VEHICULO}
-                placeholder="Seleccione"
-              />
-            </div>
-
-            <div>
-              <label className="af-label">MARCA Y MODELO</label>
-              <input
-                className="af-input"
-                value={datos.vehicle_model}
-                onChange={(e) => {
-                  if (e.target.value.length <= 25) {
-                    setDatos({ ...datos, vehicle_model: e.target.value })
-                  }
-                }}
-                placeholder="Ej: Toyota Hilux"
-                maxLength={25}
-              />
-            </div>
-          </div>
-
-          <div className="af-field">
-            <CustomSelect
-              label="SERVICIO"
-              value={datos.service_type}
-              onChange={(v) => setDatos({ ...datos, service_type: v })}
-              options={SERVICIOS.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
-              placeholder="Seleccione un servicio"
-            />
-            {servicio && (
-              <p className="af-hint">Duración estimada: {servicio.duration} minutos</p>
-            )}
-          </div>
-
-          <div className="af-field">
-            <label className="af-label">DETALLES DE LA CITA (OPCIONAL)</label>
-            <input
-              className="af-input"
-              value={datos.notes}
-              onChange={(e) => {
-                if (e.target.value.length <= 100) setDatos({ ...datos, notes: e.target.value })
-              }}
-              placeholder="Algo que haya que tener en cuenta"
-              maxLength={100}
-            />
-            <div className="af-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>
-              {datos.notes.length}/100 caracteres
-            </div>
-          </div>
-
-          <span className="af-section-label">SELECCIONE LA FECHA</span>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Calendar
-              onChange={(d) => { setFecha(d as Date); setDatos(prev => ({ ...prev, appointment_time: '' })) }}
-              value={fecha}
-              minDate={fechaMinima}
-              tileDisabled={({ date }) => diaBloqueado(date)}
-              tileClassName={claseDia}
-              className={`custom-calendar ${horarios.length > 0 ? 'calendar-loaded' : ''}`}
-              prev2Label={null}
-              next2Label={null}
-              prevLabel="‹"
-              nextLabel="›"
-              locale="es-ES"
-              showNeighboringMonth={false}
-            />
-          </div>
-
-          {!fecha && (
-            <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
-              Seleccione una fecha para ver los horarios disponibles
-            </p>
-          )}
-
-          {fecha && (
-            <>
-              <span className="af-section-label">HORARIOS DISPONIBLES</span>
-              {franjas.length === 0 ? (
-                <p style={{ color: '#f87171', fontSize: '.88rem', textAlign: 'center', padding: '1rem 0' }}>
-                  No hay horarios disponibles para este día
-                </p>
-              ) : (
-                <div className="af-time-grid">
-                  {franjas.map((hora) => (
-                    <button
-                      key={hora}
-                      type="button"
-                      className={`af-time-btn${datos.appointment_time === hora ? ' sel' : ''}`}
-                      onClick={() => setDatos({ ...datos, appointment_time: hora })}
-                    >
-                      {hora}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          <button
-            type="submit"
-            className="af-submit"
-            disabled={
-              guardando ||
-              !datos.customer_name.trim() ||
-              !datos.vehicle_type ||
-              !datos.vehicle_model.trim() ||
-              !datos.service_type ||
-              !fecha ||
-              !datos.appointment_time
-            }
+          <button 
+            type="button" 
+            className="nca-btn-close" 
+            onClick={onCerrar} 
+            aria-label="Cerrar ventana"
+            title="Cerrar (Esc)"
           >
-            {guardando ? 'Guardando...' : 'AGENDAR CITA'}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
+        </div>
+
+        {/* Formulario en 2 columnas */}
+        <form onSubmit={guardar} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+          <div className="nca-body">
+            <div className="nca-form-grid">
+              
+              {/* COLUMNA 1: CLIENTE, VEHÍCULO Y SERVICIO */}
+              <div className="nca-col">
+                <div>
+                  <div className="nca-field-row">
+                    <div className="nca-field">
+                      <label className="nca-label">Nombre y Apellido *</label>
+                      <input
+                        className="nca-input"
+                        value={datos.customer_name}
+                        onChange={(e) => {
+                          const v = e.target.value
+                          if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]*$/.test(v) && v.length <= 40) {
+                            setDatos({ ...datos, customer_name: v })
+                          }
+                        }}
+                        placeholder="Ej: Carlos Murillo"
+                        autoFocus
+                      />
+                    </div>
+
+                    <div className="nca-field">
+                      <label className="nca-label">Teléfono (Opcional)</label>
+                      <input
+                        className="nca-input"
+                        type="tel"
+                        value={datos.customer_phone}
+                        onChange={(e) => {
+                          const v = e.target.value.replace(/[^0-9]/g, '')
+                          if (v.length <= 8) setDatos({ ...datos, customer_phone: v })
+                        }}
+                        placeholder="8 dígitos"
+                        maxLength={8}
+                      />
+                      <span className="nca-hint">Para avisos por WhatsApp</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="nca-field" style={{ marginBottom: '0.85rem' }}>
+                    <CustomSelect
+                      label="TIPO DE VEHÍCULO *"
+                      value={datos.vehicle_type}
+                      onChange={(v) => setDatos(prev => ({ ...prev, vehicle_type: v }))}
+                      options={TIPOS_VEHICULO}
+                      placeholder="Seleccione el tipo de vehículo"
+                    />
+                  </div>
+
+                  <div className="nca-field">
+                    <label className="nca-label">Marca y Modelo *</label>
+                    <input
+                      className="nca-input"
+                      value={datos.vehicle_model}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 25) {
+                          setDatos({ ...datos, vehicle_model: e.target.value })
+                        }
+                      }}
+                      placeholder="Ej: Toyota Hilux, Hyundai Elantra"
+                      maxLength={25}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="nca-field" style={{ marginBottom: '0.65rem' }}>
+                    {/* COMBOBOX ANIMADO (CustomSelect) */}
+                    <CustomSelect
+                      label="SERVICIO A REALIZAR *"
+                      value={datos.service_type}
+                      onChange={(v) => setDatos(prev => ({ ...prev, service_type: v }))}
+                      options={SERVICIOS.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
+                      placeholder="Seleccione un servicio"
+                    />
+
+                    {servicio && (
+                      <div className="nca-service-info" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', alignItems: 'stretch', padding: '0.75rem 0.85rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 600, color: '#ffffff', fontSize: '0.9rem' }}>{servicio.label}</span>
+                          <strong className="nca-service-price" style={{ color: '#ff334b', fontSize: '0.95rem' }}>{servicio.price}</strong>
+                        </div>
+                        {servicio.tag && (
+                          <div style={{
+                            background: 'linear-gradient(135deg, rgba(224, 20, 44, 0.22) 0%, rgba(140, 10, 25, 0.35) 100%)',
+                            border: '1px solid rgba(224, 20, 44, 0.45)',
+                            color: '#ff8593',
+                            fontWeight: 700,
+                            fontSize: '0.76rem',
+                            padding: '0.3rem 0.6rem',
+                            borderRadius: '8px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            width: 'fit-content'
+                          }}>
+                            {servicio.tag}
+                          </div>
+                        )}
+                        {servicio.caracteristicas && servicio.caracteristicas.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.15rem' }}>
+                            {servicio.caracteristicas.map((c, i) => (
+                              <span key={i} style={{
+                                fontSize: '0.72rem',
+                                color: '#e5e7eb',
+                                background: 'rgba(255, 255, 255, 0.06)',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                padding: '0.2rem 0.55rem',
+                                borderRadius: '6px',
+                                fontWeight: 500
+                              }}>
+                                {c}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#777777', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '0.4rem' }}>
+                          <span>⏱️ Duración estimada: {servicio.duration} min</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="nca-field">
+                    <label className="nca-label">Detalles o Notas (Opcional)</label>
+                    <input
+                      className="nca-input"
+                      value={datos.notes}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 100) setDatos({ ...datos, notes: e.target.value })
+                      }}
+                      placeholder="Observaciones de la cita o del vehículo..."
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* COLUMNA 2: CALENDARIO Y HORARIOS */}
+              <div className="nca-col">
+                <div>
+                  <div className="nca-calendar-card">
+                    <Calendar
+                      onChange={(d) => {
+                        setFecha(d as Date)
+                        setDatos(prev => ({ ...prev, appointment_time: '' }))
+                      }}
+                      value={fecha}
+                      minDate={fechaMinima}
+                      tileDisabled={({ date }) => diaBloqueado(date)}
+                      tileClassName={claseDia}
+                      prev2Label={null}
+                      next2Label={null}
+                      prevLabel="‹"
+                      nextLabel="›"
+                      locale="es-ES"
+                      showNeighboringMonth={false}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="nca-times-container">
+                    {!fecha ? (
+                      <div className="nca-empty-alert">
+                        Seleccione un día en el calendario para consultar los horarios disponibles.
+                      </div>
+                    ) : franjas.length === 0 ? (
+                      <div className="nca-empty-alert warning">
+                        No hay horarios disponibles para esta fecha.
+                      </div>
+                    ) : (
+                      <div className="nca-times-grid">
+                        {franjas.map((hora) => (
+                          <button
+                            key={hora}
+                            type="button"
+                            className={`nca-time-btn ${datos.appointment_time === hora ? 'active' : ''}`}
+                            onClick={() => setDatos(prev => ({ ...prev, appointment_time: hora }))}
+                          >
+                            {hora}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* BARRA DE ACCIÓN INFERIOR */}
+          <div className="nca-footer">
+            <div className="nca-summary-pill">
+              {fechaSeleccionadaTexto && datos.appointment_time ? (
+                <>
+                  <span>Selección:</span>
+                  <span className="nca-summary-val">{fechaSeleccionadaTexto} · {datos.appointment_time}</span>
+                </>
+              ) : (
+                <span>Complete los campos requeridos (*)</span>
+              )}
+            </div>
+
+            <div className="nca-footer-actions">
+              <button type="button" className="nca-btn-cancel" onClick={onCerrar}>
+                Cancelar
+              </button>
+              
+              <button
+                type="submit"
+                className="nca-btn-submit"
+                disabled={
+                  guardando ||
+                  !datos.customer_name.trim() ||
+                  !datos.vehicle_type ||
+                  !datos.vehicle_model.trim() ||
+                  !datos.service_type ||
+                  !fecha ||
+                  !datos.appointment_time
+                }
+              >
+                {guardando ? 'Guardando...' : 'Confirmar Cita'}
+              </button>
+            </div>
+          </div>
         </form>
+
       </div>
     </div>
   )

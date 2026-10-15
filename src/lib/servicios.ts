@@ -1,4 +1,4 @@
-// Lista unica de servicios. La usan el formulario de citas, el panel de
+// Lista única de servicios. La usan el formulario de citas, el panel de
 // admin y el inicio, para que no se desincronicen los nombres ni los precios.
 
 export type Servicio = {
@@ -7,56 +7,68 @@ export type Servicio = {
   price: string
   duration: number
   desc: string
+  tag?: string
+  caracteristicas?: string[]
   imagen: string
 }
 
 export const SERVICIOS: Servicio[] = [
   {
     value: 'basico',
-    label: 'Lavado y Aspirado',
-    price: '$10',
+    label: 'Lavado Básico',
+    price: '₡7,000',
     duration: 30,
-    desc: 'Lavado exterior con agua a presión, shampoo especial y secado manual.',
+    tag: '📝 Solo para mantenimiento y suciedad leve',
+    desc: 'Lavado exterior y aspirado rápido.',
+    caracteristicas: [
+      'Lavado exterior',
+      'Aspirado rápido',
+    ],
     imagen: '/lavado-basico.jpg',
   },
   {
-    value: 'completo',
-    label: 'Lavado prémium',
-    price: '$20',
+    value: 'premium',
+    label: 'Lavado Premium',
+    price: '₡10,000',
     duration: 45,
-    desc: 'Interior y exterior. Aspirado, tablero, vidrios y limpieza de llantas.',
+    tag: '⭐ El más recomendado',
+    desc: 'Lavado exterior detallado, aspirado completo, limpieza de llantas y limpieza básica de interiores.',
+    caracteristicas: [
+      'Lavado exterior detallado',
+      'Aspirado completo',
+      'Limpieza de llantas',
+      'Limpieza básica de interiores',
+    ],
     imagen: '/lavado-completo.jpg',
   },
   {
-    value: 'encerado',
-    label: 'Full Prémium',
-    price: '$35',
+    value: 'exclusivo',
+    label: 'Lavado Exclusivo / Intensivo',
+    price: '₡15,000',
     duration: 60,
-    desc: 'Lavado completo más encerado profesional para proteger y dar brillo a la pintura.',
+    tag: '💪 Para vehículos muy sucios',
+    desc: 'Lavado profundo exterior, limpieza detallada de llantas y rin, aspirado profundo y limpieza detallada de interiores.',
+    caracteristicas: [
+      'Lavado profundo exterior',
+      'Limpieza detallada de llantas y rin',
+      'Aspirado profundo',
+      'Limpieza detallada de interiores',
+    ],
     imagen: '/encerado.jpg',
   },
   {
-    value: 'tapizado',
-    label: 'Pulido de Focos',
-    price: '$25',
-    duration: 40,
-    desc: 'Limpieza profunda de asientos y alfombras con extractora profesional.',
-    imagen: '/tapizado.jpg',
-  },
-  {
-    value: 'parabrisas',
-    label: 'Pulido de Parabrisas',
-    price: '$15',
-    duration: 25,
-    desc: 'Pulido profesional del parabrisas para eliminar manchas de agua dura y mejorar la visibilidad.',
-    imagen: '/lavado-basico.jpg',
-  },
-  {
     value: 'ceramico',
-    label: 'Tratamiento Cerámico',
-    price: '$50',
+    label: 'Lavado Cerámico',
+    price: '₡25,000',
     duration: 90,
-    desc: 'Protección cerámica de larga duración que sella la pintura y realza el brillo.',
+    tag: '✨ Brillo, protección y durabilidad',
+    desc: 'Lavado detallado completo, aplicación cerámica, protección de pintura y efecto repelente al agua y suciedad.',
+    caracteristicas: [
+      'Lavado detallado completo',
+      'Aplicación cerámica',
+      'Protección de pintura',
+      'Efecto repelente al agua y suciedad',
+    ],
     imagen: '/encerado.jpg',
   },
 ]
@@ -67,8 +79,15 @@ export const TIPOS_VEHICULO = [
   { value: 'camioneta', label: 'Camioneta / SUV' },
 ]
 
-export const nombreServicio = (value: string) =>
-  SERVICIOS.find(s => s.value === value)?.label || value
+export const nombreServicio = (value: string) => {
+  const match = SERVICIOS.find(s => s.value === value)
+  if (match) return match.label
+  // Compatibilidad con citas históricas registradas en la base de datos
+  if (value === 'completo') return 'Lavado Premium'
+  if (value === 'encerado' || value === 'tapizado') return 'Lavado Exclusivo / Intensivo'
+  if (value === 'parabrisas') return 'Pulido de Parabrisas'
+  return value
+}
 
 export const duracionServicio = (value: string) =>
   SERVICIOS.find(s => s.value === value)?.duration || 30

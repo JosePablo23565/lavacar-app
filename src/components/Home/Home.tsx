@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { Icono } from '../Icono/Icono'
 import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion'
+import { SERVICIOS } from '../../lib/servicios'
 
 export function Home() {
   const navigate = useNavigate()
@@ -113,56 +114,15 @@ export function Home() {
     }
   }, [])
 
-  const services = [
-    { 
-      name: 'Lavado y Aspirado', 
-      value: 'basico', 
-      price: '$10', 
-      desc: 'Lavado exterior con agua a presión, shampoo especial y secado manual.', 
-      time: '30 min',
-      bgImage: '/lavado-basico.jpg'
-    },
-    { 
-      name: 'Lavado prémium', 
-      value: 'completo', 
-      price: '$20', 
-      desc: 'Interior y exterior. Aspirado, tablero, vidrios y limpieza de llantas.', 
-      time: '45 min',
-      bgImage: '/lavado-completo.jpg'
-    },
-    { 
-      name: 'Full Prémium', 
-      value: 'encerado', 
-      price: '$35', 
-      desc: 'Lavado completo más encerado profesional para proteger y dar brillo a la pintura.', 
-      time: '60 min',
-      bgImage: '/encerado.jpg'
-    },
-    {
-      name: 'Pulido de  Focos',
-      value: 'tapizado',
-      price: '$25',
-      desc: 'Limpieza profunda de asientos y alfombras con extractora profesional.',
-      time: '40 min',
-      bgImage: '/tapizado.jpg'
-    },
-    {
-      name: 'Pulido de Parabrisas',
-      value: 'parabrisas',
-      price: '$15',
-      desc: 'Pulido profesional del parabrisas para eliminar manchas de agua dura y mejorar la visibilidad.',
-      time: '25 min',
-      bgImage: '/lavado-basico.jpg'
-    },
-    {
-      name: 'Tratamiento Cerámico',
-      value: 'ceramico',
-      price: '$50',
-      desc: 'Protección cerámica de larga duración que sella la pintura y realza el brillo.',
-      time: '90 min',
-      bgImage: '/encerado.jpg'
-    },
-  ]
+  const services = SERVICIOS.map(s => ({
+    name: s.label,
+    value: s.value,
+    price: s.price,
+    desc: s.desc,
+    time: `${s.duration} min`,
+    bgImage: s.imagen,
+    tag: s.tag,
+  }))
 
   return (
     <>
@@ -423,7 +383,7 @@ export function Home() {
         .services-section .lc-section {
           position: relative;
           z-index: 2;
-          max-width: 420px;
+          max-width: 1080px;
           margin: 0 auto;
         }
 
@@ -431,17 +391,18 @@ export function Home() {
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          border-radius: 20px;
-          padding: 0.8rem;
-          transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+          border-radius: 16px;
+          padding: 1.25rem;
+          transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
           position: relative;
           overflow: hidden;
           cursor: pointer;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-          min-height: 180px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+          min-height: 220px;
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .lc-service-card::before {
@@ -451,14 +412,14 @@ export function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5));
-          border-radius: 20px;
+          background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+          border-radius: 16px;
           z-index: 0;
           transition: background 0.3s ease;
         }
 
         .lc-service-card:hover::before {
-          background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+          background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.92) 100%);
         }
 
         .lc-service-card > div, 
@@ -472,52 +433,60 @@ export function Home() {
 
         .lc-service-card:hover {
           transform: translateY(-6px) scale(1.02);
+          border-color: rgba(224, 20, 44, 0.5);
         }
 
         .lc-services-grid { 
           display: grid; 
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-          gap: 0.8rem; 
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+          gap: 1.25rem; 
           margin-top: 2rem;
-          padding: 0 2rem;
+          padding: 0 1.5rem;
+          max-width: 1080px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .lc-svc-name { 
           font-family: 'Sora', sans-serif; 
-          font-size: 0.85rem; 
-          font-weight: 600; 
-          margin-bottom: 0.2rem; 
+          font-size: 1.05rem; 
+          font-weight: 700; 
+          margin-bottom: 0.25rem; 
           color: #fff; 
-          text-shadow: 0 1px 3px rgba(0,0,0,0.5); 
+          text-shadow: 0 1px 3px rgba(0,0,0,0.6); 
         }
 
         .lc-svc-price { 
           font-family: 'Sora', sans-serif; 
-          font-size: 1rem; 
+          font-size: 1.25rem; 
           font-weight: 700; 
-          color: #e0142c; 
-          margin-bottom: 0.3rem; 
-          text-shadow: 0 1px 2px rgba(0,0,0,0.3); 
+          color: #ff334b; 
+          margin-bottom: 0.4rem; 
+          text-shadow: 0 1px 3px rgba(0,0,0,0.6); 
         }
 
         .lc-svc-desc { 
-          font-size: 0.65rem; 
-          color: rgba(255, 255, 255, 0.9); 
-          line-height: 1.35; 
-          margin-bottom: 0.3rem; 
-          text-shadow: 0 1px 2px rgba(0,0,0,0.3); 
+          font-size: 0.76rem; 
+          color: rgba(255, 255, 255, 0.95); 
+          line-height: 1.45; 
+          margin-bottom: 0.45rem; 
+          text-shadow: 0 1px 2px rgba(0,0,0,0.6); 
         }
 
         .lc-svc-time { 
           display: inline-flex; 
           align-items: center; 
           gap: 0.2rem; 
-          margin-top: 0.3rem; 
-          font-size: 0.6rem; 
-          color: rgba(255, 255, 255, 0.9); 
-          background: rgba(0,0,0,0.5); 
-          padding: 0.2rem 0.5rem; 
-          border-radius: 99px; 
+          margin-top: 0.2rem; 
+          font-size: 0.68rem; 
+          font-weight: 600;
+          color: #ffffff; 
+          background: rgba(224, 20, 44, 0.25); 
+          border: 1px solid rgba(224, 20, 44, 0.4);
+          padding: 0.2rem 0.55rem; 
+          border-radius: 6px; 
+          width: fit-content;
+        } 
           width: fit-content; 
         }
 

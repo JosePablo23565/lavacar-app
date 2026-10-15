@@ -1,0 +1,643 @@
+/* ============================================================
+   NUEVA CITA ADMIN - VENTANA MODAL MODERNA & ELEGANTE
+   Paleta Estricta: Negro, Gris Oscuro, Rojo y Blanco. Cero Azules.
+   ============================================================ */
+
+.nca-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: ncaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes ncaFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.nca-dialog {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  animation: ncaScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes ncaScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================================
+   ENCABEZADO CON BOTÓN DE CERRAR ARRIBA A LA DERECHA
+   ============================================================ */
+.nca-header {
+  padding: 1.5rem 1.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  padding-right: 4.5rem;
+  background: #161616;
+}
+
+.nca-badge-pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(224, 20, 44, 0.2);
+  border: 1px solid rgba(224, 20, 44, 0.4);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+}
+
+.nca-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nca-subtitle {
+  font-size: 0.85rem;
+  color: #888888;
+  margin: 0;
+}
+
+/* Botón de cerrar X: Arriba a la derecha */
+.nca-btn-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+
+.nca-btn-close:hover {
+  background: rgba(224, 20, 44, 0.18);
+  border-color: rgba(224, 20, 44, 0.4);
+  color: #ff4d61;
+  transform: rotate(90deg);
+}
+
+/* ============================================================
+   CUERPO DEL MODAL (2 COLUMNAS EN DESKTOP)
+   ============================================================ */
+.nca-body {
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.nca-form-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 1.75rem;
+}
+
+.nca-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Secciones internas */
+.nca-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888888;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nca-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nca-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nca-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.nca-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #d4d4d4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nca-input {
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.nca-input:focus {
+  border-color: #e0142c;
+  background: #1e1e1e;
+  box-shadow: 0 0 0 2px rgba(224, 20, 44, 0.2);
+}
+
+.nca-input::placeholder {
+  color: #555555;
+}
+
+.nca-hint {
+  font-size: 0.72rem;
+  color: #777777;
+  margin: 0;
+}
+
+/* ============================================================
+   CUSTOM SELECT (ESTILO ANIMADO IDÉNTICO AL FORMULARIO DE CLIENTES)
+   Abre con animación suave, flecha roja rotatoria y opciones flotantes
+   ============================================================ */
+.custom-select-trigger {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.custom-select-trigger:hover {
+  border-color: rgba(224, 20, 44, 0.4);
+  background: #1e1e1e;
+}
+
+.custom-select-trigger.open {
+  border-color: #e0142c;
+  background: #1e1e1e;
+  box-shadow: 0 0 16px rgba(224, 20, 44, 0.2);
+}
+
+.custom-select-value {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+}
+
+.custom-select-arrow {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+  color: #e0142c;
+  margin-left: 0.5rem;
+}
+
+.custom-select-trigger.open .custom-select-arrow {
+  transform: rotate(180deg);
+}
+
+.custom-select-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #161616;
+  border: 1px solid rgba(224, 20, 44, 0.35);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 999;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
+  max-height: 220px;
+  overflow-y: auto;
+  animation: bubbleExpand 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.custom-select-options.fade-out {
+  animation: bubbleShrink 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bubbleExpand {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes bubbleShrink {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.92);
+  }
+}
+
+.custom-select-option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: #cccccc;
+  font-size: 0.86rem;
+  transition: all 0.15s ease;
+  margin: 3px 6px;
+  border-radius: 8px;
+}
+
+.custom-select-option:hover {
+  background: rgba(224, 20, 44, 0.15);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.custom-select-option.selected {
+  background: rgba(224, 20, 44, 0.25);
+  color: #ff4d61;
+  font-weight: 600;
+}
+
+/* Info del servicio seleccionado */
+.nca-service-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  font-size: 0.76rem;
+  color: #888888;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  margin-top: 0.4rem;
+}
+
+.nca-service-duration {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nca-service-price {
+  color: #ffffff;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ============================================================
+   CALENDARIO MODAL (ESTILO OSCURO & NEUTRO)
+   ============================================================ */
+.nca-calendar-card {
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.85rem;
+}
+
+.nca-calendar-card .react-calendar {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  color: #ffffff;
+}
+
+.nca-calendar-card .react-calendar__navigation {
+  display: flex;
+  height: 38px;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.nca-calendar-card .react-calendar__navigation button {
+  color: #ffffff;
+  min-width: 36px;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.nca-calendar-card .react-calendar__navigation button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nca-calendar-card .react-calendar__navigation button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nca-calendar-card .react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.68rem;
+  color: #777777;
+  margin-bottom: 0.4rem;
+}
+
+.nca-calendar-card .react-calendar__month-view__weekdays abbr {
+  text-decoration: none;
+}
+
+.nca-calendar-card .react-calendar__tile {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #d4d4d4;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+.nca-calendar-card .react-calendar__tile:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.nca-calendar-card .react-calendar__tile--now {
+  background: rgba(255, 255, 255, 0.05);
+  font-weight: 700;
+}
+
+.nca-calendar-card .react-calendar__tile--active,
+.nca-calendar-card .react-calendar__tile--active:enabled:hover,
+.nca-calendar-card .react-calendar__tile--active:enabled:focus {
+  background: #e0142c !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(224, 20, 44, 0.35);
+}
+
+.nca-calendar-card .react-calendar__tile:disabled,
+.nca-calendar-card .blocked-day {
+  color: #444444 !important;
+  opacity: 0.35;
+  cursor: not-allowed !important;
+  text-decoration: line-through;
+}
+
+/* ============================================================
+   GRILLA DE FRANJAS HORARIAS DISPONIBLES
+   ============================================================ */
+.nca-times-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nca-times-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 0.5rem;
+  max-height: 145px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.nca-times-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.nca-times-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.nca-time-btn {
+  padding: 0.55rem 0.35rem;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  color: #d4d4d4;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s ease;
+}
+
+.nca-time-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.nca-time-btn.active {
+  background: #e0142c;
+  border-color: #e0142c;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(224, 20, 44, 0.3);
+}
+
+.nca-empty-alert {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #777777;
+}
+
+.nca-empty-alert.warning {
+  color: #ff4d61;
+  border-color: rgba(224, 20, 44, 0.3);
+  background: rgba(224, 20, 44, 0.05);
+}
+
+/* ============================================================
+   FOOTER CON ACCIONES (STICKY AL FINAL)
+   ============================================================ */
+.nca-footer {
+  padding: 1rem 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: #0e0e0e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nca-summary-pill {
+  font-size: 0.78rem;
+  color: #888888;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nca-summary-val {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nca-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.nca-btn-cancel {
+  padding: 0.65rem 1.15rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #888888;
+  font-size: 0.84rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nca-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.nca-btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.4rem;
+  background: #e0142c;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nca-btn-submit:hover:not(:disabled) {
+  background: #c81024;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(224, 20, 44, 0.35);
+}
+
+.nca-btn-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================================
+   ADAPTATIVO PARA MÓVILES
+   ============================================================ */
+@media (max-width: 768px) {
+  .nca-dialog {
+    max-height: 94vh;
+  }
+
+  .nca-header {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+
+  .nca-body {
+    padding: 1.25rem;
+  }
+
+  .nca-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .nca-field-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .nca-footer {
+    padding: 1rem 1.25rem;
+    flex-direction: column-reverse;
+  }
+
+  .nca-footer-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .nca-btn-cancel, .nca-btn-submit {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+}

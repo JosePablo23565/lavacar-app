@@ -73,15 +73,12 @@ export function AdminDashboard() {
   const [mostrarAvisos, setMostrarAvisos] = useState(false)
   const [cerrandoDias, setCerrandoDias] = useState(false)
   const [avisados, setAvisados] = useState<number[]>([])
-  // Ya se cerraron los dias y solo falta avisar
   const [cierreCompletado, setCierreCompletado] = useState(false)
 
   useEffect(() => {
     checkAdminAndFetch()
   }, [])
 
-  // El estado de cada cita depende de la hora, asi que hay que
-  // volver a mirarlo cada tanto sin recargar la pagina
   const [ahora, setAhora] = useState(() => new Date())
 
   useEffect(() => {
@@ -102,7 +99,7 @@ export function AdminDashboard() {
     const { data, error } = await supabase.rpc('completar_citas_pasadas')
 
     if (error) {
-      swalError('No se pudo cerrar el dia', error.message)
+      swalError('No se pudo cerrar el día', error.message)
       return 0
     }
 
@@ -135,7 +132,7 @@ export function AdminDashboard() {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      navigate('/acceder')
+      navigate('/admin/login')
       return
     }
 
@@ -236,7 +233,6 @@ export function AdminDashboard() {
     setMostrarAvisos(false)
   }
 
-  // Paso 1 revisar las citas afectadas antes de cerrar
   const revisarCierre = async () => {
     if (fechasSeleccionadas.length === 0) return
 
@@ -262,7 +258,6 @@ export function AdminDashboard() {
     }
   }
 
-  // Paso 2 guardar los cierres y cancelar las citas
   const confirmarCierre = async () => {
     const sinAvisar = citasAfectadas.filter(c => !avisados.includes(c.id))
     if (sinAvisar.length > 0) {
@@ -275,7 +270,6 @@ export function AdminDashboard() {
 
     setCerrandoDias(true)
 
-    // Devuelve las canceladas incluidas las que entraron al final
     const { data, error } = await supabase.rpc('cerrar_dias', {
       p_fechas: fechasSeleccionadas
     })
@@ -320,7 +314,6 @@ export function AdminDashboard() {
     setAvisados([])
   }
 
-  // Se abren dentro del clic para que el navegador no los bloquee
   const abrirTodosLosChats = () => {
     const abiertos: number[] = []
     let bloqueados = 0
@@ -338,8 +331,8 @@ export function AdminDashboard() {
 
     if (bloqueados > 0) {
       swalError(
-        'El navegador bloqueó las ventanas',
-        `Se abrieron ${abiertos.length} de ${citasAfectadas.length} chats. Permití las ventanas emergentes para este sitio, o usá el botón de WhatsApp de cada cliente.`
+        'El navegador bloqueó las ventanas emergentes',
+        `Se abrieron ${abiertos.length} de ${citasAfectadas.length} chats. Permití las ventanas emergentes para este sitio o abrí cada cliente manualmente.`
       )
     }
   }
@@ -430,15 +423,13 @@ export function AdminDashboard() {
   const historialFiltrado = historial.filter(c => (c.origen || 'web') === origenHistorial)
 
   const resumenServicio = (() => {
-    if (historialFiltrado.length === 0) return { nombre: '-' }
+    if (historialFiltrado.length === 0) return { nombre: '—' }
     const cuenta: Record<string, number> = {}
     for (const c of historialFiltrado) cuenta[c.service_type] = (cuenta[c.service_type] || 0) + 1
     const top = Object.entries(cuenta).sort((a, b) => b[1] - a[1])[0]
     return { nombre: getServiceLabel(top[0]) }
   })()
 
-  // Documento propio para imprimir y para el PDF: no depende de los
-  // estilos de la pagina, que es lo que lo hacia fallar
   const filasHistorial = () => historialFiltrado.map(c => [
     formatDateDisplay(c.appointment_date),
     convertTo12Hour(c.appointment_time),
@@ -448,7 +439,7 @@ export function AdminDashboard() {
   ])
 
   const tituloHistorial = () =>
-    origenHistorial === 'web' ? 'Citas agendadas desde la pagina web' : 'Citas agendadas en el local'
+    origenHistorial === 'web' ? 'Citas agendadas desde la página web' : 'Citas agendadas en el local'
 
   const imprimirHistorial = () => window.print()
 
@@ -472,11 +463,11 @@ export function AdminDashboard() {
     doc.setFontSize(10)
     doc.setTextColor(110)
     doc.text(tituloHistorial(), 14, 25)
-    doc.text(`${filas.length} lavados atendidos  |  Servicio mas pedido: ${resumenServicio.nombre}`, 14, 31)
+    doc.text(`${filas.length} lavados atendidos  |  Servicio más pedido: ${resumenServicio.nombre}`, 14, 31)
 
     autoTable(doc, {
       startY: 38,
-      head: [['Fecha', 'Hora', 'Cliente', 'Servicio', 'Vehiculo']],
+      head: [['Fecha', 'Hora', 'Cliente', 'Servicio', 'Vehículo']],
       body: filas,
       styles: { fontSize: 9, cellPadding: 3 },
       headStyles: { fillColor: [224, 20, 44], textColor: 255 },
@@ -486,7 +477,6 @@ export function AdminDashboard() {
     const nombre = `historial-${origenHistorial}-${new Date().toISOString().slice(0, 10)}.pdf`
     const archivo = new File([doc.output('blob')], nombre, { type: 'application/pdf' })
 
-    // En el telefono abre el menu de compartir; en computadora se descarga
     if (navigator.canShare?.({ files: [archivo] })) {
       try {
         await navigator.share({ files: [archivo], title: 'Historial de citas' })
@@ -497,10 +487,10 @@ export function AdminDashboard() {
     }
 
     doc.save(nombre)
-    swalSuccess('PDF listo', 'Se descargo el archivo y ya lo podes enviar a donde quieras.')
+    swalSuccess('PDF listo', 'Se descargó el archivo correctamente.')
   }
 
-const getVehicleLabel = (type: string) => {
+  const getVehicleLabel = (type: string) => {
     const vehicles: Record<string, string> = {
       carro: 'Carro',
       moto: 'Moto',
@@ -532,7 +522,6 @@ const getVehicleLabel = (type: string) => {
     return `${parseInt(day)} de ${meses[mesNum]} de ${year}`
   }
 
-  // wa.me necesita el codigo de pais
   const getWhatsappNumero = (telefono: string) => {
     const soloNumeros = (telefono || '').replace(/\D/g, '')
     return soloNumeros.length === 8 ? `506${soloNumeros}` : soloNumeros
@@ -553,19 +542,17 @@ const getVehicleLabel = (type: string) => {
   const pendingTestimonials = testimonials.filter(t => !t.is_approved)
   const approvedTestimonials = testimonials.filter(t => t.is_approved)
 
-  // Domingo es el unico dia que se activa o desactiva fijo
   const domingo = horarios.find(h => h.dia_semana === 0)
   const domingoActivo = domingo?.activo === true
 
-  // De 7 AM a 10 PM cada 30 minutos
-  const HORA_MIN = 7   // 07:00 AM
-  const HORA_MAX = 22  // 10:00 PM
+  const HORA_MIN = 7
+  const HORA_MAX = 22
 
   const generateTimeOptions = (): string[] => {
     const times: string[] = []
     for (let hour = HORA_MIN; hour <= HORA_MAX; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        if (hour === HORA_MAX && minute > 0) break // cortar en 10:00 PM exacto
+        if (hour === HORA_MAX && minute > 0) break
         const hour12 = hour % 12 || 12
         const ampm = hour < 12 ? 'AM' : 'PM'
         const minuteStr = minute.toString().padStart(2, '0')
@@ -578,37 +565,76 @@ const getVehicleLabel = (type: string) => {
   if (loading) return (
     <div className="admin-loading">
       <div className="admin-loading-spinner" />
-      <div className="admin-loading-text">Cargando...</div>
+      <div className="admin-loading-text">Cargando panel...</div>
     </div>
   )
 
   return (
     <div className="admin-root">
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div className="admin-container">
+
+        {/* Encabezado limpio y sobrio */}
+        <header className="admin-header">
+          <div>
+            <h1 className="admin-title">Panel Administrativo</h1>
+            <p className="admin-subtitle">Gestión de citas, horarios y opiniones de Camaro Fraterno</p>
+          </div>
+        </header>
 
         {limpiezaMsg && (
-          <div style={{ marginBottom: '1rem', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#6ee7b7' }}>
-            {limpiezaMsg}
+          <div className="admin-toast-clean">
+            <span>{limpiezaMsg}</span>
           </div>
         )}
 
-        <div className="af-tabs">
-          <button onClick={() => setActiveTab('citas')} className={`af-tab ${activeTab === 'citas' ? 'active' : ''}`}>
-            Citas ({appointments.length})
+        {/* Pestañas limpias (Clean Underline Style) */}
+        <nav className="admin-tabs" role="tablist">
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'citas'}
+            onClick={() => setActiveTab('citas')} 
+            className={`admin-tab-item ${activeTab === 'citas' ? 'active' : ''}`}
+          >
+            <span>Citas Activas</span>
+            <span className="admin-tab-count">{appointments.length}</span>
           </button>
-          <button onClick={() => setActiveTab('historial')} className={`af-tab ${activeTab === 'historial' ? 'active' : ''}`}>
-            Historial
-          </button>
-          <button onClick={() => setActiveTab('testimonios')} className={`af-tab ${activeTab === 'testimonios' ? 'active' : ''}`}>
-            Opiniones {pendingTestimonials.length > 0 && `(${pendingTestimonials.length} pendientes)`}
-          </button>
-          <button onClick={() => setActiveTab('horarios')} className={`af-tab ${activeTab === 'horarios' ? 'active' : ''}`}>
-            Horarios
-          </button>
-        </div>
 
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'historial'}
+            onClick={() => setActiveTab('historial')} 
+            className={`admin-tab-item ${activeTab === 'historial' ? 'active' : ''}`}
+          >
+            <span>Historial</span>
+          </button>
+
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'testimonios'}
+            onClick={() => setActiveTab('testimonios')} 
+            className={`admin-tab-item ${activeTab === 'testimonios' ? 'active' : ''}`}
+          >
+            <span>Opiniones</span>
+            {pendingTestimonials.length > 0 && (
+              <span className="admin-tab-count alert">{pendingTestimonials.length}</span>
+            )}
+          </button>
+
+          <button 
+            role="tab"
+            aria-selected={activeTab === 'horarios'}
+            onClick={() => setActiveTab('horarios')} 
+            className={`admin-tab-item ${activeTab === 'horarios' ? 'active' : ''}`}
+          >
+            <span>Horarios y Cierres</span>
+          </button>
+        </nav>
+
+        {/* ========================================================
+            TAB 1: CITAS ACTIVAS
+           ======================================================== */}
         {activeTab === 'citas' && (
-          <>
+          <div>
             {mostrarNuevaCita && (
               <NuevaCitaAdmin
                 onCerrar={() => setMostrarNuevaCita(false)}
@@ -616,103 +642,115 @@ const getVehicleLabel = (type: string) => {
               />
             )}
 
-            <div className="stats-row">
-              <div className="stat-pill">
-                <p className="stat-pill-num" style={{ color: '#e0142c' }}>{stats.total}</p>
-                <p className="stat-pill-label">Total</p>
+            {/* Métricas limpias (Clean Stats Cards) */}
+            <div className="clean-stats-grid">
+              <div className="clean-stat-card">
+                <span className="clean-stat-label">Citas Totales</span>
+                <span className="clean-stat-value">{stats.total}</span>
               </div>
-              <div className="stat-pill">
-                <p className="stat-pill-num" style={{ color: '#34d399' }}>{stats.hoy}</p>
-                <p className="stat-pill-label">Hoy</p>
+              <div className="clean-stat-card">
+                <span className="clean-stat-label">Agendadas Hoy</span>
+                <span className="clean-stat-value">{stats.hoy}</span>
               </div>
-              <div className="stat-pill">
-                <p className="stat-pill-num" style={{ color: '#a78bfa' }}>{stats.proximas}</p>
-                <p className="stat-pill-label">Próximas</p>
+              <div className="clean-stat-card">
+                <span className="clean-stat-label">Próximos Días</span>
+                <span className="clean-stat-value">{stats.proximas}</span>
               </div>
             </div>
 
-            <div className="admin-acciones-citas">
-              <button className="admin-btn-nueva" onClick={() => setMostrarNuevaCita(true)}>
-                + Agendar cita a un cliente
-              </button>
-              <button onClick={limpiarManual} className="btn-clean" style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                color: '#f87171',
-                padding: '0.6rem 1.2rem',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontWeight: '500',
-                transition: 'all 0.2s ease',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontFamily: 'inherit'
-              }}>
-                Cerrar citas atendidas
-              </button>
+            {/* Barra de Acciones y Búsqueda */}
+            <div className="admin-action-bar">
+              <div className="admin-action-buttons">
+                <button 
+                  className="btn-admin-primary" 
+                  onClick={() => setMostrarNuevaCita(true)}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  <span>Agendar cita</span>
+                </button>
+
+                <button 
+                  onClick={limpiarManual} 
+                  className="btn-admin-secondary"
+                  title="Marcar como completadas citas pasadas"
+                >
+                  <span>Cerrar citas atendidas</span>
+                </button>
+              </div>
+
+              <div className="admin-search-wrapper">
+                <svg className="admin-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Buscar cliente, teléfono o vehículo..." 
+                  value={search} 
+                  onChange={(e) => setSearch(e.target.value)} 
+                  className="admin-search-input"
+                />
+              </div>
             </div>
 
-            <div className="search-bare">
-              <span className="search-bare-icon">🔍</span>
-              <input type="text" placeholder="nombre, teléfono, correo o vehículo..." value={search} onChange={(e) => setSearch(e.target.value)} />
-            </div>
-
-            <div className="block md:hidden space-y-4">
+            {/* Vista Móvil: Tarjetas sobrias */}
+            <div className="block md:hidden space-y-3">
               {filteredAppointments.length === 0 ? (
-                <div className="admin-card" style={{ padding: '2rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</div>
+                <div className="admin-empty-box">No hay citas registradas</div>
               ) : (
                 filteredAppointments.map((apt) => (
-                  <div key={apt.id} className="cita-card">
-                    <div className="cita-header">
-                      <div className="cita-cliente">
-                        <span className={`estado-cita ${estadoCita(apt).clave}`}>
+                  <div key={apt.id} className="clean-card-mobile">
+                    <div className="clean-card-top">
+                      <div>
+                        <span className={`clean-badge ${estadoCita(apt).clave}`}>
                           {estadoCita(apt).texto}
                         </span>
-                        <p className="cita-nombre">{apt.customer_name}</p>
-                        <p className="cita-telefono">{apt.customer_phone}</p>
-                        <p className="cita-email">{apt.email}</p>
+                        <h4 className="clean-customer-name">{apt.customer_name}</h4>
+                        <p className="clean-customer-phone">{apt.customer_phone}</p>
                       </div>
-                      <div className="cita-acciones">
-                        <button onClick={() => deleteAppointment(apt.id)} className="cita-btn-borrar" title="Eliminar cita">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            <line x1="10" y1="11" x2="10" y2="17" />
-                            <line x1="14" y1="11" x2="14" y2="17" />
-                          </svg>
-                        </button>
-                        <a href={getWhatsappLink(apt)} target="_blank" className="cita-btn-wa" title="Enviar WhatsApp">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <div className="clean-actions-mobile">
+                        <a 
+                          href={getWhatsappLink(apt)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="clean-btn-icon wa" 
+                          title="WhatsApp"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
                           </svg>
                         </a>
+                        <button 
+                          onClick={() => deleteAppointment(apt.id)} 
+                          className="clean-btn-icon del" 
+                          title="Eliminar"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
-                    <div className="cita-datos">
-                      <div className="cita-fila">
-                        <span className="cita-etiqueta">Vehículo</span>
-                        <span className="cita-valor">{getVehicleLabel(apt.vehicle_type)}</span>
+                    <div className="clean-card-body">
+                      <div className="clean-meta-item">
+                        <span className="clean-meta-lbl">Servicio</span>
+                        <span className="clean-meta-val">{getServiceLabel(apt.service_type)}</span>
                       </div>
-                      <div className="cita-fila">
-                        <span className="cita-etiqueta">Modelo</span>
-                        <span className="cita-valor">{apt.vehicle_model || '—'}</span>
+                      <div className="clean-meta-item">
+                        <span className="clean-meta-lbl">Vehículo</span>
+                        <span className="clean-meta-val">{getVehicleLabel(apt.vehicle_type)} · {apt.vehicle_model || '—'}</span>
                       </div>
-                      <div className="cita-fila">
-                        <span className="cita-etiqueta">Servicio</span>
-                        <span className="cita-valor">{getServiceLabel(apt.service_type)}</span>
-                      </div>
-                      <div className="cita-fila">
-                        <span className="cita-etiqueta">Fecha y hora</span>
-                        <span className="cita-valor cita-valor-fecha">
-                          {formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}
-                        </span>
+                      <div className="clean-meta-item">
+                        <span className="clean-meta-lbl">Horario</span>
+                        <span className="clean-meta-val time">{formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span>
                       </div>
                       {apt.notes && (
-                        <div className="cita-detalles">
-                          <span className="cita-etiqueta">Detalles</span>
-                          <span className="cita-valor">{apt.notes}</span>
+                        <div className="clean-meta-notes">
+                          <span>{apt.notes}</span>
                         </div>
                       )}
                     </div>
@@ -721,108 +759,148 @@ const getVehicleLabel = (type: string) => {
               )}
             </div>
 
-            <div className="hidden md:block admin-card" style={{ overflow: 'hidden' }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table className="admin-table">
-                  <thead>
+            {/* Vista Desktop: Tabla Limpia & Profesional */}
+            <div className="hidden md:block clean-table-container">
+              <table className="clean-table">
+                <thead>
+                  <tr>
+                    <th>Estado</th>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Vehículo</th>
+                    <th>Servicio</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Notas</th>
+                    <th style={{ textAlign: 'right' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAppointments.length === 0 ? (
                     <tr>
-                      <th>Estado</th><th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Vehículo</th><th>Modelo</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Detalles</th><th style={{ textAlign: 'center' }}>Acciones</th>
+                      <td colSpan={9} className="clean-table-empty">
+                        No hay citas registradas en este momento
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAppointments.length === 0 ? (
-                      <tr><td colSpan={11} style={{ textAlign: 'center', padding: '2.5rem', color: 'rgba(255,255,255,0.4)' }}>No hay citas registradas</td></tr>
-                    ) : (
-                      filteredAppointments.map((apt) => (
-                        <tr key={apt.id}>
-                          <td>
-                            <span className={`estado-cita ${estadoCita(apt).clave}`}>
-                              {estadoCita(apt).texto}
-                            </span>
-                          </td>
-                          <td style={{ fontWeight: '500' }}>{apt.customer_name}</td>
-                          <td>{apt.customer_phone}</td>
-                          <td style={{ fontSize: '0.8rem', color: '#a6a6a6' }}>{apt.email}</td>
-                          <td>{getVehicleLabel(apt.vehicle_type)}</td>
-                          <td>{apt.vehicle_model || '—'}</td>
-                          <td>{getServiceLabel(apt.service_type)}</td>
-                          <td><span className="badge-blue">{formatDateDisplay(apt.appointment_date)}</span></td>
-                          <td><span className="badge-green">{convertTo12Hour(apt.appointment_time)}</span></td>
-                          <td style={{ maxWidth: '200px', fontSize: '0.8rem', color: '#fff' }}>
-                            {apt.notes ? <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.2rem 0.5rem', borderRadius: '12px', display: 'inline-block' }}>{apt.notes.length > 30 ? apt.notes.substring(0, 30) + '...' : apt.notes}</span> : <span style={{ color: 'rgba(255,255,255,0.3)' }}>—</span>}
-                          </td>
-                          <td style={{ textAlign: 'center' }}>
-                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                              <button onClick={() => deleteAppointment(apt.id)} className="btn-danger">🗑️</button>
-                              <a href={getWhatsappLink(apt)} target="_blank" className="btn-success" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.4rem 0.8rem' }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
-                                </svg>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  ) : (
+                    filteredAppointments.map((apt) => (
+                      <tr key={apt.id}>
+                        <td>
+                          <span className={`clean-badge ${estadoCita(apt).clave}`}>
+                            {estadoCita(apt).texto}
+                          </span>
+                        </td>
+                        <td className="cell-client-name">
+                          {apt.customer_name}
+                        </td>
+                        <td className="cell-client-phone">
+                          {apt.customer_phone}
+                        </td>
+                        <td className="cell-vehicle">
+                          {getVehicleLabel(apt.vehicle_type)} {apt.vehicle_model ? `(${apt.vehicle_model})` : ''}
+                        </td>
+                        <td>
+                          <span className="clean-service-tag">{getServiceLabel(apt.service_type)}</span>
+                        </td>
+                        <td className="cell-date">
+                          {formatDateDisplay(apt.appointment_date)}
+                        </td>
+                        <td className="cell-time">
+                          {convertTo12Hour(apt.appointment_time)}
+                        </td>
+                        <td className="cell-notes" title={apt.notes || ''}>
+                          {apt.notes ? (apt.notes.length > 24 ? apt.notes.substring(0, 24) + '...' : apt.notes) : '—'}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <div className="clean-table-actions">
+                            <a 
+                              href={getWhatsappLink(apt)} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="btn-table-action wa" 
+                              title="Abrir WhatsApp"
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
+                              </svg>
+                            </a>
+                            <button 
+                              onClick={() => deleteAppointment(apt.id)} 
+                              className="btn-table-action del" 
+                              title="Eliminar cita"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-          </>
+          </div>
         )}
 
+        {/* ========================================================
+            TAB 2: HISTORIAL
+           ======================================================== */}
         {activeTab === 'historial' && (
-          <div className="admin-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontFamily: "'Sora',sans-serif", color: '#fff', marginBottom: '.4rem' }}>
-              Trabajo realizado
-            </h3>
-            <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1.25rem' }}>
-              Citas ya atendidas. Se conservan como registro del negocio.
-            </p>
+          <div className="clean-content-panel">
+            <div className="clean-panel-top">
+              <div>
+                <h3 className="clean-panel-title">Historial de Trabajos Atendidos</h3>
+                <p className="clean-panel-desc">Registro histórico de lavados completados en el sistema.</p>
+              </div>
 
-            <div className="admin-subtabs no-imprimir">
-              <button
-                className={`admin-subtab ${origenHistorial === 'web' ? 'active' : ''}`}
-                onClick={() => setOrigenHistorial('web')}
-              >
-                Página web
-              </button>
-              <button
-                className={`admin-subtab ${origenHistorial === 'local' ? 'active' : ''}`}
-                onClick={() => setOrigenHistorial('local')}
-              >
-                Local
-              </button>
+              <div className="clean-channel-tabs no-imprimir">
+                <button
+                  className={`clean-channel-btn ${origenHistorial === 'web' ? 'active' : ''}`}
+                  onClick={() => setOrigenHistorial('web')}
+                >
+                  Canal Web
+                </button>
+                <button
+                  className={`clean-channel-btn ${origenHistorial === 'local' ? 'active' : ''}`}
+                  onClick={() => setOrigenHistorial('local')}
+                >
+                  Local Físico
+                </button>
+              </div>
             </div>
 
             {cargandoHistorial ? (
-              <p style={{ color: 'rgba(255,255,255,.4)', textAlign: 'center', padding: '2rem 0' }}>Cargando...</p>
+              <div className="admin-empty-box">Cargando registros históricos...</div>
             ) : historialFiltrado.length === 0 ? (
-              <p style={{ color: 'rgba(255,255,255,.4)', textAlign: 'center', padding: '2rem 0' }}>
+              <div className="admin-empty-box">
                 {origenHistorial === 'web'
-                  ? 'Todavía no hay citas completadas agendadas desde la página'
-                  : 'Todavía no hay citas completadas hechas en el local'}
-              </p>
+                  ? 'No hay registros de citas web completadas aún.'
+                  : 'No hay registros de citas presenciales aún.'}
+              </div>
             ) : (
               <>
-                <div className="admin-acciones-historial no-imprimir">
-                  <button className="admin-btn-suave" onClick={imprimirHistorial}>Imprimir</button>
-                  <button className="admin-btn-suave" onClick={compartirHistorial}>Descargar PDF</button>
+                <div className="clean-historial-bar no-imprimir">
+                  <div className="clean-stat-summary">
+                    <span><strong>{historialFiltrado.length}</strong> lavados completados</span>
+                    <span className="dot-sep">•</span>
+                    <span>Servicio frecuente: <strong>{resumenServicio.nombre}</strong></span>
+                  </div>
+
+                  <div className="clean-export-actions">
+                    <button className="btn-clean-ghost" onClick={imprimirHistorial}>
+                      Imprimir
+                    </button>
+                    <button className="btn-clean-ghost" onClick={compartirHistorial}>
+                      Exportar PDF
+                    </button>
+                  </div>
                 </div>
 
-                <div className="admin-resumen">
-                  <div>
-                    <span className="admin-resumen-num">{historialFiltrado.length}</span>
-                    <span className="admin-resumen-lbl">lavados atendidos</span>
-                  </div>
-                  <div>
-                    <span className="admin-resumen-num">{resumenServicio.nombre}</span>
-                    <span className="admin-resumen-lbl">servicio más pedido</span>
-                  </div>
-                </div>
-
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="admin-table">
+                <div className="clean-table-container">
+                  <table className="clean-table">
                     <thead>
                       <tr>
                         <th>Fecha</th>
@@ -835,11 +913,11 @@ const getVehicleLabel = (type: string) => {
                     <tbody>
                       {historialFiltrado.map(c => (
                         <tr key={c.id}>
-                          <td>{formatDateDisplay(c.appointment_date)}</td>
-                          <td>{convertTo12Hour(c.appointment_time)}</td>
-                          <td>{c.customer_name}</td>
-                          <td>{getServiceLabel(c.service_type)}</td>
-                          <td>{c.vehicle_model}</td>
+                          <td className="cell-date">{formatDateDisplay(c.appointment_date)}</td>
+                          <td className="cell-time">{convertTo12Hour(c.appointment_time)}</td>
+                          <td className="cell-client-name">{c.customer_name}</td>
+                          <td><span className="clean-service-tag">{getServiceLabel(c.service_type)}</span></td>
+                          <td>{c.vehicle_model || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -850,36 +928,41 @@ const getVehicleLabel = (type: string) => {
           </div>
         )}
 
+        {/* ========================================================
+            TAB 3: TESTIMONIOS
+           ======================================================== */}
         {activeTab === 'testimonios' && (
           <div className="space-y-6">
-            <div className="admin-card testimonios-container">
-              <div className="testimonios-header pendiente">
-                <span className="testimonios-header-icon"></span>
-                <h2>Opiniones Pendientes ({pendingTestimonials.length})</h2>
+            <div className="clean-content-panel">
+              <div className="clean-panel-top">
+                <h3 className="clean-panel-title">Opiniones Pendientes ({pendingTestimonials.length})</h3>
               </div>
+
               {pendingTestimonials.length === 0 ? (
-                <div className="testimonios-empty"><p>No hay opiniones pendientes de aprobación</p></div>
+                <div className="admin-empty-box">No hay opiniones pendientes de revisión</div>
               ) : (
-                <div className="testimonios-grid">
+                <div className="clean-reviews-grid">
                   {pendingTestimonials.map((t) => (
-                    <div key={t.id} className="testimonial-card">
-                      <div className="testimonial-card-header">
-                        <div className="testimonial-avatar">{t.customer_name?.charAt(0) || 'U'}</div>
-                        <div className="testimonial-info">
-                          <div className="testimonial-name">{t.customer_name}</div>
-                          <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
+                    <div key={t.id} className="clean-review-item">
+                      <div className="clean-review-header">
+                        <div>
+                          <span className="clean-review-name">{t.customer_name}</span>
+                          <span className="clean-review-date">{formatDateLong(t.created_at)}</span>
                         </div>
-                        <div className="testimonial-stars">
-                          {[1, 2, 3, 4, 5].map((star) => (<span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>))}
+                        <div className="clean-stars">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span key={star} className={star <= t.rating ? 'filled' : 'empty'}>★</span>
+                          ))}
                         </div>
                       </div>
-                      <div className="testimonial-comment">"{t.comment}"</div>
-                      <div className="testimonial-card-footer">
-                        <div className="testimonial-date">{formatDateLong(t.created_at)}</div>
-                        <div className="testimonial-actions">
-                          <button onClick={() => approveTestimonial(t.id)} className="btn-approve">✓ Aprobar</button>
-                          <button onClick={() => deleteTestimonial(t.id)} className="btn-delete">✗ Eliminar</button>
-                        </div>
+                      <p className="clean-review-text">"{t.comment}"</p>
+                      <div className="clean-review-actions">
+                        <button onClick={() => approveTestimonial(t.id)} className="btn-clean-approve">
+                          Aprobar
+                        </button>
+                        <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -887,31 +970,33 @@ const getVehicleLabel = (type: string) => {
               )}
             </div>
 
-            <div className="admin-card testimonios-container">
-              <div className="testimonios-header aprobada">
-                <span className="testimonios-header-icon">✓</span>
-                <h2>Opiniones Aprobadas ({approvedTestimonials.length})</h2>
+            <div className="clean-content-panel">
+              <div className="clean-panel-top">
+                <h3 className="clean-panel-title">Opiniones Publicadas ({approvedTestimonials.length})</h3>
               </div>
+
               {approvedTestimonials.length === 0 ? (
-                <div className="testimonios-empty"><p>No hay opiniones aprobadas aún</p></div>
+                <div className="admin-empty-box">No hay opiniones publicadas todavía</div>
               ) : (
-                <div className="testimonios-grid">
+                <div className="clean-reviews-grid">
                   {approvedTestimonials.map((t) => (
-                    <div key={t.id} className="testimonial-card approved">
-                      <div className="testimonial-card-header">
-                        <div className="testimonial-avatar">{t.customer_name?.charAt(0) || 'U'}</div>
-                        <div className="testimonial-info">
-                          <div className="testimonial-name">{t.customer_name}</div>
-                          <div className="testimonial-email">{(t as any).email || 'correo@ejemplo.com'}</div>
+                    <div key={t.id} className="clean-review-item approved">
+                      <div className="clean-review-header">
+                        <div>
+                          <span className="clean-review-name">{t.customer_name}</span>
+                          <span className="clean-review-date">{formatDateLong(t.created_at)}</span>
                         </div>
-                        <div className="testimonial-stars">
-                          {[1, 2, 3, 4, 5].map((star) => (<span key={star} className={star <= t.rating ? 'star filled' : 'star empty'}>★</span>))}
+                        <div className="clean-stars">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span key={star} className={star <= t.rating ? 'filled' : 'empty'}>★</span>
+                          ))}
                         </div>
                       </div>
-                      <div className="testimonial-comment">"{t.comment}"</div>
-                      <div className="testimonial-card-footer">
-                        <div className="testimonial-date">{formatDateLong(t.created_at)}</div>
-                        <button onClick={() => deleteTestimonial(t.id)} className="btn-delete">✗ Eliminar</button>
+                      <p className="clean-review-text">"{t.comment}"</p>
+                      <div className="clean-review-actions">
+                        <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -921,39 +1006,64 @@ const getVehicleLabel = (type: string) => {
           </div>
         )}
 
+        {/* ========================================================
+            TAB 4: HORARIOS Y CIERRES
+           ======================================================== */}
         {activeTab === 'horarios' && (
-          <div className="admin-card">
-            <div className="af-card-header">
-              <h2>Configuración de Horarios</h2>
-              <p>Define los horarios de atención por día (formato 12 horas)</p>
-            </div>
-            <div className="af-body">
-              <div style={{ overflowX: 'auto' }}>
-                <table className="admin-table">
+          <div className="space-y-6">
+            <div className="clean-content-panel">
+              <div className="clean-panel-top">
+                <div>
+                  <h3 className="clean-panel-title">Horarios de Atención</h3>
+                  <p className="clean-panel-desc">Configuración semanal de apertura, cierre e intervalos de citas.</p>
+                </div>
+              </div>
+
+              <div className="clean-table-container">
+                <table className="clean-table">
                   <thead>
                     <tr>
                       <th>Día</th>
-                      <th>Hora Inicio</th>
-                      <th>Hora Fin</th>
-                      <th>Intervalo (min)</th>
+                      <th>Apertura</th>
+                      <th>Cierre</th>
+                      <th>Intervalo</th>
                     </tr>
                   </thead>
                   <tbody>
                     {horarios.map((horario) => (
                       <tr key={horario.id}>
-                        <td style={{ fontWeight: '500' }}>{horario.nombre_dia}</td>
+                        <td className="cell-client-name">{horario.nombre_dia}</td>
                         <td>
-                          <select value={horario.hora_inicio} onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} className="af-input" style={{ width: '120px', padding: '0.4rem' }} disabled={savingHorarios}>
-                            {generateTimeOptions().map(time => (<option key={time} value={time}>{time}</option>))}
+                          <select 
+                            value={horario.hora_inicio} 
+                            onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
+                            className="clean-select" 
+                            disabled={savingHorarios}
+                          >
+                            {generateTimeOptions().map(time => (
+                              <option key={time} value={time}>{time}</option>
+                            ))}
                           </select>
                         </td>
                         <td>
-                          <select value={horario.hora_fin} onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} className="af-input" style={{ width: '120px', padding: '0.4rem' }} disabled={savingHorarios}>
-                            {generateTimeOptions().map(time => (<option key={time} value={time}>{time}</option>))}
+                          <select 
+                            value={horario.hora_fin} 
+                            onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
+                            className="clean-select" 
+                            disabled={savingHorarios}
+                          >
+                            {generateTimeOptions().map(time => (
+                              <option key={time} value={time}>{time}</option>
+                            ))}
                           </select>
                         </td>
                         <td>
-                          <select value={horario.intervalo_minutos} onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} className="af-input" style={{ width: '100px', padding: '0.4rem' }} disabled={savingHorarios}>
+                          <select 
+                            value={horario.intervalo_minutos} 
+                            onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
+                            className="clean-select" 
+                            disabled={savingHorarios}
+                          >
                             <option value={30}>30 min</option>
                             <option value={60}>60 min</option>
                             <option value={90}>90 min</option>
@@ -965,25 +1075,23 @@ const getVehicleLabel = (type: string) => {
                   </tbody>
                 </table>
               </div>
-              <p className="af-hint" style={{ marginTop: '1rem', textAlign: 'center' }}>ℹ️ Los horarios se actualizan automáticamente. Los clientes verán los cambios inmediatamente.</p>
             </div>
-          </div>
-        )}
 
-        {activeTab === 'horarios' && (
-          <div className="admin-card" style={{ marginTop: '1.5rem' }}>
-            <div className="af-card-header">
-              <h2>Cerrar días específicos</h2>
-              <p>Seleccioná en el calendario los días que el negocio no abrirá</p>
-            </div>
-            <div className="af-body">
-              <div className="cierre-layout">
-                <div className="cierre-calendario">
+            <div className="clean-content-panel">
+              <div className="clean-panel-top">
+                <div>
+                  <h3 className="clean-panel-title">Cerrar Días Específicos</h3>
+                  <p className="clean-panel-desc">Marca en el calendario los días festivos o de mantenimiento.</p>
+                </div>
+              </div>
+
+              <div className="clean-closure-layout">
+                <div>
                   <Calendar
                     onClickDay={toggleFechaSeleccionada}
                     value={null}
                     minDate={new Date()}
-                    className="custom-calendar calendar-loaded"
+                    className="custom-calendar"
                     prev2Label={null}
                     next2Label={null}
                     prevLabel="‹"
@@ -1000,38 +1108,33 @@ const getVehicleLabel = (type: string) => {
                       return null
                     }}
                   />
-                  <p className="af-hint" style={{ textAlign: 'center', marginTop: '.75rem' }}>
-                    Tocá un día para marcarlo. Si lo volvés a tocar, se desmarca.
-                  </p>
 
                   {domingo && (
-                    <label className="domingo-toggle">
+                    <label className="clean-checkbox-row">
                       <input
                         type="checkbox"
                         checked={domingoActivo}
                         onChange={(e) => updateHorario(domingo.id, 'activo', e.target.checked)}
                         disabled={savingHorarios}
                       />
-                      <span className="domingo-toggle-texto">Abrir los domingos</span>
-                      <span className={`domingo-toggle-estado ${domingoActivo ? 'activo' : 'inactivo'}`}>
-                        {domingoActivo ? 'Activo' : 'Inactivo'}
+                      <span>Atención los días domingo</span>
+                      <span className={`clean-status-pill ${domingoActivo ? 'active' : 'inactive'}`}>
+                        {domingoActivo ? 'Abierto' : 'Cerrado'}
                       </span>
                     </label>
                   )}
                 </div>
 
-                <div className="cierre-panel">
-                  <div className="cierre-seccion">
-                    <span className="af-section-label">DÍAS MARCADOS PARA CERRAR</span>
+                <div className="clean-closure-side">
+                  <div className="clean-sub-panel">
+                    <span className="clean-sub-title">Días seleccionados para cierre</span>
                     {fechasSeleccionadas.length === 0 ? (
-                      <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '.85rem', padding: '.5rem 0' }}>
-                        Ningún día marcado todavía
-                      </p>
+                      <p className="clean-hint">Toca una fecha en el calendario para marcarla</p>
                     ) : (
-                      <div className="cierre-chips">
+                      <div className="clean-chips-wrap">
                         {fechasSeleccionadas.map(f => (
-                          <span key={f} className="cierre-chip">
-                            {formatDateLong(f)}
+                          <span key={f} className="clean-chip">
+                            <span>{formatDateLong(f)}</span>
                             <button
                               type="button"
                               onClick={() => setFechasSeleccionadas(prev => prev.filter(x => x !== f))}
@@ -1046,7 +1149,7 @@ const getVehicleLabel = (type: string) => {
 
                     <button
                       type="button"
-                      className="cierre-btn-confirmar"
+                      className="btn-admin-primary w-full"
                       onClick={revisarCierre}
                       disabled={fechasSeleccionadas.length === 0 || cerrandoDias}
                     >
@@ -1054,18 +1157,18 @@ const getVehicleLabel = (type: string) => {
                     </button>
                   </div>
 
-                  <div className="cierre-seccion">
-                    <span className="af-section-label">DÍAS YA CERRADOS</span>
+                  <div className="clean-sub-panel">
+                    <span className="clean-sub-title">Próximos días cerrados</span>
                     {diasCerrados.length === 0 ? (
-                      <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '.85rem', padding: '.5rem 0' }}>
-                        No hay días cerrados próximamente
-                      </p>
+                      <p className="clean-hint">No hay cierres programados</p>
                     ) : (
-                      <div className="cierre-lista">
+                      <div className="clean-closure-list">
                         {diasCerrados.map(d => (
-                          <div key={d.id} className="cierre-item">
+                          <div key={d.id} className="clean-closure-row">
                             <span>{formatDateLong(d.fecha)}</span>
-                            <button type="button" onClick={() => reabrirDia(d)}>Reabrir</button>
+                            <button type="button" onClick={() => reabrirDia(d)} className="btn-clean-ghost small">
+                              Reabrir
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -1078,60 +1181,48 @@ const getVehicleLabel = (type: string) => {
         )}
       </div>
 
-      {/* Aviso a los clientes de los dias que se cierran */}
+      {/* Modal Limpio de Avisos */}
       {mostrarAvisos && (
-        <div className="af-modal-overlay">
-          <div className="af-modal" style={{ maxWidth: 560 }}>
-            <h2 style={{ fontFamily: "'Sora',sans-serif", textAlign: 'center', fontSize: '1.25rem', marginBottom: '.4rem', color: '#fff' }}>
-              {cierreCompletado ? 'Reservaron a último momento' : 'Avisar a los clientes'}
-            </h2>
-            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.45)', fontSize: '.85rem', marginBottom: '1rem' }}>
+        <div className="clean-modal-backdrop">
+          <div className="clean-modal-card">
+            <h3 className="clean-modal-title">
+              {cierreCompletado ? 'Citas registradas a último momento' : 'Avisar a clientes por WhatsApp'}
+            </h3>
+            <p className="clean-modal-desc">
               {cierreCompletado
-                ? `Los días ya quedaron cerrados. ${citasAfectadas.length} cita(s) entraron mientras revisabas y también se cancelaron: avisales por WhatsApp.`
-                : `Hay ${citasAfectadas.length} cita(s) en esos días. Abrí los chats, presioná enviar en cada uno y luego confirmá el cierre.`}
+                ? `Los días ya quedaron cerrados. ${citasAfectadas.length} cita(s) entraron antes de guardar: favor avisarles.`
+                : `Hay ${citasAfectadas.length} cita(s) agendadas en esas fechas. Puedes enviar un mensaje a cada cliente antes de cancelar.`}
             </p>
 
-            <button type="button" className="aviso-abrir-todos" onClick={abrirTodosLosChats}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.695.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
-              </svg>
-              Abrir todos los chats ({citasAfectadas.length})
+            <button type="button" className="btn-clean-wa-all" onClick={abrirTodosLosChats}>
+              Abrir WhatsApp para todos ({citasAfectadas.length})
             </button>
 
-            <div className="aviso-contador">
-              {avisados.filter(id => citasAfectadas.some(c => c.id === id)).length} de {citasAfectadas.length} avisados
-            </div>
-
-            <div className="aviso-lista">
+            <div className="clean-modal-list">
               {citasAfectadas.map(apt => (
-                <div key={apt.id} className={`aviso-item ${avisados.includes(apt.id) ? 'avisado' : ''}`}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: '.9rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '.4rem' }}>
-                      {apt.customer_name}
-                      {avisados.includes(apt.id) && <span className="aviso-check">✓ avisado</span>}
+                <div key={apt.id} className={`clean-modal-item ${avisados.includes(apt.id) ? 'done' : ''}`}>
+                  <div>
+                    <div className="item-name">
+                      {apt.customer_name} {avisados.includes(apt.id) && <span className="item-done-tag">Avisado</span>}
                     </div>
-                    <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.5)' }}>
+                    <div className="item-sub">
                       {formatDateLong(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}
                     </div>
-                    <div style={{ fontSize: '.75rem', color: 'rgba(255,255,255,.35)' }}>{apt.customer_phone}</div>
                   </div>
                   <a
                     href={getWhatsappCancelacion(apt)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="aviso-wa-btn"
-                    title="Avisar por WhatsApp"
+                    className="btn-modal-wa"
                     onClick={() => setAvisados(prev => [...new Set([...prev, apt.id])])}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.695.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
-                    </svg>
+                    WhatsApp
                   </a>
                 </div>
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '.75rem', marginTop: '1.5rem' }}>
+            <div className="clean-modal-actions">
               <button
                 onClick={() => {
                   setMostrarAvisos(false)
@@ -1139,7 +1230,7 @@ const getVehicleLabel = (type: string) => {
                   setAvisados([])
                   setCierreCompletado(false)
                 }}
-                className="cierre-btn-cancelar"
+                className="btn-clean-ghost"
                 disabled={cerrandoDias}
               >
                 {cierreCompletado ? 'Listo' : 'Cancelar'}
@@ -1147,11 +1238,10 @@ const getVehicleLabel = (type: string) => {
               {!cierreCompletado && (
                 <button
                   onClick={confirmarCierre}
-                  className="cierre-btn-confirmar"
-                  style={{ marginTop: 0 }}
+                  className="btn-admin-primary"
                   disabled={cerrandoDias}
                 >
-                  {cerrandoDias ? 'Cerrando...' : 'Confirmar cierre'}
+                  {cerrandoDias ? 'Cerrando...' : 'Confirmar Cierre'}
                 </button>
               )}
             </div>
