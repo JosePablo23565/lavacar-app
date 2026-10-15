@@ -709,14 +709,15 @@ export function AdminDashboard() {
                 <div className="admin-empty-box">No hay citas registradas</div>
               ) : (
                 filteredAppointments.map((apt) => (
-                  <div key={apt.id} className="clean-card-mobile">
-                    <div className="clean-card-top">
-                      <div>
+                  <div key={apt.id} className="clean-card-mobile compact-apt-card">
+                    <div className="compact-apt-header">
+                      <div className="compact-apt-header-left">
                         <span className={`clean-badge ${estadoCita(apt).clave}`}>
                           {estadoCita(apt).texto}
                         </span>
-                        <h4 className="clean-customer-name">{apt.customer_name}</h4>
-                        <p className="clean-customer-phone">{apt.customer_phone}</p>
+                        <span className="compact-apt-time">
+                          {formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}
+                        </span>
                       </div>
                       <div className="clean-actions-mobile">
                         <a 
@@ -726,7 +727,7 @@ export function AdminDashboard() {
                           className="clean-btn-icon wa" 
                           title="WhatsApp"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.5 3.45 1.44 4.94L2 22l5.25-1.42c1.45.85 3.1 1.31 4.79 1.31 5.46 0 9.91-4.45 9.91-9.91 0-2.66-1.04-5.16-2.92-7.04A9.91 9.91 0 0 0 12.04 2zm.04 18.22c-1.49 0-2.97-.4-4.26-1.16l-.31-.18-3.11.84.85-3.03-.2-.33a8.02 8.02 0 0 1-1.22-4.27c0-4.47 3.64-8.1 8.11-8.1 2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.38 5.72c-.01 4.47-3.64 8.11-8.11 8.11zm4.44-6.07c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.19-.47-.39-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.57.18 1.09.15 1.5.09.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/>
                           </svg>
                         </a>
@@ -735,32 +736,37 @@ export function AdminDashboard() {
                           className="clean-btn-icon del" 
                           title="Eliminar"
                         >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="3 6 5 6 21 6" />
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                           </svg>
                         </button>
                       </div>
                     </div>
-                    <div className="clean-card-body">
-                      <div className="clean-meta-item">
-                        <span className="clean-meta-lbl">Servicio</span>
-                        <span className="clean-meta-val">{getServiceLabel(apt.service_type)}</span>
-                      </div>
-                      <div className="clean-meta-item">
-                        <span className="clean-meta-lbl">Vehículo</span>
-                        <span className="clean-meta-val">{getVehicleLabel(apt.vehicle_type)} · {apt.vehicle_model || '—'}</span>
-                      </div>
-                      <div className="clean-meta-item">
-                        <span className="clean-meta-lbl">Horario</span>
-                        <span className="clean-meta-val time">{formatDateDisplay(apt.appointment_date)} · {convertTo12Hour(apt.appointment_time)}</span>
-                      </div>
-                      {apt.notes && (
-                        <div className="clean-meta-notes">
-                          <span>{apt.notes}</span>
-                        </div>
-                      )}
+
+                    <div className="compact-apt-client-row">
+                      <h4 className="compact-apt-name">{apt.customer_name}</h4>
+                      <p className="compact-apt-contact">
+                        <span>{apt.customer_phone}</span>
+                        {apt.email && <span className="compact-apt-email"> · {apt.email}</span>}
+                      </p>
                     </div>
+
+                    <div className="compact-apt-chips">
+                      <span className="compact-chip service-chip">
+                        <span className="chip-lbl">Servicio:</span> {getServiceLabel(apt.service_type)}
+                      </span>
+                      <span className="compact-chip vehicle-chip">
+                        <span className="chip-lbl">Vehículo:</span> {getVehicleLabel(apt.vehicle_type)}{apt.vehicle_model ? ` · ${apt.vehicle_model}` : ''}
+                      </span>
+                    </div>
+
+                    {apt.notes && (
+                      <div className="compact-apt-notes">
+                        <span className="notes-icon">📝</span>
+                        <span className="notes-text">{apt.notes}</span>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
@@ -959,9 +965,9 @@ export function AdminDashboard() {
                   {pendingTestimonials.map((t) => (
                     <div key={t.id} className="clean-review-item">
                       <div className="clean-review-header">
-                        <div>
+                        <div className="clean-review-user">
                           <span className="clean-review-name">{t.customer_name}</span>
-                          <span className="clean-review-date">{formatDateLong(t.created_at)}</span>
+                          <span className="clean-review-date">• {formatDateDisplay(t.created_at.slice(0, 10))}</span>
                         </div>
                         <div className="clean-stars">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -969,14 +975,16 @@ export function AdminDashboard() {
                           ))}
                         </div>
                       </div>
-                      <p className="clean-review-text">"{t.comment}"</p>
-                      <div className="clean-review-actions">
-                        <button onClick={() => approveTestimonial(t.id)} className="btn-clean-approve">
-                          Aprobar
-                        </button>
-                        <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
-                          Eliminar
-                        </button>
+                      <div className="clean-review-content-row">
+                        <p className="clean-review-text">"{t.comment}"</p>
+                        <div className="clean-review-actions">
+                          <button onClick={() => approveTestimonial(t.id)} className="btn-clean-approve">
+                            Aprobar
+                          </button>
+                          <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
+                            Eliminar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -996,9 +1004,9 @@ export function AdminDashboard() {
                   {approvedTestimonials.map((t) => (
                     <div key={t.id} className="clean-review-item approved">
                       <div className="clean-review-header">
-                        <div>
+                        <div className="clean-review-user">
                           <span className="clean-review-name">{t.customer_name}</span>
-                          <span className="clean-review-date">{formatDateLong(t.created_at)}</span>
+                          <span className="clean-review-date">• {formatDateDisplay(t.created_at.slice(0, 10))}</span>
                         </div>
                         <div className="clean-stars">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -1006,11 +1014,13 @@ export function AdminDashboard() {
                           ))}
                         </div>
                       </div>
-                      <p className="clean-review-text">"{t.comment}"</p>
-                      <div className="clean-review-actions">
-                        <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
-                          Eliminar
-                        </button>
+                      <div className="clean-review-content-row">
+                        <p className="clean-review-text">"{t.comment}"</p>
+                        <div className="clean-review-actions">
+                          <button onClick={() => deleteTestimonial(t.id)} className="btn-clean-delete">
+                            Eliminar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1042,19 +1052,7 @@ export function AdminDashboard() {
                       className={`clean-schedule-card ${esDomingoDeshabilitado ? 'schedule-card-disabled' : ''}`}
                     >
                       <div className="clean-schedule-card-header">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                          <span className="clean-schedule-day-name">{horario.nombre_dia}</span>
-                          {horario.dia_semana === 0 && (
-                            <span 
-                              className={`clean-status-pill ${domingoActivo ? 'active' : 'inactive'}`} 
-                              style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', cursor: 'pointer' }}
-                              onClick={() => domingo && updateHorario(domingo.id, 'activo', !domingoActivo)}
-                              title="Toca para abrir o cerrar domingos"
-                            >
-                              {domingoActivo ? 'Abierto' : 'Deshabilitado'}
-                            </span>
-                          )}
-                        </div>
+                        <span className="clean-schedule-day-name">{horario.nombre_dia}</span>
                         <div className="clean-schedule-interval">
                           <span>Intervalo:</span>
                           <select 
@@ -1098,11 +1096,6 @@ export function AdminDashboard() {
                           </select>
                         </div>
                       </div>
-                      {esDomingoDeshabilitado && (
-                        <div style={{ fontSize: '0.72rem', color: '#888888', marginTop: '0.2rem' }}>
-                          Domingo cerrado. Habilítalo para modificar sus horarios.
-                        </div>
-                      )}
                     </div>
                   )
                 })}
@@ -1125,19 +1118,7 @@ export function AdminDashboard() {
                       return (
                         <tr key={horario.id} className={esDomingoDeshabilitado ? 'schedule-row-disabled' : ''}>
                           <td className="cell-client-name">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                              <span>{horario.nombre_dia}</span>
-                              {horario.dia_semana === 0 && (
-                                <span 
-                                  className={`clean-status-pill ${domingoActivo ? 'active' : 'inactive'}`} 
-                                  style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', cursor: 'pointer' }}
-                                  onClick={() => domingo && updateHorario(domingo.id, 'activo', !domingoActivo)}
-                                  title="Toca para abrir o cerrar domingos"
-                                >
-                                  {domingoActivo ? 'Abierto' : 'Deshabilitado'}
-                                </span>
-                              )}
-                            </div>
+                            <span>{horario.nombre_dia}</span>
                           </td>
                           <td>
                             <select 

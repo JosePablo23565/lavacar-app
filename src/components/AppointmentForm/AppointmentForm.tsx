@@ -823,14 +823,14 @@ export function AppointmentForm() {
                       placeholder="Ej: No lo voy a llevar yo, lo va a llevar mi hermano (NOMBRE)"
                       value={formData.notes}
                       onChange={(e) => {
-                        if (e.target.value.length <= 100) {
+                        if (e.target.value.length <= 50) {
                           setFormData({ ...formData, notes: e.target.value })
                         }
                       }}
-                      maxLength={100}
+                      maxLength={50}
                     />
                     <div className="af-hint" style={{ textAlign: 'right', marginTop: '0.25rem' }}>
-                      {formData.notes.length}/100 caracteres
+                      {formData.notes.length}/50 caracteres
                     </div>
                   </div>
 

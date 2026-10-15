@@ -366,10 +366,10 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
                       className="nca-input"
                       value={datos.notes}
                       onChange={(e) => {
-                        if (e.target.value.length <= 100) setDatos({ ...datos, notes: e.target.value })
+                        if (e.target.value.length <= 50) setDatos({ ...datos, notes: e.target.value })
                       }}
                       placeholder="Observaciones de la cita o del vehículo..."
-                      maxLength={100}
+                      maxLength={50}
                     />
                   </div>
                 </div>
