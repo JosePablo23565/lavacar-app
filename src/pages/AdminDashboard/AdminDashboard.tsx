@@ -626,7 +626,7 @@ export function AdminDashboard() {
             onClick={() => setActiveTab('horarios')} 
             className={`admin-tab-item ${activeTab === 'horarios' ? 'active' : ''}`}
           >
-            <span>Horarios y Cierres</span>
+            <span>Horarios</span>
           </button>
         </nav>
 

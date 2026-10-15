@@ -25,9 +25,9 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
   const [datos, setDatos] = useState({
     customer_name: '',
     customer_phone: '',
-    vehicle_type: 'carro',
+    vehicle_type: '',
     vehicle_model: '',
-    service_type: SERVICIOS[0]?.value || '',
+    service_type: '',
     appointment_time: '',
     notes: '',
   })
@@ -194,9 +194,9 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
     setDatos({
       customer_name: '',
       customer_phone: '',
-      vehicle_type: 'carro',
+      vehicle_type: '',
       vehicle_model: '',
-      service_type: SERVICIOS[0]?.value || '',
+      service_type: '',
       appointment_time: '',
       notes: '',
     })
@@ -257,7 +257,6 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
                           }
                         }}
                         placeholder="Ej: Carlos Murillo"
-                        autoFocus
                       />
                     </div>
 
@@ -274,7 +273,6 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
                         placeholder="8 dígitos"
                         maxLength={8}
                       />
-                      <span className="nca-hint">Para avisos por WhatsApp</span>
                     </div>
                   </div>
                 </div>
@@ -286,7 +284,7 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
                       value={datos.vehicle_type}
                       onChange={(v) => setDatos(prev => ({ ...prev, vehicle_type: v }))}
                       options={TIPOS_VEHICULO}
-                      placeholder="Seleccione el tipo de vehículo"
+                      placeholder="Elegir tipo de vehículo"
                     />
                   </div>
 
@@ -314,7 +312,7 @@ export function NuevaCitaAdmin({ onCreada, onCerrar }: Props) {
                       value={datos.service_type}
                       onChange={(v) => setDatos(prev => ({ ...prev, service_type: v }))}
                       options={SERVICIOS.map(s => ({ value: s.value, label: `${s.label} — ${s.price}` }))}
-                      placeholder="Seleccione un servicio"
+                      placeholder="Elegir tipo de lavado"
                     />
 
                     {servicio && (
