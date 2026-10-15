@@ -663,6 +663,8 @@ export function Opiniones() {
           line-height: 1.55;
           font-style: italic;
           margin-bottom: 0.9rem;
+          word-break: break-word;
+          overflow-wrap: anywhere;
         }
 
         .op-item-acciones {

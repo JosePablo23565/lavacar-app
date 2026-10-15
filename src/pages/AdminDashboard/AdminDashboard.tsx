@@ -919,7 +919,33 @@ export function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="clean-table-container">
+                {/* Vista Mobile: Tarjetas de Historial (sin desplazamiento horizontal) */}
+                <div className="md:hidden clean-historial-cards">
+                  {historialFiltrado.map(c => (
+                    <div key={c.id} className="clean-historial-card">
+                      <div className="clean-historial-card-top">
+                        <span className="clean-historial-date-badge">
+                          {formatDateDisplay(c.appointment_date)} · {convertTo12Hour(c.appointment_time)}
+                        </span>
+                        <span className="clean-historial-channel-badge">
+                          {(c.origen || 'web') === 'local' ? 'Física' : 'Web'}
+                        </span>
+                      </div>
+                      <div className="clean-historial-client-name">{c.customer_name}</div>
+                      <div className="clean-historial-chips">
+                        <span className="clean-historial-chip">
+                          <span className="chip-lbl">Servicio:</span> {getServiceLabel(c.service_type)}
+                        </span>
+                        <span className="clean-historial-chip">
+                          <span className="chip-lbl">Vehículo:</span> {c.vehicle_model || getVehicleLabel(c.vehicle_type)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Vista Desktop: Tabla Tradicional */}
+                <div className="hidden md:block clean-table-container">
                   <table className="clean-table">
                     <thead>
                       <tr>
@@ -967,7 +993,7 @@ export function AdminDashboard() {
                       <div className="clean-review-header">
                         <div className="clean-review-user">
                           <span className="clean-review-name">{t.customer_name}</span>
-                          <span className="clean-review-date">• {formatDateDisplay(t.created_at.slice(0, 10))}</span>
+                          <span className="clean-review-date">{formatDateDisplay(t.created_at.slice(0, 10))}</span>
                         </div>
                         <div className="clean-stars">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -1006,7 +1032,7 @@ export function AdminDashboard() {
                       <div className="clean-review-header">
                         <div className="clean-review-user">
                           <span className="clean-review-name">{t.customer_name}</span>
-                          <span className="clean-review-date">• {formatDateDisplay(t.created_at.slice(0, 10))}</span>
+                          <span className="clean-review-date">{formatDateDisplay(t.created_at.slice(0, 10))}</span>
                         </div>
                         <div className="clean-stars">
                           {[1, 2, 3, 4, 5].map((star) => (

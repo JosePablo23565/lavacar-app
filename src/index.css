@@ -6,12 +6,20 @@
 * {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  overflow-wrap: break-word;
+}
+
+p, span, h1, h2, h3, h4, h5, h6, td, th, div, label, a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 input, 
 textarea {
   user-select: text;
   cursor: text;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 body, h1, h2, h3, h4, p, div, section, article, nav, footer, header, span {

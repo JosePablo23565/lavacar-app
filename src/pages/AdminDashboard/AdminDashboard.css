@@ -703,6 +703,79 @@
   font-size: 0.74rem;
 }
 
+/* ============================================================
+   TARJETAS MÓVILES PARA HISTORIAL (SIN SCROLL HORIZONTAL)
+   ============================================================ */
+.clean-historial-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.clean-historial-card {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.clean-historial-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clean-historial-date-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.clean-historial-channel-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d4d4d4;
+  text-transform: uppercase;
+}
+
+.clean-historial-client-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.clean-historial-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.clean-historial-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.18rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.clean-historial-chip .chip-lbl {
+  color: #777777;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .admin-empty-box {
   text-align: center;
   padding: 3rem 1rem;
@@ -740,9 +813,8 @@
 
 .clean-review-user {
   display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .clean-review-name {
