@@ -146,35 +146,41 @@
 .clean-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .clean-stat-card {
-  background: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 10px;
-  padding: 1.25rem 1.4rem;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem 1.1rem;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: border-color 0.15s ease;
+}
+
+.clean-stat-card:hover {
+  border-color: rgba(224, 20, 44, 0.3);
 }
 
 .clean-stat-label {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   color: #888888;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0;
 }
 
 .clean-stat-value {
   font-family: 'Sora', sans-serif;
-  font-size: 1.85rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 /* ============================================================
@@ -1029,13 +1035,77 @@
 }
 
 /* ============================================================
+   TARJETAS MÓVILES PARA HORARIOS (SIN SCROLL HORIZONTAL)
+   ============================================================ */
+.clean-schedule-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.clean-schedule-card {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.clean-schedule-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.5rem;
+}
+
+.clean-schedule-day-name {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.clean-schedule-interval {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  color: #888888;
+}
+
+.clean-select-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  height: auto;
+}
+
+.clean-schedule-times-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.clean-schedule-time-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.clean-schedule-time-lbl {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #888888;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
    RESPONSIVE DESIGN
    ============================================================ */
 @media (max-width: 900px) {
-  .clean-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
   .clean-closure-layout {
     grid-template-columns: 1fr;
   }
@@ -1046,6 +1116,31 @@
 }
 
 @media (max-width: 600px) {
+  .clean-stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .clean-stat-card {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.55rem 0.25rem;
+    gap: 0.2rem;
+  }
+
+  .clean-stat-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.02em;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .clean-stat-value {
+    font-size: 1.15rem;
+  }
   .admin-tabs {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

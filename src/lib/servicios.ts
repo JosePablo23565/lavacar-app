@@ -18,7 +18,7 @@ export const SERVICIOS: Servicio[] = [
     label: 'Lavado Básico',
     price: '₡7,000',
     duration: 30,
-    tag: '📝 Solo para mantenimiento y suciedad leve',
+    tag: 'Solo para mantenimiento y suciedad leve',
     desc: 'Lavado exterior y aspirado rápido.',
     caracteristicas: [
       'Lavado exterior',
@@ -31,7 +31,7 @@ export const SERVICIOS: Servicio[] = [
     label: 'Lavado Premium',
     price: '₡10,000',
     duration: 45,
-    tag: '⭐ El más recomendado',
+    tag: 'El más recomendado',
     desc: 'Lavado exterior detallado, aspirado completo, limpieza de llantas y limpieza básica de interiores.',
     caracteristicas: [
       'Lavado exterior detallado',
@@ -46,7 +46,7 @@ export const SERVICIOS: Servicio[] = [
     label: 'Lavado Exclusivo / Intensivo',
     price: '₡15,000',
     duration: 60,
-    tag: '💪 Para vehículos muy sucios',
+    tag: 'Para vehículos muy sucios',
     desc: 'Lavado profundo exterior, limpieza detallada de llantas y rin, aspirado profundo y limpieza detallada de interiores.',
     caracteristicas: [
       'Lavado profundo exterior',
@@ -61,7 +61,7 @@ export const SERVICIOS: Servicio[] = [
     label: 'Lavado Cerámico',
     price: '₡25,000',
     duration: 90,
-    tag: '✨ Brillo, protección y durabilidad',
+    tag: 'Brillo, protección y durabilidad',
     desc: 'Lavado detallado completo, aplicación cerámica, protección de pintura y efecto repelente al agua y suciedad.',
     caracteristicas: [
       'Lavado detallado completo',

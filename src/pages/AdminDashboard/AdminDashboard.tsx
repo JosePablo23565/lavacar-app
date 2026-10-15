@@ -577,7 +577,6 @@ export function AdminDashboard() {
         <header className="admin-header">
           <div>
             <h1 className="admin-title">Panel Administrativo</h1>
-            <p className="admin-subtitle">Gestión de citas, horarios y opiniones de Camaro Fraterno</p>
           </div>
         </header>
 
@@ -595,8 +594,7 @@ export function AdminDashboard() {
             onClick={() => setActiveTab('citas')} 
             className={`admin-tab-item ${activeTab === 'citas' ? 'active' : ''}`}
           >
-            <span>Citas Activas</span>
-            <span className="admin-tab-count">{appointments.length}</span>
+            <span>Citas</span>
           </button>
 
           <button 
@@ -853,7 +851,6 @@ export function AdminDashboard() {
             <div className="clean-panel-top">
               <div>
                 <h3 className="clean-panel-title">Historial de Trabajos Atendidos</h3>
-                <p className="clean-panel-desc">Registro histórico de lavados completados en el sistema.</p>
               </div>
 
               <div className="clean-channel-tabs no-imprimir">
@@ -1015,11 +1012,64 @@ export function AdminDashboard() {
               <div className="clean-panel-top">
                 <div>
                   <h3 className="clean-panel-title">Horarios de Atención</h3>
-                  <p className="clean-panel-desc">Configuración semanal de apertura, cierre e intervalos de citas.</p>
                 </div>
               </div>
 
-              <div className="clean-table-container">
+              {/* Vista Mobile: Tarjetas por Día (sin desplazamiento horizontal) */}
+              <div className="md:hidden clean-schedule-cards">
+                {horarios.map((horario) => (
+                  <div key={horario.id} className="clean-schedule-card">
+                    <div className="clean-schedule-card-header">
+                      <span className="clean-schedule-day-name">{horario.nombre_dia}</span>
+                      <div className="clean-schedule-interval">
+                        <span>Intervalo:</span>
+                        <select 
+                          value={horario.intervalo_minutos} 
+                          onChange={(e) => updateHorario(horario.id, 'intervalo_minutos', parseInt(e.target.value))} 
+                          className="clean-select clean-select-sm" 
+                          disabled={savingHorarios}
+                        >
+                          <option value={30}>30 min</option>
+                          <option value={60}>60 min</option>
+                          <option value={90}>90 min</option>
+                          <option value={120}>120 min</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="clean-schedule-times-grid">
+                      <div className="clean-schedule-time-field">
+                        <span className="clean-schedule-time-lbl">Apertura</span>
+                        <select 
+                          value={horario.hora_inicio} 
+                          onChange={(e) => updateHorario(horario.id, 'hora_inicio', e.target.value)} 
+                          className="clean-select" 
+                          disabled={savingHorarios}
+                        >
+                          {generateTimeOptions().map(time => (
+                            <option key={time} value={time}>{time}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="clean-schedule-time-field">
+                        <span className="clean-schedule-time-lbl">Cierre</span>
+                        <select 
+                          value={horario.hora_fin} 
+                          onChange={(e) => updateHorario(horario.id, 'hora_fin', e.target.value)} 
+                          className="clean-select" 
+                          disabled={savingHorarios}
+                        >
+                          {generateTimeOptions().map(time => (
+                            <option key={time} value={time}>{time}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Vista Desktop: Tabla Tradicional */}
+              <div className="hidden md:block clean-table-container">
                 <table className="clean-table">
                   <thead>
                     <tr>
@@ -1081,7 +1131,6 @@ export function AdminDashboard() {
               <div className="clean-panel-top">
                 <div>
                   <h3 className="clean-panel-title">Cerrar Días Específicos</h3>
-                  <p className="clean-panel-desc">Marca en el calendario los días festivos o de mantenimiento.</p>
                 </div>
               </div>
 
