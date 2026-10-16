@@ -1266,6 +1266,34 @@
 }
 
 /* ============================================================
+   REGLAS RESPONSIVAS ESTRICTAS: MOBILE vs DESKTOP
+   ============================================================ */
+@media (min-width: 769px) {
+  .clean-historial-cards,
+  .clean-schedule-cards,
+  .clean-card-mobile,
+  .mobile-only-view {
+    display: none !important;
+  }
+  .clean-table-container,
+  .desktop-only-view {
+    display: block !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .clean-table-container,
+  .desktop-only-view {
+    display: none !important;
+  }
+  .clean-historial-cards,
+  .clean-schedule-cards,
+  .mobile-only-view {
+    display: flex !important;
+  }
+}
+
+/* ============================================================
    RESPONSIVE DESIGN
    ============================================================ */
 @media (max-width: 900px) {

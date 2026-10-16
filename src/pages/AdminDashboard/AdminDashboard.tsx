@@ -704,7 +704,7 @@ export function AdminDashboard() {
             </div>
 
             {/* Vista Móvil: Tarjetas sobrias */}
-            <div className="block md:hidden space-y-3">
+            <div className="mobile-only-view space-y-3">
               {filteredAppointments.length === 0 ? (
                 <div className="admin-empty-box">No hay citas registradas</div>
               ) : (
@@ -773,7 +773,7 @@ export function AdminDashboard() {
             </div>
 
             {/* Vista Desktop: Tabla Limpia & Profesional */}
-            <div className="hidden md:block clean-table-container">
+            <div className="desktop-only-view clean-table-container">
               <table className="clean-table">
                 <thead>
                   <tr>
@@ -920,7 +920,7 @@ export function AdminDashboard() {
                 </div>
 
                 {/* Vista Mobile: Tarjetas de Historial (sin desplazamiento horizontal) */}
-                <div className="md:hidden clean-historial-cards">
+                <div className="mobile-only-view clean-historial-cards">
                   {historialFiltrado.map(c => (
                     <div key={c.id} className="clean-historial-card">
                       <div className="clean-historial-card-top">
@@ -945,7 +945,7 @@ export function AdminDashboard() {
                 </div>
 
                 {/* Vista Desktop: Tabla Tradicional */}
-                <div className="hidden md:block clean-table-container">
+                <div className="desktop-only-view clean-table-container">
                   <table className="clean-table">
                     <thead>
                       <tr>
@@ -1069,7 +1069,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Vista Mobile: Tarjetas por Día (sin desplazamiento horizontal) */}
-              <div className="md:hidden clean-schedule-cards">
+              <div className="mobile-only-view clean-schedule-cards">
                 {horariosOrdenados.map((horario) => {
                   const esDomingoDeshabilitado = horario.dia_semana === 0 && !domingoActivo
                   return (
@@ -1128,7 +1128,7 @@ export function AdminDashboard() {
               </div>
 
               {/* Vista Desktop: Tabla Tradicional */}
-              <div className="hidden md:block clean-table-container">
+              <div className="desktop-only-view clean-table-container">
                 <table className="clean-table">
                   <thead>
                     <tr>
