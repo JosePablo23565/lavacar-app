@@ -1,15 +1,49 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { ConfigurarPerfilModal } from '../ConfigurarPerfilModal/ConfigurarPerfilModal'
+import { supabase } from '../../lib/supabase'
 import './NavBar.css'
+
+function resizeAndCropImage(file: File, size = 256): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Canvas error'))
+          return
+        }
+
+        const minDim = Math.min(img.width, img.height)
+        const startX = (img.width - minDim) / 2
+        const startY = (img.height - minDim) / 2
+
+        ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size)
+        resolve(canvas.toDataURL('image/jpeg', 0.85))
+      }
+      img.onerror = () => reject(new Error('Image error'))
+      img.src = e.target?.result as string
+    }
+    reader.onerror = () => reject(new Error('Reader error'))
+    reader.readAsDataURL(file)
+  })
+}
 
 export function NavBar() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [scrolling, setScrolling] = useState(false)
   const [showPerfilModal, setShowPerfilModal] = useState(false)
+  const [subiendoFoto, setSubiendoFoto] = useState(false)
+  const [avatarLocal, setAvatarLocal] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const location = useLocation()
-  const { user, perfil, signOut } = useAuth()
+  const { user, perfil, signOut, refetchPerfil } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +65,42 @@ export function NavBar() {
     cerrarMenu()
   }
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido')
+      return
+    }
+
+    try {
+      setSubiendoFoto(true)
+      const dataUrl = await resizeAndCropImage(file, 256)
+      setAvatarLocal(dataUrl)
+
+      if (user?.id) {
+        const { error } = await supabase
+          .from('perfiles')
+          .update({ avatar_url: dataUrl })
+          .eq('id', user.id)
+
+        if (error) {
+          console.error('Error al guardar foto:', error)
+          alert('No se pudo guardar la foto de perfil')
+        } else {
+          await refetchPerfil()
+        }
+      }
+    } catch (err) {
+      console.error('Error procesando imagen:', err)
+      alert('No se pudo procesar la imagen seleccionada')
+    } finally {
+      setSubiendoFoto(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   const navLinks = [
     { path: '/', name: 'Inicio' },
     { path: '/agendar', name: 'Agendar' },
@@ -46,8 +116,9 @@ export function NavBar() {
 
   const isAdmin = perfil?.is_admin === true
   const userEmail = user?.email || 'usuario'
-  const userInitial = userEmail.charAt(0).toUpperCase()
+  const userInitial = (perfil?.nombre || userEmail).charAt(0).toUpperCase()
   const userNombre = perfil?.nombre || userEmail.split('@')[0]
+  const avatarUrl = avatarLocal || perfil?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null
 
   return (
     <>
@@ -243,62 +314,136 @@ export function NavBar() {
         }
 
         .menu-user-profile {
+          position: relative;
           display: flex;
           align-items: center;
           gap: 14px;
-          padding: 20px 20px 16px;
+          padding: 18px 48px 16px 18px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
           background: rgba(255, 255, 255, 0.02);
         }
 
+        .user-avatar-wrapper {
+          position: relative;
+          width: 50px;
+          height: 50px;
+          flex-shrink: 0;
+        }
+
         .user-avatar {
-          width: 48px;
-          height: 48px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           background: linear-gradient(135deg, #e0142c, #a10e1f);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.2rem;
+          font-size: 1.25rem;
           font-weight: 600;
           color: white;
           box-shadow: 0 4px 12px rgba(224, 20, 44, 0.3);
+          overflow: hidden;
+          border: 2px solid rgba(255, 255, 255, 0.15);
         }
 
-        .user-info {
-          flex: 1;
+        .user-avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+          display: block;
         }
 
-        .user-name {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: white;
-          margin-bottom: 2px;
+        .user-avatar-initial {
+          user-select: none;
         }
 
-        .user-email {
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.6);
-          word-break: break-all;
-        }
-
-        .user-badge {
-          font-size: 0.65rem;
-          color: #e0142c;
-          margin-top: 4px;
-        }
-
-        .config-profile-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+        .avatar-edit-btn {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: #1c1c1e;
+          border: 1.5px solid rgba(255, 255, 255, 0.35);
+          color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          color: rgba(255, 255, 255, 0.7);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+          transition: all 0.2s ease;
+          padding: 0;
+          z-index: 2;
+        }
+
+        .avatar-edit-btn:hover {
+          background: #e0142c;
+          border-color: #ff4d61;
+          transform: scale(1.12);
+        }
+
+        .avatar-loading-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #e0142c;
+          animation: avatarPulse 0.8s infinite alternate;
+        }
+
+        @keyframes avatarPulse {
+          from { opacity: 0.3; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1.2); }
+        }
+
+        .user-info {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .user-name {
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: white;
+          margin-bottom: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .user-email {
+          font-size: 0.74rem;
+          color: rgba(255, 255, 255, 0.65);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.3;
+        }
+
+        .user-badge {
+          display: inline-block;
+          font-size: 0.65rem;
+          font-weight: 600;
+          color: #ff334b;
+          margin-top: 4px;
+          letter-spacing: 0.3px;
+        }
+
+        .config-profile-btn {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          width: 32px;
+          height: 32px;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: rgba(255, 255, 255, 0.75);
           transition: all 0.2s;
         }
 
@@ -306,7 +451,7 @@ export function NavBar() {
           background: rgba(224, 20, 44, 0.2);
           color: #e0142c;
           border-color: rgba(224, 20, 44, 0.4);
-          transform: scale(1.02);
+          transform: scale(1.06);
         }
 
         .nav-links {
@@ -718,14 +863,45 @@ export function NavBar() {
 
       <div className={`nav-menu ${menuAbierto ? 'open' : ''}`}>
         <div className="menu-user-profile">
-          <div className="user-avatar">
-            {userInitial}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleAvatarChange}
+          />
+
+          <div className="user-avatar-wrapper">
+            <div className="user-avatar">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={userNombre} className="user-avatar-img" />
+              ) : (
+                <span className="user-avatar-initial">{userInitial}</span>
+              )}
+            </div>
+            <button
+              type="button"
+              className="avatar-edit-btn"
+              onClick={() => fileInputRef.current?.click()}
+              title="Cambiar foto de perfil"
+              disabled={subiendoFoto}
+            >
+              {subiendoFoto ? (
+                <span className="avatar-loading-dot"></span>
+              ) : (
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+              )}
+            </button>
           </div>
+
           <div className="user-info">
-            <div className="user-name">{userNombre}</div>
-            <div className="user-email">{userEmail}</div>
+            <div className="user-name" title={userNombre}>{userNombre}</div>
+            <div className="user-email" title={userEmail}>{userEmail}</div>
             {isAdmin && <div className="user-badge">Administrador</div>}
           </div>
+
           <button
             className="config-profile-btn"
             onClick={() => {
@@ -734,7 +910,7 @@ export function NavBar() {
             }}
             title="Configurar perfil"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>

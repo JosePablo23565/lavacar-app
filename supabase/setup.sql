@@ -649,6 +649,7 @@ where email_confirmed_at is null;
 -- ============================================================
 
 -- 11.1. Seguridad de fila en perfiles (RLS sin recursion)
+alter table public.perfiles add column if not exists avatar_url text;
 alter table public.perfiles enable row level security;
 
 -- Cada cliente solo puede ver su propio perfil; el admin ve todos

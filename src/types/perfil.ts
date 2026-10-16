@@ -5,4 +5,5 @@ export type Perfil = {
   email?: string
   created_at: string
   is_admin?: boolean
+  avatar_url?: string | null
 }
