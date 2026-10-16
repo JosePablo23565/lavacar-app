@@ -683,28 +683,7 @@ create policy "perfiles_update"
     or public.es_admin()
   );
 
--- 11.2. Asignar admin automatico al dueno principal y proteger is_admin
-create or replace function public.prevenir_admin_en_insert()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if lower(btrim(coalesce(new.email, ''))) = 'alexvillegascuendis@gmail.com' then
-    new.is_admin := true;
-  elsif new.is_admin is true and not public.es_admin() then
-    new.is_admin := false;
-  end if;
-  return new;
-end;
-$$;
-
-drop trigger if exists trigger_prevenir_admin_en_insert on public.perfiles;
-create trigger trigger_prevenir_admin_en_insert
-  before insert on public.perfiles
-  for each row execute function public.prevenir_admin_en_insert();
-
+-- 11.2. Proteger is_admin contra manipulacion web, pero permitir cambios libres desde Supabase Dashboard
 create or replace function public.proteger_is_admin()
 returns trigger
 language plpgsql
@@ -712,23 +691,27 @@ security definer
 set search_path = public
 as $$
 begin
-  if lower(btrim(coalesce(new.email, ''))) = 'alexvillegascuendis@gmail.com' then
-    new.is_admin := true;
-  elsif new.is_admin is distinct from old.is_admin then
-    if not public.es_admin() then
-      new.is_admin := coalesce(old.is_admin, false);
-    end if;
+  -- Si el cambio se hace directamente en Supabase (Table Editor, SQL Editor o service_role), permitirlo SIEMPRE:
+  if auth.uid() is null or auth.role() is null or auth.role() = 'service_role' then
+    return new;
   end if;
+
+  -- Si un usuario desde la web intenta manipular su estado de admin sin tener permisos, bloquearlo:
+  if new.is_admin is distinct from old.is_admin and not public.es_admin() then
+    new.is_admin := coalesce(old.is_admin, false);
+  end if;
+
   return new;
 end;
 $$;
 
+drop trigger if exists trigger_prevenir_admin_en_insert on public.perfiles;
 drop trigger if exists trigger_proteger_is_admin on public.perfiles;
 create trigger trigger_proteger_is_admin
   before update on public.perfiles
   for each row execute function public.proteger_is_admin();
 
--- Asegurar que si alexvillegascuendis@gmail.com ya existe, sea admin
+-- Asegurar que alexvillegascuendis@gmail.com sea admin
 update public.perfiles
 set is_admin = true
 where lower(btrim(email)) = 'alexvillegascuendis@gmail.com';
