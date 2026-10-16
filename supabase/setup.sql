@@ -594,3 +594,27 @@ create policy "testimonials_delete_propias"
 -- ============================================================
 revoke insert on table public.appointments from anon, authenticated;
 revoke insert on table public.testimonials from anon, authenticated;
+
+-- ============================================================
+-- 10. Auto-confirmación inmediata de usuarios registrados
+--     Evita bloqueos por email no verificado en registro manual
+-- ============================================================
+create or replace function public.auto_confirm_user()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  new.email_confirmed_at = coalesce(new.email_confirmed_at, now());
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_auto_confirm on auth.users;
+create trigger on_auth_user_created_auto_confirm
+  before insert on auth.users
+  for each row execute function public.auto_confirm_user();
+
+update auth.users
+set email_confirmed_at = now()
+where email_confirmed_at is null;
