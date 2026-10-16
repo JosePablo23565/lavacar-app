@@ -162,14 +162,13 @@ export function Home() {
           left: 0;
           width: 100%;
           height: 120%;
-          background-image: url('/fondo-hero.jpg');
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
+          object-fit: cover;
+          object-position: center;
           will-change: transform;
           z-index: 0;
           transform: translateY(0);
           transition: transform 0.1s ease-out;
+          pointer-events: none;
         }
 
         .hero-overlay {
@@ -745,7 +744,17 @@ export function Home() {
 
       <div className="lc-root">
         <section className="lc-hero" id="hero-section">
-          <div className="parallax-bg" id="hero-parallax-bg"></div>
+          <video
+            className="parallax-bg"
+            id="hero-parallax-bg"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster="/fondo-hero.jpg"
+          >
+            <source src="/video2.mp4" type="video/mp4" />
+          </video>
           <div className="hero-overlay"></div>
           <div className="lc-glow" />
           <span className="lc-car-bg"></span>
