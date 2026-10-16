@@ -9,6 +9,8 @@ export function ClienteAuth() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+  const [showResend, setShowResend] = useState(false)
   const [isFlipping, setIsFlipping] = useState(false)
 
   const [loginEmail, setLoginEmail] = useState('')
@@ -28,17 +30,54 @@ export function ClienteAuth() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccessMessage('')
+    setShowResend(false)
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
+    const emailSanitized = loginEmail.trim().toLowerCase()
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: emailSanitized,
       password: loginPassword
     })
 
-    if (error) {
-      setError('❌ Correo o contraseña incorrectos')
+    if (authError) {
+      const msg = authError.message?.toLowerCase() || ''
+      const code = (authError as any).code || ''
+
+      if (msg.includes('email not confirmed') || code === 'email_not_confirmed') {
+        setError('⚠️ Tu correo aún no ha sido verificado. Por favor revisa tu bandeja de entrada o carpeta de spam y abre el enlace de confirmación antes de iniciar sesión.')
+        setShowResend(true)
+      } else if (msg.includes('invalid login credentials') || code === 'invalid_credentials') {
+        setError('❌ Correo o contraseña incorrectos. Verifica que tus datos sean correctos.')
+      } else {
+        setError(`❌ ${authError.message}`)
+      }
     } else {
       navigate('/')
+    }
+    setLoading(false)
+  }
+
+  const handleResendConfirmation = async () => {
+    const emailSanitized = loginEmail.trim().toLowerCase()
+    if (!emailSanitized) {
+      setError('Por favor escribe tu correo para reenviar el enlace.')
+      return
+    }
+
+    setLoading(true)
+    const { error: resendError } = await supabase.auth.resend({
+      type: 'signup',
+      email: emailSanitized,
+    })
+
+    if (resendError) {
+      setError(`❌ ${resendError.message}`)
+    } else {
+      setSuccessMessage('✅ Enlace de confirmación reenviado a tu correo. Por favor revisa tu bandeja y carpeta de Spam.')
+      setError('')
+      setShowResend(false)
     }
     setLoading(false)
   }
@@ -52,12 +91,12 @@ export function ClienteAuth() {
     setResetLoading(true)
     setResetMessage('')
 
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(resetEmail.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/actualizar-contrasena`,
     })
 
-    if (error) {
-      setResetMessage(`❌ ${error.message}`)
+    if (resetErr) {
+      setResetMessage(`❌ ${resetErr.message}`)
     } else {
       setResetMessage('✅ Se ha enviado un enlace de recuperación a tu correo electrónico')
       setTimeout(() => {
@@ -86,8 +125,14 @@ export function ClienteAuth() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccessMessage('')
+    setShowResend(false)
     
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(regNombre)) {
+    const emailSanitized = regEmail.trim().toLowerCase()
+    const nombreSanitized = regNombre.trim()
+    const telefonoSanitized = regTelefono.trim()
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombreSanitized)) {
       setError('El nombre solo puede contener letras y espacios')
       return
     }
@@ -102,47 +147,69 @@ export function ClienteAuth() {
       return
     }
 
-    if (regTelefono && regTelefono.length !== 8) {
+    if (telefonoSanitized && telefonoSanitized.length !== 8) {
       setError('El teléfono debe tener exactamente 8 dígitos')
       return
     }
 
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signUp({
-      email: regEmail,
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: emailSanitized,
       password: regPassword,
       options: {
         data: {
-          nombre: regNombre,
-          telefono: regTelefono
+          nombre: nombreSanitized,
+          telefono: telefonoSanitized
         }
       }
     })
 
-    if (error) {
-      setError(error.message)
+    if (signUpError) {
+      setError(`❌ ${signUpError.message}`)
     } else if (data.user) {
+      // Supabase anti-enumeration: si el usuario ya existe devuelve identities vacías
+      if (data.user.identities && data.user.identities.length === 0) {
+        setError('⚠️ Este correo ya está registrado en el sistema. Puedes iniciar sesión o recuperar tu contraseña.')
+        setLoading(false)
+        return
+      }
+
       await supabase.from('perfiles').upsert([
-        { id: data.user.id, nombre: regNombre, telefono: regTelefono, email: regEmail }
+        { id: data.user.id, nombre: nombreSanitized, telefono: telefonoSanitized, email: emailSanitized }
       ])
-      navigate('/')
+
+      // Si Supabase requiere confirmación por email, data.session viene null
+      if (!data.session) {
+        setSuccessMessage('✅ Cuenta creada exitosamente. Hemos enviado un enlace de confirmación a tu correo (revisa tu bandeja de entrada o Spam). Confirma tu cuenta para poder ingresar.')
+        setLoginEmail(emailSanitized)
+        setLoginPassword('')
+        setIsLogin(true)
+      } else {
+        // Sesión activa directa
+        navigate('/')
+      }
     }
     setLoading(false)
   }
 
   const signInWithGoogle = async () => {
     setError('')
+    setSuccessMessage('')
     setGoogleLoading(true)
     
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/completar-perfil`
+        redirectTo: `${window.location.origin}/completar-perfil`,
+        queryParams: {
+          prompt: 'select_account',
+          access_type: 'offline'
+        }
       }
     })
     
-    if (error) {
+    if (googleError) {
       setError('Error al iniciar sesión con Google. Intenta de nuevo.')
       setGoogleLoading(false)
     }
@@ -153,6 +220,8 @@ export function ClienteAuth() {
     setTimeout(() => {
       setIsLogin(!isLogin)
       setError('')
+      setSuccessMessage('')
+      setShowResend(false)
       setIsFlipping(false)
     }, 200)
   }
@@ -166,11 +235,32 @@ export function ClienteAuth() {
               <h1 className="auth-title">Bienvenido</h1>
               <p className="auth-subtitle">Acceso para clientes registrados</p>
 
+              {successMessage && <div className="success-message">{successMessage}</div>}
               {error && <div className="error-message">{error}</div>}
+
+              {showResend && (
+                <button
+                  type="button"
+                  onClick={handleResendConfirmation}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#ff4d61',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '0.74rem',
+                    margin: '-0.4rem auto 0.85rem',
+                    display: 'block',
+                    textAlign: 'center'
+                  }}
+                >
+                  ¿No recibiste el enlace? Haz clic aquí para reenviar
+                </button>
+              )}
 
               <form onSubmit={handleLogin}>
                 <div className="input-group">
-                  <label>Gmail</label>
+                  <label>Correo Electrónico</label>
                   <input
                     type="email"
                     placeholder="tucorreo@gmail.com"
@@ -242,6 +332,7 @@ export function ClienteAuth() {
               <h1 className="auth-title">Crear cuenta</h1>
               <p className="auth-subtitle">Regístrate para comenzar</p>
 
+              {successMessage && <div className="success-message">{successMessage}</div>}
               {error && <div className="error-message">{error}</div>}
 
               <form onSubmit={handleRegister}>
@@ -261,7 +352,7 @@ export function ClienteAuth() {
                 </div>
 
                 <div className="input-group">
-                  <label>Gmail</label>
+                  <label>Correo Electrónico</label>
                   <input
                     type="email"
                     placeholder="tucorreo@gmail.com"
