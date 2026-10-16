@@ -26,9 +26,12 @@ export function ClienteAuth() {
   const [resetEmail, setResetEmail] = useState('')
   const [resetMessage, setResetMessage] = useState('')
   const [resetLoading, setResetLoading] = useState(false)
+  const [honeypot, setHoneypot] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (honeypot) return // Bot detectado
+
     setError('')
     setSuccessMessage('')
     setShowResend(false)
@@ -124,6 +127,8 @@ export function ClienteAuth() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (honeypot) return // Bot detectado
+
     setError('')
     setSuccessMessage('')
     setShowResend(false)
@@ -290,6 +295,16 @@ export function ClienteAuth() {
               )}
 
               <form onSubmit={handleLogin}>
+                <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                  <input
+                    type="text"
+                    name="b_website_hp"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
                 <div className="input-group">
                   <label>Correo Electrónico</label>
                   <input
@@ -371,6 +386,16 @@ export function ClienteAuth() {
               {error && <div className="error-message">{error}</div>}
 
               <form onSubmit={handleRegister}>
+                <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                  <input
+                    type="text"
+                    name="b_website_hp_reg"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
                 <div className="input-group">
                   <label>Nombre completo</label>
                   <input

@@ -837,7 +837,7 @@ export function NavBar() {
       <nav className={`navbar-modern ${scrolling ? 'scrolled' : ''}`}>
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={cerrarMenu}>
-            <img src="/lavacarlogo.png" alt="Camaro Fraterno" />
+            <img src="/lavacarlogo.png" alt="Camaro Fraterno" width="40" height="40" decoding="async" />
             <div className="navbar-logo-text">
               Autolavado Camaro Fraterno
             </div>
@@ -875,7 +875,7 @@ export function NavBar() {
           <div className="user-avatar-wrapper">
             <div className="user-avatar">
               {avatarUrl ? (
-                <img src={avatarUrl} alt={userNombre} className="user-avatar-img" />
+                <img src={avatarUrl} alt={userNombre} className="user-avatar-img" loading="lazy" decoding="async" />
               ) : (
                 <span className="user-avatar-initial">{userInitial}</span>
               )}

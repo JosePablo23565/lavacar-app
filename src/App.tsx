@@ -8,6 +8,10 @@ import { Opiniones } from './components/Opiniones/Opiniones'
 import { ClienteAuth } from './pages/ClienteAuth/ClienteAuth'
 import { ActualizarContrasena } from './pages/ActualizarContrasena/ActualizarContrasena'
 import { CompletarPerfil } from './pages/CompletarPerfil/CompletarPerfil'
+import { AvisoLegal } from './pages/Legal/AvisoLegal'
+import { PoliticaPrivacidad } from './pages/Legal/PoliticaPrivacidad'
+import { NotFound } from './pages/NotFound/NotFound'
+import { CookieBanner } from './components/CookieBanner/CookieBanner'
 import { RutaProtegida } from './components/RutaProtegida/RutaProtegida'
 import { NavBar } from './components/NavBar/NavBar'
 import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
@@ -17,12 +21,15 @@ const AdminDashboard = lazy(() =>
   import('./pages/AdminDashboard/AdminDashboard').then(m => ({ default: m.AdminDashboard }))
 )
 
-// Cada pagina empieza desde arriba
+import { trackPageView } from './lib/analytics'
+
+// Cada pagina empieza desde arriba y reporta la métrica
 function IrArriba() {
   const { pathname } = useLocation()
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    trackPageView(pathname)
   }, [pathname])
 
   return null
@@ -33,78 +40,99 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-        <IrArriba />
-        <div className="app-shell">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <RutaProtegida>
+          <IrArriba />
+          <div className="app-shell">
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <RutaProtegida>
+                    <>
+                      <NavBar />
+                      <Home />
+                    </>
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/agendar"
+                element={
+                  <RutaProtegida>
+                    <>
+                      <NavBar />
+                      <AppointmentForm />
+                    </>
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/contacto"
+                element={
+                  <RutaProtegida>
+                    <>
+                      <NavBar />
+                      <Contact />
+                    </>
+                  </RutaProtegida>
+                }
+              />
+              <Route
+                path="/opiniones"
+                element={
+                  <RutaProtegida>
+                    <>
+                      <NavBar />
+                      <Opiniones />
+                    </>
+                  </RutaProtegida>
+                }
+              />
+              <Route path="/acceder" element={<ClienteAuth />} />
+              <Route path="/completar-perfil" element={<CompletarPerfil />} />
+              <Route path="/actualizar-contrasena" element={<ActualizarContrasena />} />
+              <Route
+                path="/aviso-legal"
+                element={
                   <>
                     <NavBar />
-                    <Home />
+                    <AvisoLegal />
                   </>
-                </RutaProtegida>
-              }
-            />
-            <Route
-              path="/agendar"
-              element={
-                <RutaProtegida>
+                }
+              />
+              <Route
+                path="/privacidad"
+                element={
                   <>
                     <NavBar />
-                    <AppointmentForm />
+                    <PoliticaPrivacidad />
                   </>
-                </RutaProtegida>
-              }
-            />
-            <Route
-              path="/contacto"
-              element={
-                <RutaProtegida>
-                  <>
-                    <NavBar />
-                    <Contact />
-                  </>
-                </RutaProtegida>
-              }
-            />
-            <Route
-              path="/opiniones"
-              element={
-                <RutaProtegida>
-                  <>
-                    <NavBar />
-                    <Opiniones />
-                  </>
-                </RutaProtegida>
-              }
-            />
-            <Route path="/acceder" element={<ClienteAuth />} />
-            <Route path="/completar-perfil" element={<CompletarPerfil />} />
-            <Route path="/actualizar-contrasena" element={<ActualizarContrasena />} />
-            <Route
-              path="/admin"
-              element={
-                <RutaProtegida>
-                  <>
-                    <NavBar />
-                    <Suspense
-                      fallback={
-                        <div className="app-loading">
-                          <div className="app-loading-spinner" />
-                          <div className="app-loading-text">Cargando panel...</div>
-                        </div>
-                      }
-                    >
-                      <AdminDashboard />
-                    </Suspense>
-                  </>
-                </RutaProtegida>
-              }
-            />
-          </Routes>
-        </div>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <RutaProtegida>
+                    <>
+                      <NavBar />
+                      <Suspense
+                        fallback={
+                          <div className="app-loading">
+                            <div className="app-loading-spinner" />
+                            <div className="app-loading-text">Cargando panel...</div>
+                          </div>
+                        }
+                      >
+                        <AdminDashboard />
+                      </Suspense>
+                    </>
+                  </RutaProtegida>
+                }
+              />
+              {/* Ruta 404 personalizada */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <CookieBanner />
+          </div>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

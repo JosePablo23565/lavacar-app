@@ -22,6 +22,7 @@ export function Opiniones() {
     comentario: '',
     rating: 0
   })
+  const [honeypot, setHoneypot] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState('')
   const [hoveredStar, setHoveredStar] = useState(0)
@@ -80,6 +81,13 @@ export function Opiniones() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Antispam honeypot: Si un bot rellena el campo oculto, simular éxito silencioso
+    if (honeypot) {
+      setMensaje('Opinión enviada con éxito. Quedará visible tras ser aprobada.')
+      setFormData({ ...formData, comentario: '', rating: 0 })
+      return
+    }
+
     if (!formData.nombre.trim()) {
       setMensaje('Por favor ingrese su nombre')
       return
@@ -801,6 +809,18 @@ export function Opiniones() {
                 )}
 
                 <form onSubmit={handleSubmit}>
+                  {/* Campo trampa antispam (oculto para humanos, los bots lo llenan) */}
+                  <div style={{ display: 'none', position: 'absolute', left: '-9999px', opacity: 0 }} aria-hidden="true">
+                    <input
+                      type="text"
+                      name="b_extra_comments_hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
+
                   {/* Nombre (no editable) */}
                   <div className="op-input-group">
                     <label className="op-input-label">

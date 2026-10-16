@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { Icono } from '../Icono/Icono';
 import { googleMapsUrl, googleMapsEmbedUrl, wazeUrl, appleMapsUrl, FACEBOOK_URL, INSTAGRAM_URL } from '../../lib/ubicacion';
 
 export function Contact() {
+  const navigate = useNavigate();
 
   return (
     <>
@@ -379,7 +381,7 @@ export function Contact() {
                     style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
                   >
                     <Icono nombre="google" size={17} />
-                    Google Maps
+                    Google Maps (Ficha y Reseñas)
                   </a>
 
                   <a
@@ -405,6 +407,42 @@ export function Contact() {
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Enlaces Legales & Pie de Página */}
+          <div style={{
+            marginTop: '3.5rem',
+            paddingTop: '1.5rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '1rem',
+            fontSize: '0.8rem',
+            color: '#777777'
+          }}>
+            <div>© {new Date().getFullYear()} Auto Lavado y Servicios Camaro Fraterno · Bagaces, Guanacaste</div>
+            <div style={{ display: 'flex', gap: '1.25rem' }}>
+              <button
+                type="button"
+                onClick={() => navigate('/aviso-legal')}
+                style={{ background: 'none', border: 'none', color: '#888888', cursor: 'pointer', fontSize: '0.8rem', padding: 0 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#e0142c' }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#888888' }}
+              >
+                Aviso Legal
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/privacidad')}
+                style={{ background: 'none', border: 'none', color: '#888888', cursor: 'pointer', fontSize: '0.8rem', padding: 0 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#e0142c' }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#888888' }}
+              >
+                Política de Privacidad
+              </button>
             </div>
           </div>
         </div>

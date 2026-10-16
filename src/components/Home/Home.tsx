@@ -1142,6 +1142,8 @@ export function Home() {
             <button onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}>Servicios</button>
             <button onClick={() => navigate('/contacto')}>Contacto</button>
             <button onClick={() => navigate('/opiniones')}>Opiniones</button>
+            <button onClick={() => navigate('/aviso-legal')}>Aviso Legal</button>
+            <button onClick={() => navigate('/privacidad')}>Privacidad</button>
           </div>
           <div className="lc-footer-copy">© {new Date().getFullYear()} Autolavado Camaro Fraterno · Todos los derechos reservados</div>
         </footer>
