@@ -33,6 +33,7 @@ export function Opiniones() {
   const [editForm, setEditForm] = useState({ comentario: '', rating: 0 })
 
   const MAX_OPINIONES = 2
+  const MAX_CARACTERES = 50
   const alcanzoLimite = misOpiniones.length >= MAX_OPINIONES
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export function Opiniones() {
 
   const handleComentarioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (value.length <= 100) {
+    if (value.length <= MAX_CARACTERES) {
       setFormData({ ...formData, comentario: value })
     }
   }
@@ -215,19 +216,22 @@ export function Opiniones() {
     return stars
   }
 
+  // Separación en dos columnas (mampostería / masonry)
+  const colIzquierda = opiniones.filter((_, idx) => idx % 2 === 0)
+  const colDerecha = opiniones.filter((_, idx) => idx % 2 !== 0)
+
   return (
     <>
       <style>{`
         /* ============================================================
            FUSIÓN: ESTRUCTURA ORIGINAL + ESTÉTICA PURA ADMIN
            Fondo oscuro mate sin halos ni adornos flotantes.
-           Paleta: Negro (#0a0a0a), Grafito (#121212 / #161616), Rojo (#e0142c), Dorado (#f59e0b)
            ============================================================ */
 
         .op-fusion-root {
           min-height: calc(100vh - 72px);
           background-color: #080808;
-          padding: 2rem 1rem 4rem;
+          padding: 1.5rem 1rem 4rem;
           font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           color: #d4d4d4;
           box-sizing: border-box;
@@ -238,16 +242,22 @@ export function Opiniones() {
           margin: 0 auto;
         }
 
-        /* Pestañas: estilo píldora como el original, pero con la sobriedad del Admin */
+        /* Pestañas flotantes y fijas al hacer scroll */
         .op-fusion-tabs {
           display: flex;
-          background: #141414;
-          padding: 0.3rem;
+          background: rgba(20, 20, 20, 0.94);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          padding: 0.35rem;
           border-radius: 50px;
           max-width: 360px;
-          margin: 0 auto 1.75rem;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          margin: 0 auto 1.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.12);
           gap: 0.25rem;
+          position: sticky;
+          top: 75px;
+          z-index: 30;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         .op-fusion-tab {
@@ -276,7 +286,7 @@ export function Opiniones() {
           box-shadow: 0 4px 14px rgba(224, 20, 44, 0.35);
         }
 
-        /* Tarjeta principal: mezcla del borde redondeado original con acabados del Admin */
+        /* Tarjeta principal */
         .op-fusion-card {
           background: #121212;
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -285,7 +295,6 @@ export function Opiniones() {
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        /* Encabezado con sutil degradado carmesí del original */
         .op-fusion-card-header {
           background: linear-gradient(135deg, rgba(224, 20, 44, 0.12), rgba(224, 20, 44, 0.02));
           padding: 1.5rem 1.75rem;
@@ -312,7 +321,7 @@ export function Opiniones() {
           padding: 1.75rem;
         }
 
-        /* Grupos de inputs como los del formulario original */
+        /* Grupos de inputs */
         .op-input-group {
           margin-bottom: 1.5rem;
         }
@@ -355,7 +364,7 @@ export function Opiniones() {
         }
 
         textarea.op-input-control {
-          min-height: 100px;
+          min-height: 85px;
           resize: vertical;
           word-break: break-word;
           overflow-wrap: anywhere;
@@ -378,13 +387,12 @@ export function Opiniones() {
           font-weight: 600;
         }
 
-        /* Calificación por estrellas: formato centrado del original con el dorado del Admin */
+        /* Calificación por estrellas limpia: sin marco ni cuadro de fondo */
         .op-rating-group {
           text-align: center;
-          background: #161616;
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 12px;
-          padding: 1rem;
+          padding: 0.35rem 0;
+          background: transparent;
+          border: none;
         }
 
         .op-rating-stars {
@@ -423,7 +431,7 @@ export function Opiniones() {
           margin-bottom: 0;
         }
 
-        /* Botón de envío: píldora como el original, rojo profesional */
+        /* Botón de envío */
         .op-fusion-submit-btn {
           width: 100%;
           padding: 0.9rem;
@@ -475,37 +483,52 @@ export function Opiniones() {
           border: 1px solid rgba(239, 68, 68, 0.25);
         }
 
-        /* Muro de testimonios: Grid con tarjetas limpias estilo Admin */
-        .op-fusion-reviews-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-          gap: 1rem;
-          padding: 1.5rem;
+        /* ============================================================
+           MURO DE TESTIMONIOS: 2 COLUMNAS (ESTILO MASONRY SIN HUECOS)
+           Se ven dos a la par en teléfonos y en computadoras.
+           Cada columna fluye hacia abajo adaptándose a su contenido.
+           ============================================================ */
+        .op-fusion-masonry {
+          display: flex;
+          gap: 0.65rem;
+          padding: 1.25rem 1rem;
+          align-items: flex-start;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .op-masonry-col {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+          min-width: 0;
         }
 
         .op-fusion-review-card {
           background: #141414;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 14px;
-          padding: 1.15rem;
+          border-radius: 12px;
+          padding: 0.75rem 0.65rem;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          box-sizing: border-box;
         }
 
         .op-fusion-review-stars {
           color: #f59e0b;
-          font-size: 0.92rem;
-          margin-bottom: 0.65rem;
-          letter-spacing: 2px;
+          font-size: 0.78rem;
+          margin-bottom: 0.4rem;
+          letter-spacing: 1.5px;
           text-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
         }
 
         .op-fusion-review-text {
-          font-size: 0.85rem;
+          font-size: 0.78rem;
           color: #d4d4d4;
-          line-height: 1.55;
-          margin-bottom: 0.9rem;
+          line-height: 1.4;
+          margin-bottom: 0.6rem;
           font-style: italic;
           word-break: break-word;
           overflow-wrap: anywhere;
@@ -514,21 +537,21 @@ export function Opiniones() {
         .op-fusion-review-author {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding-top: 0.75rem;
+          gap: 0.45rem;
+          padding-top: 0.5rem;
           border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .op-fusion-review-avatar {
-          width: 34px;
-          height: 34px;
+          width: 24px;
+          height: 24px;
           background: linear-gradient(135deg, #e0142c, #800a16);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          font-size: 0.84rem;
+          font-size: 0.68rem;
           color: #ffffff;
           flex-shrink: 0;
         }
@@ -536,18 +559,23 @@ export function Opiniones() {
         .op-fusion-review-info {
           display: flex;
           flex-direction: column;
-          gap: 0.15rem;
+          min-width: 0;
+          gap: 0.08rem;
+          overflow: hidden;
         }
 
         .op-fusion-review-name {
           font-weight: 700;
-          font-size: 0.85rem;
+          font-size: 0.74rem;
           color: #ffffff;
           line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .op-fusion-review-date {
-          font-size: 0.7rem;
+          font-size: 0.64rem;
           color: #777777;
           font-family: 'JetBrains Mono', monospace;
         }
@@ -698,17 +726,25 @@ export function Opiniones() {
 
         @media (max-width: 640px) {
           .op-fusion-root {
-            padding: 1.5rem 0.85rem 3rem;
+            padding: 1rem 0.65rem 3rem;
+          }
+          .op-fusion-tabs {
+            top: 68px;
+            max-width: 310px;
+            margin-bottom: 1.25rem;
           }
           .op-fusion-body {
-            padding: 1.25rem 1rem;
+            padding: 1.25rem 0.9rem;
           }
-          .op-fusion-reviews-grid {
-            grid-template-columns: 1fr;
-            padding: 1rem 0.85rem;
+          .op-fusion-masonry {
+            padding: 1rem 0.6rem;
+            gap: 0.5rem;
+          }
+          .op-masonry-col {
+            gap: 0.5rem;
           }
           .op-rating-star {
-            font-size: 1.9rem;
+            font-size: 1.85rem;
           }
         }
       `}</style>
@@ -716,7 +752,7 @@ export function Opiniones() {
       <div className="op-fusion-root">
         <div className="op-fusion-container">
 
-          {/* Selector de pestañas: estilo píldora como el original con paleta del Admin */}
+          {/* Selector de pestañas: flotante fijo arriba */}
           <div className="op-fusion-tabs">
             <button
               type="button"
@@ -779,7 +815,7 @@ export function Opiniones() {
                     />
                   </div>
 
-                  {/* Calificación */}
+                  {/* Calificación: estrellas limpias sin marco de fondo */}
                   <div className="op-input-group">
                     <label className="op-input-label">
                       CALIFICACIÓN
@@ -789,14 +825,12 @@ export function Opiniones() {
                         {renderRatingStars()}
                       </div>
                       <p className="op-rating-hint">
-                        {formData.rating === 0
-                          ? 'Haga clic en las estrellas para calificar'
-                          : `${formData.rating} de 5 estrellas seleccionadas`}
+                        Haga clic en las estrellas para seleccionar
                       </p>
                     </div>
                   </div>
 
-                  {/* Comentario */}
+                  {/* Comentario (máximo 50 caracteres) */}
                   <div className="op-input-group">
                     <label className="op-input-label">
                       SU COMENTARIO
@@ -806,11 +840,11 @@ export function Opiniones() {
                       value={formData.comentario}
                       onChange={handleComentarioChange}
                       placeholder="Cuéntenos su experiencia con nuestro servicio..."
-                      maxLength={100}
+                      maxLength={MAX_CARACTERES}
                       required
                     />
-                    <div className={`op-char-counter ${formData.comentario.length >= 90 ? (formData.comentario.length >= 100 ? 'limit' : 'near-limit') : ''}`}>
-                      {formData.comentario.length}/100 caracteres
+                    <div className={`op-char-counter ${formData.comentario.length >= 45 ? (formData.comentario.length >= 50 ? 'limit' : 'near-limit') : ''}`}>
+                      {formData.comentario.length}/{MAX_CARACTERES} caracteres
                     </div>
                   </div>
 
@@ -869,8 +903,12 @@ export function Opiniones() {
                             <textarea
                               className="op-input-control"
                               value={editForm.comentario}
-                              maxLength={100}
-                              onChange={(e) => setEditForm({ ...editForm, comentario: e.target.value })}
+                              maxLength={MAX_CARACTERES}
+                              onChange={(e) => {
+                                if (e.target.value.length <= MAX_CARACTERES) {
+                                  setEditForm({ ...editForm, comentario: e.target.value })
+                                }
+                              }}
                             />
                             <div className="op-fusion-item-acciones">
                               <button type="button" className="op-fusion-btn-cancelar" onClick={() => setEditandoId(null)}>
@@ -908,7 +946,7 @@ export function Opiniones() {
             </div>
           )}
 
-          {/* VISTA 1 CONTINUACIÓN: OPINIONES DE NUESTROS CLIENTES */}
+          {/* VISTA 1 CONTINUACIÓN: OPINIONES EN 2 COLUMNAS (MASONRY) */}
           {vista === 'opinar' && (
             <div className="op-fusion-card" style={{ marginTop: '2rem' }}>
               <div className="op-fusion-card-header">
@@ -916,39 +954,65 @@ export function Opiniones() {
                 <p>Lo que dicen quienes ya nos visitaron</p>
               </div>
 
-              <div className="op-fusion-reviews-grid">
-                {loading ? (
-                  <div className="op-fusion-empty" style={{ gridColumn: '1 / -1' }}>
-                    <div className="op-fusion-empty-icon">⏳</div>
-                    <p>Cargando opiniones...</p>
-                  </div>
-                ) : opiniones.length === 0 ? (
-                  <div className="op-fusion-empty" style={{ gridColumn: '1 / -1' }}>
-                    <div className="op-fusion-empty-icon">📋</div>
-                    <p>No hay opiniones aún. ¡Sea el primero en opinar!</p>
-                  </div>
-                ) : (
-                  opiniones.map((opinion) => (
-                    <div key={opinion.id} className="op-fusion-review-card">
-                      <div>
-                        <div className="op-fusion-review-stars">{"★".repeat(opinion.rating)}</div>
-                        <div className="op-fusion-review-text">"{opinion.comment}"</div>
-                      </div>
-                      <div className="op-fusion-review-author">
-                        <div className="op-fusion-review-avatar">
-                          {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
+              {loading ? (
+                <div className="op-fusion-empty">
+                  <div className="op-fusion-empty-icon">⏳</div>
+                  <p>Cargando opiniones...</p>
+                </div>
+              ) : opiniones.length === 0 ? (
+                <div className="op-fusion-empty">
+                  <div className="op-fusion-empty-icon">📋</div>
+                  <p>No hay opiniones aún. ¡Sea el primero en opinar!</p>
+                </div>
+              ) : (
+                <div className="op-fusion-masonry">
+                  {/* Columna Izquierda */}
+                  <div className="op-masonry-col">
+                    {colIzquierda.map((opinion) => (
+                      <div key={opinion.id} className="op-fusion-review-card">
+                        <div>
+                          <div className="op-fusion-review-stars">{"★".repeat(opinion.rating)}</div>
+                          <div className="op-fusion-review-text">"{opinion.comment}"</div>
                         </div>
-                        <div className="op-fusion-review-info">
-                          <div className="op-fusion-review-name">{opinion.customer_name}</div>
-                          <div className="op-fusion-review-date">
-                            {new Date(opinion.created_at).toLocaleDateString('es-CR')}
+                        <div className="op-fusion-review-author">
+                          <div className="op-fusion-review-avatar">
+                            {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
+                          </div>
+                          <div className="op-fusion-review-info">
+                            <div className="op-fusion-review-name">{opinion.customer_name}</div>
+                            <div className="op-fusion-review-date">
+                              {new Date(opinion.created_at).toLocaleDateString('es-CR')}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ))}
+                  </div>
+
+                  {/* Columna Derecha */}
+                  <div className="op-masonry-col">
+                    {colDerecha.map((opinion) => (
+                      <div key={opinion.id} className="op-fusion-review-card">
+                        <div>
+                          <div className="op-fusion-review-stars">{"★".repeat(opinion.rating)}</div>
+                          <div className="op-fusion-review-text">"{opinion.comment}"</div>
+                        </div>
+                        <div className="op-fusion-review-author">
+                          <div className="op-fusion-review-avatar">
+                            {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
+                          </div>
+                          <div className="op-fusion-review-info">
+                            <div className="op-fusion-review-name">{opinion.customer_name}</div>
+                            <div className="op-fusion-review-date">
+                              {new Date(opinion.created_at).toLocaleDateString('es-CR')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
