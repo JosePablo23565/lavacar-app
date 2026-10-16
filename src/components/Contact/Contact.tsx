@@ -28,25 +28,7 @@ export function Contact() {
         /* Encabezado */
         .ct-header {
           text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .ct-icon-circle {
-          width: 68px;
-          height: 68px;
-          background: linear-gradient(135deg, #e0142c, #800a16);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 1.25rem;
-          box-shadow: 0 4px 20px rgba(224, 20, 44, 0.35);
-        }
-
-        .ct-icon-circle svg {
-          width: 34px;
-          height: 34px;
-          color: #ffffff;
+          margin-bottom: 1.5rem;
         }
 
         .ct-title {
@@ -54,14 +36,8 @@ export function Contact() {
           font-size: 2.1rem;
           font-weight: 700;
           color: #ffffff;
-          margin: 0 0 0.4rem 0;
-          letter-spacing: -0.02em;
-        }
-
-        .ct-sub {
-          color: #888888;
-          font-size: 0.92rem;
           margin: 0;
+          letter-spacing: -0.02em;
         }
 
         /* Sección de redes sociales (Mantenemos los colores y píldoras exactos pedidos) */
@@ -278,14 +254,6 @@ export function Contact() {
           .ct-title {
             font-size: 1.75rem;
           }
-          .ct-icon-circle {
-            width: 58px;
-            height: 58px;
-          }
-          .ct-icon-circle svg {
-            width: 28px;
-            height: 28px;
-          }
           .ct-items {
             padding: 1.15rem 1rem;
           }
@@ -303,13 +271,7 @@ export function Contact() {
       <div className="ct-root">
         <div className="ct-inner">
           <div className="ct-header">
-            <div className="ct-icon-circle">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </div>
             <h1 className="ct-title">Contacto</h1>
-            <p className="ct-sub">Estamos aquí para ayudarle</p>
           </div>
 
           {/* Redes sociales con colores intactos */}
