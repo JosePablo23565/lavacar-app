@@ -15,6 +15,26 @@
 
 
 -- ============================================================
+-- 0. Helper de verificacion de Administrador (Anti-recursion RLS)
+-- ============================================================
+create or replace function public.es_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce(
+    (select is_admin from public.perfiles where id = auth.uid()),
+    false
+  );
+$$;
+
+revoke all on function public.es_admin() from public;
+grant execute on function public.es_admin() to anon, authenticated;
+
+
+-- ============================================================
 -- 1. Dias que el negocio cierra
 -- ============================================================
 create table if not exists public.dias_cerrados (
@@ -33,12 +53,12 @@ create policy "dias_cerrados_lectura_publica"
 drop policy if exists "dias_cerrados_insert_admin" on public.dias_cerrados;
 create policy "dias_cerrados_insert_admin"
   on public.dias_cerrados for insert
-  with check (exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true));
+  with check (public.es_admin());
 
 drop policy if exists "dias_cerrados_delete_admin" on public.dias_cerrados;
 create policy "dias_cerrados_delete_admin"
   on public.dias_cerrados for delete
-  using (exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true));
+  using (public.es_admin());
 
 
 -- ============================================================
@@ -280,9 +300,7 @@ declare
   v_fin      time;
   v_dueno    uuid;
 begin
-  if not exists (
-    select 1 from public.perfiles where id = auth.uid() and is_admin = true
-  ) then
+  if not public.es_admin() then
     raise exception 'NO_AUTORIZADO';
   end if;
 
@@ -412,9 +430,7 @@ as $$
 declare
   v_fecha date;
 begin
-  if not exists (
-    select 1 from public.perfiles where id = auth.uid() and is_admin = true
-  ) then
+  if not public.es_admin() then
     raise exception 'NO_AUTORIZADO';
   end if;
 
@@ -453,9 +469,7 @@ as $$
 declare
   v_total int;
 begin
-  if not exists (
-    select 1 from public.perfiles where id = auth.uid() and is_admin = true
-  ) then
+  if not public.es_admin() then
     raise exception 'NO_AUTORIZADO';
   end if;
 
@@ -553,7 +567,7 @@ create policy "appointments_select_propias"
   on public.appointments for select
   using (
     user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
 drop policy if exists "appointments_delete_propias" on public.appointments;
@@ -561,7 +575,7 @@ create policy "appointments_delete_propias"
   on public.appointments for delete
   using (
     user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
 alter table public.testimonials enable row level security;
@@ -573,7 +587,7 @@ create policy "testimonials_select"
   using (
     is_approved = true
     or user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
 drop policy if exists "testimonials_update_propias" on public.testimonials;
@@ -581,11 +595,11 @@ create policy "testimonials_update_propias"
   on public.testimonials for update
   using (
     user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   )
   with check (
     user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
 drop policy if exists "testimonials_delete_propias" on public.testimonials;
@@ -593,7 +607,7 @@ create policy "testimonials_delete_propias"
   on public.testimonials for delete
   using (
     user_id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
 
@@ -634,7 +648,7 @@ where email_confirmed_at is null;
 -- 11. Seguridad Total y Validación de Teléfonos Únicos
 -- ============================================================
 
--- 11.1. Seguridad de fila en perfiles (RLS)
+-- 11.1. Seguridad de fila en perfiles (RLS sin recursion)
 alter table public.perfiles enable row level security;
 
 -- Cada cliente solo puede ver su propio perfil; el admin ve todos
@@ -643,15 +657,16 @@ create policy "perfiles_select"
   on public.perfiles for select
   using (
     id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
--- Cada usuario solo puede insertar su propio registro
+-- Cada usuario puede insertar su propio registro
 drop policy if exists "perfiles_insert" on public.perfiles;
 create policy "perfiles_insert"
   on public.perfiles for insert
   with check (
     id = auth.uid()
+    or public.es_admin()
   );
 
 -- Cada usuario solo puede actualizar su propio registro (o admin)
@@ -660,14 +675,35 @@ create policy "perfiles_update"
   on public.perfiles for update
   using (
     id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   )
   with check (
     id = auth.uid()
-    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+    or public.es_admin()
   );
 
--- 11.2. Impedir que usuarios comunes se auto-promuevan a administradores
+-- 11.2. Asignar admin automatico al dueno principal y proteger is_admin
+create or replace function public.prevenir_admin_en_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if lower(btrim(coalesce(new.email, ''))) = 'alexvillegascuendis@gmail.com' then
+    new.is_admin := true;
+  elsif new.is_admin is true and not public.es_admin() then
+    new.is_admin := false;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trigger_prevenir_admin_en_insert on public.perfiles;
+create trigger trigger_prevenir_admin_en_insert
+  before insert on public.perfiles
+  for each row execute function public.prevenir_admin_en_insert();
+
 create or replace function public.proteger_is_admin()
 returns trigger
 language plpgsql
@@ -675,8 +711,10 @@ security definer
 set search_path = public
 as $$
 begin
-  if new.is_admin is distinct from old.is_admin then
-    if not exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true) then
+  if lower(btrim(coalesce(new.email, ''))) = 'alexvillegascuendis@gmail.com' then
+    new.is_admin := true;
+  elsif new.is_admin is distinct from old.is_admin then
+    if not public.es_admin() then
       new.is_admin := coalesce(old.is_admin, false);
     end if;
   end if;
@@ -688,6 +726,11 @@ drop trigger if exists trigger_proteger_is_admin on public.perfiles;
 create trigger trigger_proteger_is_admin
   before update on public.perfiles
   for each row execute function public.proteger_is_admin();
+
+-- Asegurar que si alexvillegascuendis@gmail.com ya existe, sea admin
+update public.perfiles
+set is_admin = true
+where lower(btrim(email)) = 'alexvillegascuendis@gmail.com';
 
 -- 11.3. Validar unicidad estricta de teléfonos a nivel de base de datos
 create or replace function public.validar_telefono_unico_trigger()
