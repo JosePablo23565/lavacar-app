@@ -24,7 +24,6 @@ export function Opiniones() {
   })
   const [enviando, setEnviando] = useState(false)
   const [mensaje, setMensaje] = useState('')
-  const [focusedField, setFocusedField] = useState<string | null>(null)
   const [hoveredStar, setHoveredStar] = useState(0)
 
   const [vista, setVista] = useState<'opinar' | 'mis'>('opinar')
@@ -194,8 +193,20 @@ export function Opiniones() {
     fetchOpiniones()
   }
 
+  const getRatingLabel = (val: number) => {
+    switch (val) {
+      case 1: return '1 / 5 · Deficiente'
+      case 2: return '2 / 5 · Regular'
+      case 3: return '3 / 5 · Bueno'
+      case 4: return '4 / 5 · Muy bueno'
+      case 5: return '5 / 5 · Excelente'
+      default: return 'Seleccione de 1 a 5 estrellas'
+    }
+  }
+
   const renderRatingStars = () => {
     const stars = []
+    const currentRating = hoveredStar > 0 ? hoveredStar : formData.rating
     for (let i = 1; i <= 5; i++) {
       const isActive = i <= formData.rating
       const isHovered = i <= hoveredStar
@@ -203,7 +214,7 @@ export function Opiniones() {
         <button
           key={i}
           type="button"
-          className={`rating-star ${isActive ? 'active' : ''} ${isHovered && !isActive ? 'hover' : ''}`}
+          className={`op-star-btn ${isActive ? 'active' : ''} ${isHovered ? 'hovered' : ''}`}
           onClick={() => setFormData({ ...formData, rating: i })}
           onMouseEnter={() => setHoveredStar(i)}
           onMouseLeave={() => setHoveredStar(0)}
@@ -213,666 +224,628 @@ export function Opiniones() {
         </button>
       )
     }
-    return stars
+    return (
+      <div className="op-stars-wrap">
+        <div className="op-stars-row">{stars}</div>
+        <div className="op-stars-hint">{getRatingLabel(currentRating)}</div>
+      </div>
+    )
   }
 
   return (
     <>
       <style>{`
-
-        .opiniones-root {
+        /* Raíz limpia: fondo oscuro mate, sin degradados ni halos flotantes */
+        .op-page-root {
           min-height: calc(100vh - 80px);
-                  background: #1a1a1a;
-          padding: 2rem 1rem 4rem;
-          font-family: 'Inter', sans-serif;
-          position: relative;
-          /* 'clip' recorta los adornos que se salen a los lados igual que
-             'hidden', pero sin convertir esto en una segunda zona de scroll.
-             Con 'hidden' el navegador vuelve el eje vertical desplazable y
-             la pagina rebota al bajar y subir en el telefono. */
-          overflow-x: hidden; /* respaldo para navegadores viejos */
-          overflow-x: clip;
+          background-color: #0d0d10;
+          padding: 2.5rem 1rem 4rem;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #f4f4f5;
         }
 
-        .opiniones-root::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -20%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(224, 20, 44,0.06) 0%, transparent 70%);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        .opiniones-root::after {
-          content: '';
-          position: absolute;
-          bottom: -30%;
-          left: -10%;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(224, 20, 44,0.04) 0%, transparent 70%);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        .opiniones-container {
+        .op-container {
           max-width: 680px;
           margin: 0 auto;
-          position: relative;
-          z-index: 2;
         }
 
-
-
-
-
-        .opiniones-icon svg {
-          width: 40px;
-          height: 40px;
-          color: white;
-        }
-
-
-
-
-
-
-        .form-card-header p {
-          font-size: 0.75rem;
-          color: #e0142c;
-          letter-spacing: 0.1em;
-          font-weight: 600;
-          text-transform: uppercase;
-          margin: 0;
-        }
-
-
-        .input-group {
-          margin-bottom: 1.75rem;
-        }
-
-        .input-label {
-          display: block;
-          font-size: 0.7rem;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.5);
-          margin-bottom: 0.6rem;
-          letter-spacing: 0.08em;
-          line-height: 1.4;
-          text-transform: uppercase;
-          transition: all 0.2s ease;
-        }
-
-        .input-label.active {
-          color: #e0142c;
-        }
-
-        .input-field {
-          width: 100%;
-          padding: 1rem 1.1rem;
-          line-height: 1.5;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          color: #fff;
-          font-size: 0.9rem;
-          font-family: 'Inter', sans-serif;
-          transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-          outline: none;
-        }
-
-        .input-field:focus {
-          border-color: rgba(224, 20, 44, 0.5);
-          background: rgba(224, 20, 44, 0.05);
-          box-shadow: 0 0 0 3px rgba(224, 20, 44, 0.1);
-        }
-
-        .input-field:active {
-          transform: scale(1.01);
-        }
-
-        .input-field::placeholder {
-          color: rgba(255, 255, 255, 0.3);
-        }
-
-        .input-field:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          background: rgba(255, 255, 255, 0.02);
-        }
-
-        textarea.input-field {
-          min-height: 100px;
-          resize: vertical;
-        }
-
-        .char-counter {
-          text-align: right;
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.4);
-          margin-top: 0.5rem;
-        }
-
-        .char-counter.near-limit {
-          color: #f59e0b;
-        }
-
-        .char-counter.limit {
-          color: #f87171;
-        }
-
-        .rating-group {
-          text-align: center;
-        }
-
-        .rating-stars {
+        /* Selector de pestañas elegante y formal */
+        .op-nav-tabs {
           display: flex;
-          justify-content: center;
-          gap: 0.75rem;
-          margin-bottom: 0.75rem;
+          background: #141417;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 8px;
+          padding: 4px;
+          margin-bottom: 1.5rem;
+          gap: 4px;
         }
 
-        .rating-star {
-          background: none;
+        .op-tab-btn {
+          flex: 1;
+          background: transparent;
           border: none;
-          font-size: 2.5rem;
-          cursor: pointer;
-          color: #444444;
-          transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-          padding: 0;
-          line-height: 1;
-        }
-
-        .rating-star:hover {
-          transform: translateY(-6px) scale(1.15);
-          color: #f59e0b;
-          text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
-        }
-
-        .rating-star:active {
-          transform: scale(0.95);
-        }
-
-        .rating-star.hover {
-          transform: translateY(-4px) scale(1.08);
-          color: #f59e0b;
-          text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-        }
-
-        .rating-star.active {
-          color: #f59e0b;
-          text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-        }
-
-        .rating-hint {
-          font-size: 0.7rem;
-          color: rgba(245, 158, 11, 0.6);
-          text-align: center;
-          margin-top: 0.5rem;
-        }
-
-        .submit-btn {
-          width: 100%;
-          padding: 1rem;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
-          color: white;
-          border: none;
-          border-radius: 50px;
-          font-size: 0.9rem;
+          color: #a1a1aa;
+          padding: 0.65rem 1rem;
+          font-size: 0.85rem;
           font-weight: 600;
           font-family: 'Sora', sans-serif;
+          border-radius: 6px;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-          margin-top: 0.5rem;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .submit-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-          transition: left 0.5s ease;
-        }
-
-        .submit-btn:hover::before {
-          left: 100%;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-          transform: translateY(-3px);
-          box-shadow: 0 10px 30px rgba(224, 20, 44, 0.4);
-        }
-
-        .submit-btn:active {
-          transform: scale(0.97);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .message {
-          padding: 0.85rem;
-          border-radius: 16px;
-          margin-bottom: 1.5rem;
+          transition: background-color 0.15s ease, color 0.15s ease;
           text-align: center;
-          font-size: 0.85rem;
-          animation: fadeIn 0.3s ease;
-          backdrop-filter: blur(8px);
         }
 
-        .message.success {
-          background: rgba(16, 185, 129, 0.1);
-          color: #34d399;
-          border: 1px solid rgba(16, 185, 129, 0.2);
+        .op-tab-btn:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.04);
         }
 
-        .message.error {
-          background: rgba(239, 68, 68, 0.1);
-          color: #f87171;
-          border: 1px solid rgba(239, 68, 68, 0.2);
+        .op-tab-btn.active {
+          background: #e0142c;
+          color: #ffffff;
         }
 
+        /* Estructura de tarjeta: sobria, angular y limpia */
+        .op-panel-card {
+          background: #131316;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 10px;
+          overflow: hidden;
+          margin-bottom: 2rem;
+        }
 
+        .op-panel-header {
+          padding: 1.25rem 1.5rem;
+          background: #17171c;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
 
-        .reviews-header p {
-          font-size: 0.75rem;
-          color: #e0142c;
-          letter-spacing: 0.1em;
-          font-weight: 600;
-          text-transform: uppercase;
+        .op-panel-title {
+          font-family: 'Sora', sans-serif;
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0 0 0.25rem 0;
+          letter-spacing: -0.01em;
+        }
+
+        .op-panel-subtitle {
+          font-size: 0.82rem;
+          color: #8b8b94;
           margin: 0;
+          line-height: 1.4;
         }
 
-        .reviews-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 1.25rem;
+        .op-panel-body {
           padding: 1.5rem;
         }
 
-        .review-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 20px;
-          padding: 1.25rem;
-          transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* Grupos de formularios sobrios */
+        .op-form-group {
+          margin-bottom: 1.25rem;
         }
 
-        .review-card:hover {
-          border-color: rgba(224, 20, 44, 0.3);
-          transform: translateY(-4px);
-          background: rgba(224, 20, 44, 0.02);
+        .op-label {
+          display: block;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #9ca3af;
+          margin-bottom: 0.45rem;
         }
 
-        .review-card:active {
-          transform: scale(0.98);
+        .op-input,
+        .op-textarea {
+          width: 100%;
+          background: #0a0a0c;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 6px;
+          color: #ffffff;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.88rem;
+          padding: 0.75rem 0.9rem;
+          line-height: 1.5;
+          outline: none;
+          transition: border-color 0.15s ease, background 0.15s ease;
+          box-sizing: border-box;
         }
 
-        .review-stars {
-          color: #f59e0b;
-          font-size: 0.9rem;
-          margin-bottom: 0.75rem;
-          letter-spacing: 2px;
+        .op-input:focus,
+        .op-textarea:focus {
+          border-color: #e0142c;
+          background: #0e0e12;
         }
 
-        .review-text {
-          font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.85);
-          line-height: 1.6;
-          margin-bottom: 1rem;
-          font-style: italic;
+        .op-input:disabled {
+          background: #101014;
+          color: #71717a;
+          border-color: rgba(255, 255, 255, 0.05);
+          cursor: not-allowed;
         }
 
-        .review-author {
+        .op-textarea {
+          min-height: 95px;
+          resize: vertical;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+
+        .op-char-bar {
           display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          margin-top: 0.75rem;
-          padding-top: 0.75rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          justify-content: flex-end;
+          margin-top: 0.4rem;
+          font-size: 0.72rem;
+          color: #71717a;
         }
 
-        .review-avatar {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
-          border-radius: 50%;
+        .op-char-bar.near-limit {
+          color: #f59e0b;
+        }
+
+        .op-char-bar.limit {
+          color: #ef4444;
+          font-weight: 600;
+        }
+
+        /* Selector de estrellas sobrio y limpio */
+        .op-stars-wrap {
+          background: #0a0a0c;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 8px;
+          padding: 1rem 0.75rem;
+          text-align: center;
+        }
+
+        .op-stars-row {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+        }
+
+        .op-star-btn {
+          background: none;
+          border: none;
+          font-size: 1.85rem;
+          cursor: pointer;
+          color: #3f3f46;
+          padding: 0 0.15rem;
+          line-height: 1;
+          transition: color 0.15s ease;
+        }
+
+        .op-star-btn.active,
+        .op-star-btn.hovered {
+          color: #f59e0b;
+        }
+
+        .op-stars-hint {
+          font-size: 0.75rem;
+          color: #a1a1aa;
+          margin-top: 0.5rem;
+          font-weight: 500;
+        }
+
+        /* Botón de envío directo y formal */
+        .op-btn-primary {
+          width: 100%;
+          background: #e0142c;
+          color: #ffffff;
+          border: none;
+          border-radius: 6px;
+          padding: 0.8rem 1rem;
+          font-family: 'Sora', sans-serif;
+          font-size: 0.88rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.15s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 600;
-          font-size: 0.85rem;
-          color: #ffffff;
-          transition: transform 0.3s ease;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
         }
 
-        .review-card:hover .review-avatar {
-          transform: scale(1.05);
+        .op-btn-primary:hover:not(:disabled) {
+          background: #c81024;
         }
 
-        .review-info {
-          flex: 1;
+        .op-btn-primary:disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
         }
 
-        .review-name {
-          font-weight: 600;
-          font-size: 0.85rem;
-          margin-bottom: 0.2rem;
-          color: #ffffff;
-        }
-
-        .review-date {
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.45);
-        }
-
-        .empty-state {
+        /* Alertas limpias */
+        .op-alert {
+          padding: 0.75rem 1rem;
+          border-radius: 6px;
+          font-size: 0.82rem;
+          margin-bottom: 1.25rem;
           text-align: center;
-          padding: 3rem;
-          color: rgba(255, 255, 255, 0.4);
+          line-height: 1.4;
         }
 
-        .empty-icon {
-          font-size: 3rem;
-          margin-bottom: 1rem;
-          opacity: 0.5;
+        .op-alert-success {
+          background: rgba(16, 185, 129, 0.1);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.25);
         }
 
-        .spinner {
-          animation: spin 1s linear infinite;
+        .op-alert-error {
+          background: rgba(239, 68, 68, 0.1);
+          color: #f87171;
+          border: 1px solid rgba(239, 68, 68, 0.25);
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+        /* Lista de opiniones públicas (Muro) */
+        .op-reviews-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+          gap: 1rem;
+          padding: 1.25rem;
         }
 
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-
-
-
-
-
-
-
-        .op-lista {
+        .op-review-item {
+          background: #0d0d10;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 8px;
+          padding: 1.1rem;
           display: flex;
           flex-direction: column;
-          gap: 0.9rem;
+          justify-content: space-between;
         }
 
-        .op-item {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 18px;
-          padding: 1.1rem;
-        }
-
-        .op-item-top {
+        .op-review-top {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 0.75rem;
-          margin-bottom: 0.6rem;
+          margin-bottom: 0.75rem;
         }
 
-        .op-item-estrellas {
+        .op-review-stars {
           color: #f59e0b;
-          font-size: 1.05rem;
+          font-size: 0.92rem;
           letter-spacing: 2px;
         }
 
-        .op-estado {
-          font-size: 0.65rem;
-          font-weight: 500;
-          padding: 0.22rem 0.65rem;
-          border-radius: 20px;
-          text-transform: uppercase;
-          white-space: nowrap;
+        .op-review-date {
+          font-size: 0.72rem;
+          color: #71717a;
         }
 
-        .op-estado.aprobada {
-          background: rgba(16, 185, 129, 0.15);
-          border: 1px solid rgba(16, 185, 129, 0.3);
-          color: #34d399;
-        }
-
-        .op-estado.pendiente {
-          background: rgba(245, 158, 11, 0.15);
-          border: 1px solid rgba(245, 158, 11, 0.3);
-          color: #fbbf24;
-        }
-
-        .op-item-texto {
-          font-size: 0.95rem;
-          color: #fff;
+        .op-review-text {
+          font-size: 0.85rem;
+          color: #d4d4d8;
           line-height: 1.55;
-          font-style: italic;
+          margin: 0 0 1rem 0;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+        }
+
+        .op-review-author {
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .op-avatar-badge {
+          width: 30px;
+          height: 30px;
+          border-radius: 6px;
+          background: #1c1c22;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #e0142c;
+          font-weight: 700;
+          font-size: 0.82rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .op-author-name {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #ffffff;
+        }
+
+        .op-author-verified {
+          font-size: 0.68rem;
+          color: #10b981;
+          margin-top: 1px;
+        }
+
+        /* Mis opiniones */
+        .op-my-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .op-my-item {
+          background: #0a0a0c;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 8px;
+          padding: 1.1rem;
+        }
+
+        .op-my-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.6rem;
+        }
+
+        .op-status-tag {
+          font-size: 0.65rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          padding: 0.2rem 0.6rem;
+          border-radius: 4px;
+        }
+
+        .op-status-tag.approved {
+          background: rgba(16, 185, 129, 0.12);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .op-status-tag.pending {
+          background: rgba(245, 158, 11, 0.12);
+          color: #fbbf24;
+          border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .op-my-comment {
+          font-size: 0.88rem;
+          color: #e4e4e7;
+          line-height: 1.5;
           margin-bottom: 0.9rem;
           word-break: break-word;
           overflow-wrap: anywhere;
         }
 
-        .op-item-acciones {
+        .op-actions-row {
           display: flex;
-          gap: 0.6rem;
           justify-content: flex-end;
-          margin-top: 0.75rem;
+          gap: 0.5rem;
         }
 
-        .op-item-acciones button {
-          padding: 0.5rem 1.1rem;
-          border-radius: 20px;
-          font-size: 0.8rem;
+        .op-btn-action {
+          padding: 0.4rem 0.85rem;
+          border-radius: 5px;
+          font-size: 0.78rem;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
-        .op-btn-editar {
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: rgba(255, 255, 255, 0.85);
+        .op-btn-edit {
+          background: #18181c;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #e4e4e7;
         }
 
-        .op-btn-editar:hover { background: rgba(255, 255, 255, 0.16); }
+        .op-btn-edit:hover {
+          background: #222228;
+          border-color: rgba(255, 255, 255, 0.2);
+        }
 
-        .op-btn-eliminar {
-          background: rgba(239, 68, 68, 0.12);
-          border: 1px solid rgba(239, 68, 68, 0.3);
+        .op-btn-delete {
+          background: rgba(239, 68, 68, 0.08);
+          border: 1px solid rgba(239, 68, 68, 0.25);
           color: #f87171;
         }
 
-        .op-btn-eliminar:hover { background: rgba(239, 68, 68, 0.25); }
-
-        .op-btn-cancelar {
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: rgba(255, 255, 255, 0.7);
+        .op-btn-delete:hover {
+          background: rgba(239, 68, 68, 0.18);
         }
 
-        .op-btn-guardar {
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
+        .op-btn-cancel {
+          background: #18181c;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #a1a1aa;
+        }
+
+        .op-btn-save {
+          background: #e0142c;
           border: none;
-          color: #fff;
+          color: #ffffff;
           font-weight: 600;
         }
 
-        .op-edit-estrellas {
-          display: flex;
-          gap: 0.4rem;
-          margin-bottom: 0.75rem;
+        .op-btn-save:hover {
+          background: #c81024;
         }
 
-        .op-edit-estrellas .rating-star {
-          font-size: 1.6rem;
+        .op-edit-stars-row {
+          display: flex;
+          gap: 0.35rem;
+          margin-bottom: 0.65rem;
+        }
+
+        .op-edit-stars-row .op-star-btn {
+          font-size: 1.4rem;
+        }
+
+        /* Estados vacíos */
+        .op-empty-view {
+          text-align: center;
+          padding: 2.5rem 1rem;
+          color: #71717a;
+          font-size: 0.85rem;
+        }
+
+        .op-empty-icon {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          opacity: 0.6;
+        }
+
+        /* Spinner */
+        .op-spinner {
+          animation: opSpin 0.9s linear infinite;
+        }
+
+        @keyframes opSpin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
 
         @media (max-width: 640px) {
-          .opiniones-root {
-            padding: 1.5rem 1rem 3rem;
+          .op-page-root {
+            padding: 1.25rem 0.75rem 3rem;
           }
-          .opiniones-icon svg {
-            width: 32px;
-            height: 32px;
+          .op-panel-body {
+            padding: 1.15rem 1rem;
           }
-          .rating-star {
-            font-size: 2rem;
-          }
-          .reviews-grid {
+          .op-reviews-grid {
             grid-template-columns: 1fr;
-            padding: 1rem;
+            padding: 1rem 0.85rem;
           }
-          .input-group {
-            margin-bottom: 1.5rem;
-          }
-          .rating-stars {
-            gap: 0.5rem;
+          .op-star-btn {
+            font-size: 1.65rem;
           }
         }
       `}</style>
 
-      <div className="opiniones-root">
-        <div className="opiniones-container">
-          <div className="af-tabs">
-            <button className={`af-tab${vista === 'opinar' ? ' active' : ''}`} onClick={() => setVista('opinar')}>
+      <div className="op-page-root">
+        <div className="op-container">
+
+          {/* Selector de pestañas */}
+          <div className="op-nav-tabs">
+            <button
+              type="button"
+              className={`op-tab-btn ${vista === 'opinar' ? 'active' : ''}`}
+              onClick={() => setVista('opinar')}
+            >
               Dejar opinión
             </button>
-            <button className={`af-tab${vista === 'mis' ? ' active' : ''}`} onClick={() => setVista('mis')}>
+            <button
+              type="button"
+              className={`op-tab-btn ${vista === 'mis' ? 'active' : ''}`}
+              onClick={() => setVista('mis')}
+            >
               Mis opiniones
             </button>
           </div>
 
+          {/* VISTA 1: DEJAR OPINIÓN */}
           {vista === 'opinar' && (
-          <div className="af-card">
-            <div className="af-card-header">
-              <h2>Dejar Opinión</h2>
-              <p>Comparta su experiencia y ayude a otros clientes</p>
-            </div>
-            <div className="af-body">
-              {alcanzoLimite && (
-                <AvisoLimite
-                  titulo="Ya dejaste todas tus opiniones"
-                  destacado={{
-                    etiqueta: 'Opiniones usadas',
-                    valor: `${misOpiniones.length} de ${MAX_OPINIONES}`,
-                  }}
-                  nota="Si querés escribir otra, primero eliminá una de las que ya tenés."
-                >
-                  <button type="button" className="avl-btn avl-btn-rojo" onClick={() => setVista('mis')}>
-                    Ver mis opiniones
-                  </button>
-                </AvisoLimite>
-              )}
-              {mensaje && (
-                <div className={`message ${mensaje.includes('éxito') ? 'success' : 'error'}`}>
-                  {mensaje}
-                </div>
-              )}
-              <form onSubmit={handleSubmit}>
-                <div className="input-group">
-                  <label className={`input-label ${focusedField === 'nombre' ? 'active' : ''}`}>
-                    SU NOMBRE (NO EDITABLE)
-                  </label>
-                  <input
-                    className="input-field"
-                    type="text"
-                    value={perfil.nombre || ''}
-                    disabled
-                    placeholder="Cargando..."
-                  />
-                </div>
+            <div className="op-panel-card">
+              <div className="op-panel-header">
+                <h2 className="op-panel-title">Comparta su Experiencia</h2>
+                <p className="op-panel-subtitle">Su testimonio nos ayuda a mejorar y guía a futuros clientes</p>
+              </div>
 
-                <div className="input-group">
-                  <label className={`input-label ${focusedField === 'rating' ? 'active' : ''}`}>
-                    CALIFICACIÓN
-                  </label>
-                  <div className="rating-group">
-                    <div className="rating-stars">
-                      {renderRatingStars()}
+              <div className="op-panel-body">
+                {alcanzoLimite && (
+                  <AvisoLimite
+                    titulo="Límite de opiniones alcanzado"
+                    destacado={{
+                      etiqueta: 'Opiniones registradas',
+                      valor: `${misOpiniones.length} de ${MAX_OPINIONES}`,
+                    }}
+                    nota="Cada cliente puede registrar hasta 2 opiniones. Si desea escribir una nueva, primero elimine una anterior en Mis Opiniones."
+                  >
+                    <button type="button" className="op-btn-primary" style={{ maxWidth: '200px', margin: '0 auto' }} onClick={() => setVista('mis')}>
+                      Gestionar mis opiniones
+                    </button>
+                  </AvisoLimite>
+                )}
+
+                {mensaje && (
+                  <div className={`op-alert ${mensaje.includes('éxito') ? 'op-alert-success' : 'op-alert-error'}`}>
+                    {mensaje}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                  {/* Nombre del cliente */}
+                  <div className="op-form-group">
+                    <label className="op-label">Nombre del Cliente</label>
+                    <input
+                      className="op-input"
+                      type="text"
+                      value={perfil.nombre || ''}
+                      disabled
+                      placeholder="Cargando perfil..."
+                    />
+                  </div>
+
+                  {/* Calificación */}
+                  <div className="op-form-group">
+                    <label className="op-label">Calificación del Servicio</label>
+                    {renderRatingStars()}
+                  </div>
+
+                  {/* Comentario */}
+                  <div className="op-form-group">
+                    <label className="op-label">Comentario o Reseña</label>
+                    <textarea
+                      className="op-textarea"
+                      value={formData.comentario}
+                      onChange={handleComentarioChange}
+                      placeholder="Describa brevemente la atención, el acabado de su vehículo y su satisfacción..."
+                      maxLength={100}
+                      required
+                    />
+                    <div className={`op-char-bar ${formData.comentario.length >= 90 ? (formData.comentario.length >= 100 ? 'limit' : 'near-limit') : ''}`}>
+                      {formData.comentario.length} / 100 caracteres
                     </div>
-                    {formData.rating === 0 && (
-                      <p className="rating-hint">Haga clic en las estrellas para calificar</p>
+                  </div>
+
+                  {/* Botón de envío */}
+                  <button type="submit" className="op-btn-primary" disabled={enviando || alcanzoLimite}>
+                    {enviando ? (
+                      <>
+                        <svg className="op-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31" strokeDashoffset="10" />
+                        </svg>
+                        <span>Procesando...</span>
+                      </>
+                    ) : (
+                      'Publicar Opinión'
                     )}
-                  </div>
-                </div>
-
-                <div className="input-group">
-                  <label className={`input-label ${focusedField === 'comentario' ? 'active' : ''}`}>
-                    SU COMENTARIO
-                  </label>
-                  <textarea
-                    className="input-field"
-                    value={formData.comentario}
-                    onChange={handleComentarioChange}
-                    onFocus={() => setFocusedField('comentario')}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Cuéntenos su experiencia con nuestro servicio..."
-                    maxLength={100}
-                    required
-                  />
-                  <div className={`char-counter ${formData.comentario.length >= 90 ? (formData.comentario.length >= 100 ? 'limit' : 'near-limit') : ''}`}>
-                    {formData.comentario.length}/100 caracteres
-                  </div>
-                </div>
-
-                <button type="submit" className="submit-btn" disabled={enviando || alcanzoLimite}>
-                  {enviando ? (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                      <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31" strokeDashoffset="10" />
-                      </svg>
-                      Enviando...
-                    </span>
-                  ) : (
-                    'Enviar Opinión'
-                  )}
-                </button>
-              </form>
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
           )}
 
+          {/* VISTA 2: MIS OPINIONES */}
           {vista === 'mis' && (
-            <div className="af-card">
-              <div className="af-card-header">
-                <h2>Mis Opiniones</h2>
-                <p>Estas son las opiniones que has dejado</p>
+            <div className="op-panel-card">
+              <div className="op-panel-header">
+                <h2 className="op-panel-title">Mis Opiniones Registradas</h2>
+                <p className="op-panel-subtitle">Historial de calificaciones emitidas con su cuenta</p>
               </div>
-              <div className="af-body">
+
+              <div className="op-panel-body">
                 {buscando ? (
-                  <div className="empty-state"><p>Cargando tus opiniones...</p></div>
+                  <div className="op-empty-view">
+                    <p>Cargando opiniones...</p>
+                  </div>
                 ) : misOpiniones.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">💬</div>
-                    <p>Todavía no has dejado ninguna opinión</p>
+                  <div className="op-empty-view">
+                    <div className="op-empty-icon">💬</div>
+                    <p>Aún no ha dejado ninguna opinión registrada en el sistema.</p>
                   </div>
                 ) : (
-                  <div className="op-lista">
+                  <div className="op-my-list">
                     {misOpiniones.map((op) => (
-                      <div key={op.id} className="op-item">
+                      <div key={op.id} className="op-my-item">
                         {editandoId === op.id ? (
                           <>
-                            <div className="op-edit-estrellas">
+                            <div className="op-edit-stars-row">
                               {[1, 2, 3, 4, 5].map((i) => (
                                 <button
                                   key={i}
                                   type="button"
-                                  className={`rating-star ${i <= editForm.rating ? 'active' : ''}`}
+                                  className={`op-star-btn ${i <= editForm.rating ? 'active' : ''}`}
                                   onClick={() => setEditForm({ ...editForm, rating: i })}
                                 >
                                   ★
@@ -880,34 +853,36 @@ export function Opiniones() {
                               ))}
                             </div>
                             <textarea
-                              className="input-field"
+                              className="op-textarea"
                               value={editForm.comentario}
                               maxLength={100}
                               onChange={(e) => setEditForm({ ...editForm, comentario: e.target.value })}
                             />
-                            <div className="op-item-acciones">
-                              <button type="button" className="op-btn-cancelar" onClick={() => setEditandoId(null)}>
+                            <div className="op-actions-row" style={{ marginTop: '0.75rem' }}>
+                              <button type="button" className="op-btn-action op-btn-cancel" onClick={() => setEditandoId(null)}>
                                 Cancelar
                               </button>
-                              <button type="button" className="op-btn-guardar" onClick={() => guardarEdicion(op.id)}>
-                                Guardar
+                              <button type="button" className="op-btn-action op-btn-save" onClick={() => guardarEdicion(op.id)}>
+                                Guardar cambios
                               </button>
                             </div>
                           </>
                         ) : (
                           <>
-                            <div className="op-item-top">
-                              <span className="op-item-estrellas">{'★'.repeat(op.rating)}</span>
-                              <span className={`op-estado ${op.is_approved ? 'aprobada' : 'pendiente'}`}>
-                                {op.is_approved ? 'Publicada' : 'Pendiente'}
+                            <div className="op-my-top">
+                              <span style={{ color: '#f59e0b', fontSize: '1rem', letterSpacing: '2px' }}>
+                                {'★'.repeat(op.rating)}
+                              </span>
+                              <span className={`op-status-tag ${op.is_approved ? 'approved' : 'pending'}`}>
+                                {op.is_approved ? 'Publicada' : 'En revisión'}
                               </span>
                             </div>
-                            <p className="op-item-texto">"{op.comment}"</p>
-                            <div className="op-item-acciones">
-                              <button type="button" className="op-btn-editar" onClick={() => empezarEdicion(op)}>
+                            <p className="op-my-comment">"{op.comment}"</p>
+                            <div className="op-actions-row">
+                              <button type="button" className="op-btn-action op-btn-edit" onClick={() => empezarEdicion(op)}>
                                 Editar
                               </button>
-                              <button type="button" className="op-btn-eliminar" onClick={() => eliminarOpinion(op)}>
+                              <button type="button" className="op-btn-action op-btn-delete" onClick={() => eliminarOpinion(op)}>
                                 Eliminar
                               </button>
                             </div>
@@ -921,43 +896,49 @@ export function Opiniones() {
             </div>
           )}
 
+          {/* MURO DE OPINIONES DE CLIENTES */}
           {vista === 'opinar' && (
-          <div className="af-card" style={{ marginTop: '2rem' }}>
-            <div className="af-card-header">
-              <h2>Opiniones de nuestros clientes</h2>
-              <p>Lo que dicen quienes ya nos visitaron</p>
-            </div>
-            <div className="reviews-grid">
-              {loading ? (
-                <div className="empty-state">
-                  <div className="empty-icon">⏳</div>
-                  <p>Cargando opiniones...</p>
-                </div>
-              ) : opiniones.length === 0 ? (
-                <div className="empty-state">
-                  <div className="empty-icon">📋</div>
-                  <p>No hay opiniones aún. ¡Sea el primero en opinar!</p>
-                </div>
-              ) : (
-                opiniones.map((opinion) => (
-                  <div key={opinion.id} className="review-card">
-                    <div className="review-stars">{"★".repeat(opinion.rating)}</div>
-                    <div className="review-text">{opinion.comment}</div>
-                    <div className="review-author">
-                      <div className="review-avatar">
-                        {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
+            <div className="op-panel-card">
+              <div className="op-panel-header">
+                <h2 className="op-panel-title">Opiniones de Nuestros Clientes</h2>
+                <p className="op-panel-subtitle">Comentarios recientes verificados por el taller</p>
+              </div>
+
+              <div className="op-reviews-grid">
+                {loading ? (
+                  <div className="op-empty-view" style={{ gridColumn: '1 / -1' }}>
+                    <p>Cargando testimonios...</p>
+                  </div>
+                ) : opiniones.length === 0 ? (
+                  <div className="op-empty-view" style={{ gridColumn: '1 / -1' }}>
+                    <p>No hay opiniones públicas registradas actualmente.</p>
+                  </div>
+                ) : (
+                  opiniones.map((opinion) => (
+                    <div key={opinion.id} className="op-review-item">
+                      <div>
+                        <div className="op-review-top">
+                          <span className="op-review-stars">{'★'.repeat(opinion.rating)}</span>
+                          <span className="op-review-date">{new Date(opinion.created_at).toLocaleDateString('es-CR')}</span>
+                        </div>
+                        <p className="op-review-text">"{opinion.comment}"</p>
                       </div>
-                      <div className="review-info">
-                        <div className="review-name">{opinion.customer_name}</div>
-                        <div className="review-date">{new Date(opinion.created_at).toLocaleDateString('es-CR')}</div>
+                      <div className="op-review-author">
+                        <div className="op-avatar-badge">
+                          {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
+                        </div>
+                        <div>
+                          <div className="op-author-name">{opinion.customer_name}</div>
+                          <div className="op-author-verified">✓ Cliente verificado</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          </div>
           )}
+
         </div>
       </div>
     </>
