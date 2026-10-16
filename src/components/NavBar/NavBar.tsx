@@ -334,16 +334,16 @@ export function NavBar() {
           width: 50px;
           height: 50px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          background: #202024;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 1.25rem;
           font-weight: 600;
           color: white;
-          box-shadow: 0 4px 12px rgba(224, 20, 44, 0.3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
           overflow: hidden;
-          border: 2px solid rgba(255, 255, 255, 0.15);
+          border: 1.5px solid rgba(255, 255, 255, 0.15);
         }
 
         .user-avatar-img {
@@ -356,6 +356,7 @@ export function NavBar() {
 
         .user-avatar-initial {
           user-select: none;
+          color: #f0f0f0;
         }
 
         .avatar-edit-btn {
@@ -379,8 +380,8 @@ export function NavBar() {
         }
 
         .avatar-edit-btn:hover {
-          background: #e0142c;
-          border-color: #ff4d61;
+          background: #2e2e33;
+          border-color: rgba(255, 255, 255, 0.6);
           transform: scale(1.12);
         }
 
