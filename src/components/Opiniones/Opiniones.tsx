@@ -193,20 +193,8 @@ export function Opiniones() {
     fetchOpiniones()
   }
 
-  const getRatingLabel = (val: number) => {
-    switch (val) {
-      case 1: return '1 / 5 · Deficiente'
-      case 2: return '2 / 5 · Regular'
-      case 3: return '3 / 5 · Bueno'
-      case 4: return '4 / 5 · Muy bueno'
-      case 5: return '5 / 5 · Excelente'
-      default: return 'Seleccione de 1 a 5 estrellas'
-    }
-  }
-
   const renderRatingStars = () => {
     const stars = []
-    const currentRating = hoveredStar > 0 ? hoveredStar : formData.rating
     for (let i = 1; i <= 5; i++) {
       const isActive = i <= formData.rating
       const isHovered = i <= hoveredStar
@@ -214,7 +202,7 @@ export function Opiniones() {
         <button
           key={i}
           type="button"
-          className={`op-star-btn ${isActive ? 'active' : ''} ${isHovered ? 'hovered' : ''}`}
+          className={`op-rating-star ${isActive ? 'active' : ''} ${isHovered && !isActive ? 'hover' : ''}`}
           onClick={() => setFormData({ ...formData, rating: i })}
           onMouseEnter={() => setHoveredStar(i)}
           onMouseLeave={() => setHoveredStar(0)}
@@ -224,470 +212,483 @@ export function Opiniones() {
         </button>
       )
     }
-    return (
-      <div className="op-stars-wrap">
-        <div className="op-stars-row">{stars}</div>
-        <div className="op-stars-hint">{getRatingLabel(currentRating)}</div>
-      </div>
-    )
+    return stars
   }
 
   return (
     <>
       <style>{`
-        /* Raíz limpia: fondo oscuro mate, sin degradados ni halos flotantes */
-        .op-page-root {
-          min-height: calc(100vh - 80px);
-          background-color: #0d0d10;
-          padding: 2.5rem 1rem 4rem;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          color: #f4f4f5;
+        /* ============================================================
+           FUSIÓN: ESTRUCTURA ORIGINAL + ESTÉTICA PURA ADMIN
+           Fondo oscuro mate sin halos ni adornos flotantes.
+           Paleta: Negro (#0a0a0a), Grafito (#121212 / #161616), Rojo (#e0142c), Dorado (#f59e0b)
+           ============================================================ */
+
+        .op-fusion-root {
+          min-height: calc(100vh - 72px);
+          background-color: #080808;
+          padding: 2rem 1rem 4rem;
+          font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #d4d4d4;
+          box-sizing: border-box;
         }
 
-        .op-container {
+        .op-fusion-container {
           max-width: 680px;
           margin: 0 auto;
         }
 
-        /* Selector de pestañas elegante y formal */
-        .op-nav-tabs {
+        /* Pestañas: estilo píldora como el original, pero con la sobriedad del Admin */
+        .op-fusion-tabs {
           display: flex;
-          background: #141417;
+          background: #141414;
+          padding: 0.3rem;
+          border-radius: 50px;
+          max-width: 360px;
+          margin: 0 auto 1.75rem;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          padding: 4px;
-          margin-bottom: 1.5rem;
-          gap: 4px;
+          gap: 0.25rem;
         }
 
-        .op-tab-btn {
+        .op-fusion-tab {
           flex: 1;
-          background: transparent;
+          padding: 0.65rem 1.1rem;
           border: none;
-          color: #a1a1aa;
-          padding: 0.65rem 1rem;
-          font-size: 0.85rem;
-          font-weight: 600;
-          font-family: 'Sora', sans-serif;
-          border-radius: 6px;
+          background: transparent;
+          color: #888888;
+          font-size: 0.86rem;
+          font-weight: 500;
+          font-family: 'DM Sans', sans-serif;
+          border-radius: 50px;
           cursor: pointer;
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition: all 0.2s ease;
           text-align: center;
         }
 
-        .op-tab-btn:hover {
+        .op-fusion-tab:hover {
           color: #ffffff;
-          background: rgba(255, 255, 255, 0.04);
         }
 
-        .op-tab-btn.active {
+        .op-fusion-tab.active {
           background: #e0142c;
           color: #ffffff;
+          font-weight: 600;
+          box-shadow: 0 4px 14px rgba(224, 20, 44, 0.35);
         }
 
-        /* Estructura de tarjeta: sobria, angular y limpia */
-        .op-panel-card {
-          background: #131316;
+        /* Tarjeta principal: mezcla del borde redondeado original con acabados del Admin */
+        .op-fusion-card {
+          background: #121212;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 10px;
+          border-radius: 18px;
           overflow: hidden;
-          margin-bottom: 2rem;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        .op-panel-header {
-          padding: 1.25rem 1.5rem;
-          background: #17171c;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        /* Encabezado con sutil degradado carmesí del original */
+        .op-fusion-card-header {
+          background: linear-gradient(135deg, rgba(224, 20, 44, 0.12), rgba(224, 20, 44, 0.02));
+          padding: 1.5rem 1.75rem;
+          text-align: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .op-panel-title {
+        .op-fusion-card-header h2 {
           font-family: 'Sora', sans-serif;
-          font-size: 1.2rem;
+          font-size: 1.35rem;
           font-weight: 700;
           color: #ffffff;
-          margin: 0 0 0.25rem 0;
+          margin: 0 0 0.35rem 0;
           letter-spacing: -0.01em;
         }
 
-        .op-panel-subtitle {
+        .op-fusion-card-header p {
           font-size: 0.82rem;
-          color: #8b8b94;
+          color: #888888;
           margin: 0;
-          line-height: 1.4;
         }
 
-        .op-panel-body {
-          padding: 1.5rem;
+        .op-fusion-body {
+          padding: 1.75rem;
         }
 
-        /* Grupos de formularios sobrios */
-        .op-form-group {
-          margin-bottom: 1.25rem;
+        /* Grupos de inputs como los del formulario original */
+        .op-input-group {
+          margin-bottom: 1.5rem;
         }
 
-        .op-label {
+        .op-input-label {
           display: block;
           font-size: 0.72rem;
           font-weight: 600;
-          letter-spacing: 0.06em;
+          color: #888888;
+          margin-bottom: 0.5rem;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #9ca3af;
-          margin-bottom: 0.45rem;
         }
 
-        .op-input,
-        .op-textarea {
+        .op-input-control {
           width: 100%;
-          background: #0a0a0c;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 6px;
-          color: #ffffff;
-          font-family: 'Inter', sans-serif;
-          font-size: 0.88rem;
-          padding: 0.75rem 0.9rem;
+          padding: 0.85rem 1.1rem;
           line-height: 1.5;
+          background: #181818;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          color: #ffffff;
+          font-size: 0.9rem;
+          font-family: 'DM Sans', sans-serif;
           outline: none;
-          transition: border-color 0.15s ease, background 0.15s ease;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
           box-sizing: border-box;
         }
 
-        .op-input:focus,
-        .op-textarea:focus {
+        .op-input-control:focus {
           border-color: #e0142c;
-          background: #0e0e12;
+          box-shadow: 0 0 0 2px rgba(224, 20, 44, 0.2);
         }
 
-        .op-input:disabled {
-          background: #101014;
-          color: #71717a;
-          border-color: rgba(255, 255, 255, 0.05);
+        .op-input-control:disabled {
+          opacity: 0.75;
           cursor: not-allowed;
+          background: #141414;
+          color: #777777;
         }
 
-        .op-textarea {
-          min-height: 95px;
+        textarea.op-input-control {
+          min-height: 100px;
           resize: vertical;
           word-break: break-word;
           overflow-wrap: anywhere;
         }
 
-        .op-char-bar {
-          display: flex;
-          justify-content: flex-end;
-          margin-top: 0.4rem;
+        .op-char-counter {
+          text-align: right;
           font-size: 0.72rem;
-          color: #71717a;
+          color: #666666;
+          margin-top: 0.45rem;
+          font-family: 'JetBrains Mono', monospace;
         }
 
-        .op-char-bar.near-limit {
+        .op-char-counter.near-limit {
           color: #f59e0b;
         }
 
-        .op-char-bar.limit {
+        .op-char-counter.limit {
           color: #ef4444;
           font-weight: 600;
         }
 
-        /* Selector de estrellas sobrio y limpio */
-        .op-stars-wrap {
-          background: #0a0a0c;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          padding: 1rem 0.75rem;
+        /* Calificación por estrellas: formato centrado del original con el dorado del Admin */
+        .op-rating-group {
           text-align: center;
+          background: #161616;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 12px;
+          padding: 1rem;
         }
 
-        .op-stars-row {
+        .op-rating-stars {
           display: flex;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.6rem;
         }
 
-        .op-star-btn {
+        .op-rating-star {
           background: none;
           border: none;
-          font-size: 1.85rem;
+          font-size: 2.2rem;
           cursor: pointer;
-          color: #3f3f46;
-          padding: 0 0.15rem;
+          color: #333333;
+          padding: 0;
           line-height: 1;
-          transition: color 0.15s ease;
+          transition: color 0.15s ease, text-shadow 0.15s ease;
         }
 
-        .op-star-btn.active,
-        .op-star-btn.hovered {
+        .op-rating-star:hover,
+        .op-rating-star.hover {
           color: #f59e0b;
+          text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
 
-        .op-stars-hint {
+        .op-rating-star.active {
+          color: #f59e0b;
+          text-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+        }
+
+        .op-rating-hint {
           font-size: 0.75rem;
-          color: #a1a1aa;
+          color: #888888;
+          text-align: center;
           margin-top: 0.5rem;
-          font-weight: 500;
+          margin-bottom: 0;
         }
 
-        /* Botón de envío directo y formal */
-        .op-btn-primary {
+        /* Botón de envío: píldora como el original, rojo profesional */
+        .op-fusion-submit-btn {
           width: 100%;
-          background: #e0142c;
-          color: #ffffff;
+          padding: 0.9rem;
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          color: white;
           border: none;
-          border-radius: 6px;
-          padding: 0.8rem 1rem;
-          font-family: 'Sora', sans-serif;
-          font-size: 0.88rem;
+          border-radius: 50px;
+          font-size: 0.92rem;
           font-weight: 600;
+          font-family: 'Sora', sans-serif;
           cursor: pointer;
-          transition: background-color 0.15s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
           margin-top: 0.5rem;
+          box-shadow: 0 4px 15px rgba(224, 20, 44, 0.3);
         }
 
-        .op-btn-primary:hover:not(:disabled) {
-          background: #c81024;
+        .op-fusion-submit-btn:hover:not(:disabled) {
+          box-shadow: 0 6px 20px rgba(224, 20, 44, 0.45);
         }
 
-        .op-btn-primary:disabled {
+        .op-fusion-submit-btn:active {
+          transform: scale(0.99);
+        }
+
+        .op-fusion-submit-btn:disabled {
           opacity: 0.55;
           cursor: not-allowed;
+          box-shadow: none;
         }
 
-        /* Alertas limpias */
-        .op-alert {
-          padding: 0.75rem 1rem;
-          border-radius: 6px;
-          font-size: 0.82rem;
+        /* Mensajes de notificación */
+        .op-fusion-msg {
+          padding: 0.8rem;
+          border-radius: 10px;
           margin-bottom: 1.25rem;
           text-align: center;
-          line-height: 1.4;
+          font-size: 0.84rem;
         }
 
-        .op-alert-success {
-          background: rgba(16, 185, 129, 0.1);
-          color: #34d399;
-          border: 1px solid rgba(16, 185, 129, 0.25);
+        .op-fusion-msg.success {
+          background: rgba(34, 197, 94, 0.1);
+          color: #4ade80;
+          border: 1px solid rgba(34, 197, 94, 0.25);
         }
 
-        .op-alert-error {
+        .op-fusion-msg.error {
           background: rgba(239, 68, 68, 0.1);
           color: #f87171;
           border: 1px solid rgba(239, 68, 68, 0.25);
         }
 
-        /* Lista de opiniones públicas (Muro) */
-        .op-reviews-grid {
+        /* Muro de testimonios: Grid con tarjetas limpias estilo Admin */
+        .op-fusion-reviews-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
           gap: 1rem;
-          padding: 1.25rem;
+          padding: 1.5rem;
         }
 
-        .op-review-item {
-          background: #0d0d10;
+        .op-fusion-review-card {
+          background: #141414;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          padding: 1.1rem;
+          border-radius: 14px;
+          padding: 1.15rem;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
         }
 
-        .op-review-top {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0.75rem;
-        }
-
-        .op-review-stars {
+        .op-fusion-review-stars {
           color: #f59e0b;
           font-size: 0.92rem;
+          margin-bottom: 0.65rem;
           letter-spacing: 2px;
+          text-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
         }
 
-        .op-review-date {
-          font-size: 0.72rem;
-          color: #71717a;
-        }
-
-        .op-review-text {
+        .op-fusion-review-text {
           font-size: 0.85rem;
-          color: #d4d4d8;
+          color: #d4d4d4;
           line-height: 1.55;
-          margin: 0 0 1rem 0;
+          margin-bottom: 0.9rem;
+          font-style: italic;
           word-break: break-word;
           overflow-wrap: anywhere;
         }
 
-        .op-review-author {
+        .op-fusion-review-author {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
+          gap: 0.75rem;
           padding-top: 0.75rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .op-avatar-badge {
-          width: 30px;
-          height: 30px;
-          border-radius: 6px;
-          background: #1c1c22;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #e0142c;
-          font-weight: 700;
-          font-size: 0.82rem;
+        .op-fusion-review-avatar {
+          width: 34px;
+          height: 34px;
+          background: linear-gradient(135deg, #e0142c, #800a16);
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-weight: 700;
+          font-size: 0.84rem;
+          color: #ffffff;
           flex-shrink: 0;
         }
 
-        .op-author-name {
-          font-size: 0.82rem;
-          font-weight: 600;
-          color: #ffffff;
+        .op-fusion-review-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
         }
 
-        .op-author-verified {
-          font-size: 0.68rem;
-          color: #10b981;
-          margin-top: 1px;
+        .op-fusion-review-name {
+          font-weight: 700;
+          font-size: 0.85rem;
+          color: #ffffff;
+          line-height: 1.2;
+        }
+
+        .op-fusion-review-date {
+          font-size: 0.7rem;
+          color: #777777;
+          font-family: 'JetBrains Mono', monospace;
         }
 
         /* Mis opiniones */
-        .op-my-list {
+        .op-fusion-lista {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.9rem;
         }
 
-        .op-my-item {
-          background: #0a0a0c;
+        .op-fusion-item {
+          background: #161616;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
-          padding: 1.1rem;
+          border-radius: 14px;
+          padding: 1.15rem;
         }
 
-        .op-my-top {
+        .op-fusion-item-top {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 0.75rem;
           margin-bottom: 0.6rem;
         }
 
-        .op-status-tag {
+        .op-fusion-item-estrellas {
+          color: #f59e0b;
+          font-size: 1rem;
+          letter-spacing: 2px;
+          text-shadow: 0 0 6px rgba(245, 158, 11, 0.3);
+        }
+
+        .op-fusion-estado {
           font-size: 0.65rem;
           font-weight: 600;
+          padding: 0.2rem 0.65rem;
+          border-radius: 20px;
           text-transform: uppercase;
+          white-space: nowrap;
           letter-spacing: 0.05em;
-          padding: 0.2rem 0.6rem;
-          border-radius: 4px;
         }
 
-        .op-status-tag.approved {
-          background: rgba(16, 185, 129, 0.12);
-          color: #34d399;
-          border: 1px solid rgba(16, 185, 129, 0.25);
+        .op-fusion-estado.aprobada {
+          background: rgba(34, 197, 94, 0.12);
+          border: 1px solid rgba(34, 197, 94, 0.3);
+          color: #4ade80;
         }
 
-        .op-status-tag.pending {
+        .op-fusion-estado.pendiente {
           background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.3);
           color: #fbbf24;
-          border: 1px solid rgba(245, 158, 11, 0.25);
         }
 
-        .op-my-comment {
+        .op-fusion-item-texto {
           font-size: 0.88rem;
-          color: #e4e4e7;
-          line-height: 1.5;
+          color: #d4d4d4;
+          line-height: 1.55;
+          font-style: italic;
           margin-bottom: 0.9rem;
           word-break: break-word;
           overflow-wrap: anywhere;
         }
 
-        .op-actions-row {
+        .op-fusion-item-acciones {
           display: flex;
+          gap: 0.6rem;
           justify-content: flex-end;
-          gap: 0.5rem;
+          margin-top: 0.75rem;
         }
 
-        .op-btn-action {
-          padding: 0.4rem 0.85rem;
-          border-radius: 5px;
+        .op-fusion-item-acciones button {
+          padding: 0.45rem 1rem;
+          border-radius: 20px;
           font-size: 0.78rem;
           font-weight: 500;
           cursor: pointer;
-          transition: background-color 0.15s ease, border-color 0.15s ease;
+          transition: all 0.2s ease;
         }
 
-        .op-btn-edit {
-          background: #18181c;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: #e4e4e7;
+        .op-fusion-btn-editar {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #d4d4d4;
         }
 
-        .op-btn-edit:hover {
-          background: #222228;
-          border-color: rgba(255, 255, 255, 0.2);
+        .op-fusion-btn-editar:hover {
+          background: rgba(255, 255, 255, 0.16);
+          color: #ffffff;
         }
 
-        .op-btn-delete {
-          background: rgba(239, 68, 68, 0.08);
-          border: 1px solid rgba(239, 68, 68, 0.25);
+        .op-fusion-btn-eliminar {
+          background: rgba(239, 68, 68, 0.1);
+          border: 1px solid rgba(239, 68, 68, 0.3);
           color: #f87171;
         }
 
-        .op-btn-delete:hover {
-          background: rgba(239, 68, 68, 0.18);
+        .op-fusion-btn-eliminar:hover {
+          background: rgba(239, 68, 68, 0.22);
         }
 
-        .op-btn-cancel {
-          background: #18181c;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: #a1a1aa;
+        .op-fusion-btn-cancelar {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #888888;
         }
 
-        .op-btn-save {
-          background: #e0142c;
+        .op-fusion-btn-guardar {
+          background: linear-gradient(135deg, #e0142c, #a10e1f);
           border: none;
           color: #ffffff;
           font-weight: 600;
         }
 
-        .op-btn-save:hover {
-          background: #c81024;
-        }
-
-        .op-edit-stars-row {
+        .op-fusion-edit-estrellas {
           display: flex;
-          gap: 0.35rem;
-          margin-bottom: 0.65rem;
+          gap: 0.4rem;
+          margin-bottom: 0.75rem;
         }
 
-        .op-edit-stars-row .op-star-btn {
-          font-size: 1.4rem;
+        .op-fusion-edit-estrellas .op-rating-star {
+          font-size: 1.6rem;
         }
 
         /* Estados vacíos */
-        .op-empty-view {
+        .op-fusion-empty {
           text-align: center;
           padding: 2.5rem 1rem;
-          color: #71717a;
-          font-size: 0.85rem;
+          color: #666666;
+          font-size: 0.88rem;
         }
 
-        .op-empty-icon {
-          font-size: 2rem;
+        .op-fusion-empty-icon {
+          font-size: 2.5rem;
           margin-bottom: 0.5rem;
-          opacity: 0.6;
+          opacity: 0.5;
         }
 
-        /* Spinner */
-        .op-spinner {
-          animation: opSpin 0.9s linear infinite;
+        .op-fusion-spinner {
+          animation: opSpin 0.75s linear infinite;
         }
 
         @keyframes opSpin {
@@ -696,37 +697,37 @@ export function Opiniones() {
         }
 
         @media (max-width: 640px) {
-          .op-page-root {
-            padding: 1.25rem 0.75rem 3rem;
+          .op-fusion-root {
+            padding: 1.5rem 0.85rem 3rem;
           }
-          .op-panel-body {
-            padding: 1.15rem 1rem;
+          .op-fusion-body {
+            padding: 1.25rem 1rem;
           }
-          .op-reviews-grid {
+          .op-fusion-reviews-grid {
             grid-template-columns: 1fr;
             padding: 1rem 0.85rem;
           }
-          .op-star-btn {
-            font-size: 1.65rem;
+          .op-rating-star {
+            font-size: 1.9rem;
           }
         }
       `}</style>
 
-      <div className="op-page-root">
-        <div className="op-container">
+      <div className="op-fusion-root">
+        <div className="op-fusion-container">
 
-          {/* Selector de pestañas */}
-          <div className="op-nav-tabs">
+          {/* Selector de pestañas: estilo píldora como el original con paleta del Admin */}
+          <div className="op-fusion-tabs">
             <button
               type="button"
-              className={`op-tab-btn ${vista === 'opinar' ? 'active' : ''}`}
+              className={`op-fusion-tab ${vista === 'opinar' ? 'active' : ''}`}
               onClick={() => setVista('opinar')}
             >
               Dejar opinión
             </button>
             <button
               type="button"
-              className={`op-tab-btn ${vista === 'mis' ? 'active' : ''}`}
+              className={`op-fusion-tab ${vista === 'mis' ? 'active' : ''}`}
               onClick={() => setVista('mis')}
             >
               Mis opiniones
@@ -735,80 +736,95 @@ export function Opiniones() {
 
           {/* VISTA 1: DEJAR OPINIÓN */}
           {vista === 'opinar' && (
-            <div className="op-panel-card">
-              <div className="op-panel-header">
-                <h2 className="op-panel-title">Comparta su Experiencia</h2>
-                <p className="op-panel-subtitle">Su testimonio nos ayuda a mejorar y guía a futuros clientes</p>
+            <div className="op-fusion-card">
+              <div className="op-fusion-card-header">
+                <h2>Dejar Opinión</h2>
+                <p>Comparta su experiencia y ayude a otros clientes</p>
               </div>
 
-              <div className="op-panel-body">
+              <div className="op-fusion-body">
                 {alcanzoLimite && (
                   <AvisoLimite
-                    titulo="Límite de opiniones alcanzado"
+                    titulo="Ya dejaste todas tus opiniones"
                     destacado={{
-                      etiqueta: 'Opiniones registradas',
+                      etiqueta: 'Opiniones usadas',
                       valor: `${misOpiniones.length} de ${MAX_OPINIONES}`,
                     }}
-                    nota="Cada cliente puede registrar hasta 2 opiniones. Si desea escribir una nueva, primero elimine una anterior en Mis Opiniones."
+                    nota="Si querés escribir otra, primero eliminá una de las que ya tenés."
                   >
-                    <button type="button" className="op-btn-primary" style={{ maxWidth: '200px', margin: '0 auto' }} onClick={() => setVista('mis')}>
-                      Gestionar mis opiniones
+                    <button type="button" className="avl-btn avl-btn-rojo" onClick={() => setVista('mis')}>
+                      Ver mis opiniones
                     </button>
                   </AvisoLimite>
                 )}
 
                 {mensaje && (
-                  <div className={`op-alert ${mensaje.includes('éxito') ? 'op-alert-success' : 'op-alert-error'}`}>
+                  <div className={`op-fusion-msg ${mensaje.includes('éxito') ? 'success' : 'error'}`}>
                     {mensaje}
                   </div>
                 )}
 
                 <form onSubmit={handleSubmit}>
-                  {/* Nombre del cliente */}
-                  <div className="op-form-group">
-                    <label className="op-label">Nombre del Cliente</label>
+                  {/* Nombre (no editable) */}
+                  <div className="op-input-group">
+                    <label className="op-input-label">
+                      SU NOMBRE (NO EDITABLE)
+                    </label>
                     <input
-                      className="op-input"
+                      className="op-input-control"
                       type="text"
                       value={perfil.nombre || ''}
                       disabled
-                      placeholder="Cargando perfil..."
+                      placeholder="Cargando..."
                     />
                   </div>
 
                   {/* Calificación */}
-                  <div className="op-form-group">
-                    <label className="op-label">Calificación del Servicio</label>
-                    {renderRatingStars()}
-                  </div>
-
-                  {/* Comentario */}
-                  <div className="op-form-group">
-                    <label className="op-label">Comentario o Reseña</label>
-                    <textarea
-                      className="op-textarea"
-                      value={formData.comentario}
-                      onChange={handleComentarioChange}
-                      placeholder="Describa brevemente la atención, el acabado de su vehículo y su satisfacción..."
-                      maxLength={100}
-                      required
-                    />
-                    <div className={`op-char-bar ${formData.comentario.length >= 90 ? (formData.comentario.length >= 100 ? 'limit' : 'near-limit') : ''}`}>
-                      {formData.comentario.length} / 100 caracteres
+                  <div className="op-input-group">
+                    <label className="op-input-label">
+                      CALIFICACIÓN
+                    </label>
+                    <div className="op-rating-group">
+                      <div className="op-rating-stars">
+                        {renderRatingStars()}
+                      </div>
+                      <p className="op-rating-hint">
+                        {formData.rating === 0
+                          ? 'Haga clic en las estrellas para calificar'
+                          : `${formData.rating} de 5 estrellas seleccionadas`}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Botón de envío */}
-                  <button type="submit" className="op-btn-primary" disabled={enviando || alcanzoLimite}>
+                  {/* Comentario */}
+                  <div className="op-input-group">
+                    <label className="op-input-label">
+                      SU COMENTARIO
+                    </label>
+                    <textarea
+                      className="op-input-control"
+                      value={formData.comentario}
+                      onChange={handleComentarioChange}
+                      placeholder="Cuéntenos su experiencia con nuestro servicio..."
+                      maxLength={100}
+                      required
+                    />
+                    <div className={`op-char-counter ${formData.comentario.length >= 90 ? (formData.comentario.length >= 100 ? 'limit' : 'near-limit') : ''}`}>
+                      {formData.comentario.length}/100 caracteres
+                    </div>
+                  </div>
+
+                  {/* Botón enviar */}
+                  <button type="submit" className="op-fusion-submit-btn" disabled={enviando || alcanzoLimite}>
                     {enviando ? (
-                      <>
-                        <svg className="op-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                        <svg className="op-fusion-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none">
                           <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="3" strokeDasharray="31" strokeDashoffset="10" />
                         </svg>
-                        <span>Procesando...</span>
-                      </>
+                        Enviando...
+                      </span>
                     ) : (
-                      'Publicar Opinión'
+                      'Enviar Opinión'
                     )}
                   </button>
                 </form>
@@ -818,34 +834,32 @@ export function Opiniones() {
 
           {/* VISTA 2: MIS OPINIONES */}
           {vista === 'mis' && (
-            <div className="op-panel-card">
-              <div className="op-panel-header">
-                <h2 className="op-panel-title">Mis Opiniones Registradas</h2>
-                <p className="op-panel-subtitle">Historial de calificaciones emitidas con su cuenta</p>
+            <div className="op-fusion-card">
+              <div className="op-fusion-card-header">
+                <h2>Mis Opiniones</h2>
+                <p>Estas son las opiniones que has dejado</p>
               </div>
 
-              <div className="op-panel-body">
+              <div className="op-fusion-body">
                 {buscando ? (
-                  <div className="op-empty-view">
-                    <p>Cargando opiniones...</p>
-                  </div>
+                  <div className="op-fusion-empty"><p>Cargando tus opiniones...</p></div>
                 ) : misOpiniones.length === 0 ? (
-                  <div className="op-empty-view">
-                    <div className="op-empty-icon">💬</div>
-                    <p>Aún no ha dejado ninguna opinión registrada en el sistema.</p>
+                  <div className="op-fusion-empty">
+                    <div className="op-fusion-empty-icon">💬</div>
+                    <p>Todavía no has dejado ninguna opinión</p>
                   </div>
                 ) : (
-                  <div className="op-my-list">
+                  <div className="op-fusion-lista">
                     {misOpiniones.map((op) => (
-                      <div key={op.id} className="op-my-item">
+                      <div key={op.id} className="op-fusion-item">
                         {editandoId === op.id ? (
                           <>
-                            <div className="op-edit-stars-row">
+                            <div className="op-fusion-edit-estrellas">
                               {[1, 2, 3, 4, 5].map((i) => (
                                 <button
                                   key={i}
                                   type="button"
-                                  className={`op-star-btn ${i <= editForm.rating ? 'active' : ''}`}
+                                  className={`op-rating-star ${i <= editForm.rating ? 'active' : ''}`}
                                   onClick={() => setEditForm({ ...editForm, rating: i })}
                                 >
                                   ★
@@ -853,36 +867,34 @@ export function Opiniones() {
                               ))}
                             </div>
                             <textarea
-                              className="op-textarea"
+                              className="op-input-control"
                               value={editForm.comentario}
                               maxLength={100}
                               onChange={(e) => setEditForm({ ...editForm, comentario: e.target.value })}
                             />
-                            <div className="op-actions-row" style={{ marginTop: '0.75rem' }}>
-                              <button type="button" className="op-btn-action op-btn-cancel" onClick={() => setEditandoId(null)}>
+                            <div className="op-fusion-item-acciones">
+                              <button type="button" className="op-fusion-btn-cancelar" onClick={() => setEditandoId(null)}>
                                 Cancelar
                               </button>
-                              <button type="button" className="op-btn-action op-btn-save" onClick={() => guardarEdicion(op.id)}>
-                                Guardar cambios
+                              <button type="button" className="op-fusion-btn-guardar" onClick={() => guardarEdicion(op.id)}>
+                                Guardar
                               </button>
                             </div>
                           </>
                         ) : (
                           <>
-                            <div className="op-my-top">
-                              <span style={{ color: '#f59e0b', fontSize: '1rem', letterSpacing: '2px' }}>
-                                {'★'.repeat(op.rating)}
-                              </span>
-                              <span className={`op-status-tag ${op.is_approved ? 'approved' : 'pending'}`}>
-                                {op.is_approved ? 'Publicada' : 'En revisión'}
+                            <div className="op-fusion-item-top">
+                              <span className="op-fusion-item-estrellas">{'★'.repeat(op.rating)}</span>
+                              <span className={`op-fusion-estado ${op.is_approved ? 'aprobada' : 'pendiente'}`}>
+                                {op.is_approved ? 'Publicada' : 'Pendiente'}
                               </span>
                             </div>
-                            <p className="op-my-comment">"{op.comment}"</p>
-                            <div className="op-actions-row">
-                              <button type="button" className="op-btn-action op-btn-edit" onClick={() => empezarEdicion(op)}>
+                            <p className="op-fusion-item-texto">"{op.comment}"</p>
+                            <div className="op-fusion-item-acciones">
+                              <button type="button" className="op-fusion-btn-editar" onClick={() => empezarEdicion(op)}>
                                 Editar
                               </button>
-                              <button type="button" className="op-btn-action op-btn-delete" onClick={() => eliminarOpinion(op)}>
+                              <button type="button" className="op-fusion-btn-eliminar" onClick={() => eliminarOpinion(op)}>
                                 Eliminar
                               </button>
                             </div>
@@ -896,40 +908,41 @@ export function Opiniones() {
             </div>
           )}
 
-          {/* MURO DE OPINIONES DE CLIENTES */}
+          {/* VISTA 1 CONTINUACIÓN: OPINIONES DE NUESTROS CLIENTES */}
           {vista === 'opinar' && (
-            <div className="op-panel-card">
-              <div className="op-panel-header">
-                <h2 className="op-panel-title">Opiniones de Nuestros Clientes</h2>
-                <p className="op-panel-subtitle">Comentarios recientes verificados por el taller</p>
+            <div className="op-fusion-card" style={{ marginTop: '2rem' }}>
+              <div className="op-fusion-card-header">
+                <h2>Opiniones de nuestros clientes</h2>
+                <p>Lo que dicen quienes ya nos visitaron</p>
               </div>
 
-              <div className="op-reviews-grid">
+              <div className="op-fusion-reviews-grid">
                 {loading ? (
-                  <div className="op-empty-view" style={{ gridColumn: '1 / -1' }}>
-                    <p>Cargando testimonios...</p>
+                  <div className="op-fusion-empty" style={{ gridColumn: '1 / -1' }}>
+                    <div className="op-fusion-empty-icon">⏳</div>
+                    <p>Cargando opiniones...</p>
                   </div>
                 ) : opiniones.length === 0 ? (
-                  <div className="op-empty-view" style={{ gridColumn: '1 / -1' }}>
-                    <p>No hay opiniones públicas registradas actualmente.</p>
+                  <div className="op-fusion-empty" style={{ gridColumn: '1 / -1' }}>
+                    <div className="op-fusion-empty-icon">📋</div>
+                    <p>No hay opiniones aún. ¡Sea el primero en opinar!</p>
                   </div>
                 ) : (
                   opiniones.map((opinion) => (
-                    <div key={opinion.id} className="op-review-item">
+                    <div key={opinion.id} className="op-fusion-review-card">
                       <div>
-                        <div className="op-review-top">
-                          <span className="op-review-stars">{'★'.repeat(opinion.rating)}</span>
-                          <span className="op-review-date">{new Date(opinion.created_at).toLocaleDateString('es-CR')}</span>
-                        </div>
-                        <p className="op-review-text">"{opinion.comment}"</p>
+                        <div className="op-fusion-review-stars">{"★".repeat(opinion.rating)}</div>
+                        <div className="op-fusion-review-text">"{opinion.comment}"</div>
                       </div>
-                      <div className="op-review-author">
-                        <div className="op-avatar-badge">
+                      <div className="op-fusion-review-author">
+                        <div className="op-fusion-review-avatar">
                           {opinion.customer_name?.charAt(0).toUpperCase() || 'C'}
                         </div>
-                        <div>
-                          <div className="op-author-name">{opinion.customer_name}</div>
-                          <div className="op-author-verified">✓ Cliente verificado</div>
+                        <div className="op-fusion-review-info">
+                          <div className="op-fusion-review-name">{opinion.customer_name}</div>
+                          <div className="op-fusion-review-date">
+                            {new Date(opinion.created_at).toLocaleDateString('es-CR')}
+                          </div>
                         </div>
                       </div>
                     </div>
