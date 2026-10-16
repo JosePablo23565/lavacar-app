@@ -273,6 +273,8 @@ export function ClienteAuth() {
                   <label>Correo Electrónico</label>
                   <input
                     type="email"
+                    name="username"
+                    autoComplete="username email"
                     placeholder="tucorreo@gmail.com"
                     className="input-field"
                     value={loginEmail}
@@ -285,6 +287,8 @@ export function ClienteAuth() {
                   <label>Contraseña</label>
                   <input
                     type="password"
+                    name="password"
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     className="input-field"
                     value={loginPassword}
@@ -350,6 +354,8 @@ export function ClienteAuth() {
                   <label>Nombre completo</label>
                   <input
                     type="text"
+                    name="name"
+                    autoComplete="name"
                     placeholder="Ej: Carlos Pérez"
                     className="input-field"
                     value={regNombre}
@@ -365,6 +371,8 @@ export function ClienteAuth() {
                   <label>Correo Electrónico</label>
                   <input
                     type="email"
+                    name="username"
+                    autoComplete="username email"
                     placeholder="tucorreo@gmail.com"
                     className="input-field"
                     value={regEmail}
@@ -377,6 +385,8 @@ export function ClienteAuth() {
                   <label>Teléfono</label>
                   <input
                     type="tel"
+                    name="tel"
+                    autoComplete="tel"
                     placeholder="Ej: 83606680"
                     className="input-field"
                     value={regTelefono}
@@ -392,6 +402,8 @@ export function ClienteAuth() {
                   <label>Contraseña</label>
                   <input
                     type="password"
+                    name="password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     className="input-field"
                     value={regPassword}
@@ -404,6 +416,8 @@ export function ClienteAuth() {
                   <label>Confirmar contraseña</label>
                   <input
                     type="password"
+                    name="confirmPassword"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     className="input-field"
                     value={regConfirmPassword}
