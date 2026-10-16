@@ -6,245 +6,73 @@ export function Contact() {
   return (
     <>
       <style>{`
+        /* ============================================================
+           PÁGINA DE CONTACTO: ESTÉTICA FUSIÓN PROFESIONAL
+           Lienzo oscuro mate puro, rojo deportivo (#e0142c) y acabados precisos
+           ============================================================ */
 
         .ct-root {
-          background: #1a1a1a;
-          padding: 2rem 1.5rem;
-                  font-family: 'Inter', sans-serif;
-          position: relative;
-          /* 'clip' recorta los adornos que se salen a los lados igual que
-             'hidden', pero sin convertir esto en una segunda zona de scroll.
-             Con 'hidden' el navegador vuelve el eje vertical desplazable y
-             la pagina rebota al bajar y subir en el telefono. */
-          overflow-x: hidden; /* respaldo para navegadores viejos */
-          overflow-x: clip;
-        }
-
-        .ct-root::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          right: -20%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(224, 20, 44,0.06) 0%, transparent 70%);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        .ct-root::after {
-          content: '';
-          position: absolute;
-          bottom: -30%;
-          left: -10%;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(224, 20, 44,0.04) 0%, transparent 70%);
-          border-radius: 50%;
-          pointer-events: none;
+          min-height: calc(100vh - 72px);
+          background-color: #080808;
+          padding: 2rem 1.25rem 4rem;
+          font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #d4d4d4;
+          box-sizing: border-box;
         }
 
         .ct-inner {
-          max-width: 1100px;
+          max-width: 1050px;
           margin: 0 auto;
-          position: relative;
-          z-index: 2;
         }
 
+        /* Encabezado */
         .ct-header {
           text-align: center;
           margin-bottom: 2rem;
         }
 
         .ct-icon-circle {
-          width: 80px;
-          height: 80px;
-          background: linear-gradient(135deg, #e0142c, #a10e1f);
+          width: 68px;
+          height: 68px;
+          background: linear-gradient(135deg, #e0142c, #800a16);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 1.2rem;
-          transition: transform 0.2s ease;
-        }
-
-        .ct-icon-circle:hover {
-          transform: scale(1.02);
+          margin: 0 auto 1.25rem;
+          box-shadow: 0 4px 20px rgba(224, 20, 44, 0.35);
         }
 
         .ct-icon-circle svg {
-          width: 40px;
-          height: 40px;
-          color: white;
+          width: 34px;
+          height: 34px;
+          color: #ffffff;
         }
 
         .ct-title {
           font-family: 'Sora', sans-serif;
-          font-size: 2.5rem;
+          font-size: 2.1rem;
           font-weight: 700;
-          color: #e0142c;
-          margin-bottom: 0.5rem;
+          color: #ffffff;
+          margin: 0 0 0.4rem 0;
+          letter-spacing: -0.02em;
         }
 
         .ct-sub {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 0.95rem;
-        }
-
-        .ct-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1.5rem;
-        }
-
-        .ct-card {
-          background: rgba(25, 25, 25, 0.35);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 28px;
-          overflow: hidden;
-          transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-
-        .ct-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(224, 20, 44, 0.3);
-        }
-
-        .ct-card-header {
-          background: linear-gradient(135deg, rgba(224, 20, 44, 0.15), rgba(224, 20, 44, 0.05));
-          padding: 1rem 1.5rem;
-          text-align: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .ct-card-header p {
-          font-size: 0.75rem;
-          color: #e0142c;
-          letter-spacing: 0.1em;
-          font-weight: 600;
-          text-transform: uppercase;
+          color: #888888;
+          font-size: 0.92rem;
           margin: 0;
         }
 
-        .ct-items {
-          padding: 1.5rem;
-        }
-
-        .ct-item {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          border-radius: 18px;
-          padding: 1rem;
-          margin-bottom: 1rem;
-          transition: all 0.2s ease;
-          cursor: pointer;
-        }
-
-        .ct-item:hover {
-          background: rgba(224, 20, 44, 0.08);
-          border-color: rgba(224, 20, 44, 0.3);
-          transform: translateX(4px);
-        }
-
-        .ct-item-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.05);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          font-size: 24px;
-        }
-
-        .ct-item-label {
-          font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.5);
-          margin-bottom: 0.2rem;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .ct-item-value {
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #ffffff;
-          line-height: 1.5;
-          overflow-wrap: anywhere;
-        }
-
-        .ct-wa-btn {
-          color: #25d366;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 0.4rem 0.6rem;
-          line-height: 1.5;
-        }
-
-        .ct-wa-btn:hover {
-          opacity: 0.8;
-        }
-
-        .ct-iframe {
-          border-radius: 18px;
-          overflow: hidden;
-          margin-bottom: 1rem;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .ct-iframe iframe {
-          display: block;
-          width: 100%;
-          height: 200px;
-          border: 0;
-        }
-
-        .ct-maps-btn {
-          width: 100%;
-          box-sizing: border-box;
-          text-decoration: none;
-          background: rgba(224, 20, 44, 0.12);
-          color: #e0142c;
-          border: 1px solid rgba(224, 20, 44, 0.25);
-          padding: 0.85rem;
-          border-radius: 16px;
-          font-size: 0.85rem;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          transition: all 0.2s ease;
-          font-family: 'Inter', sans-serif;
-        }
-
-        .ct-maps-btn:hover {
-          background: rgba(224, 20, 44, 0.2);
-          color: #fff;
-          transform: translateY(-2px);
-          border-color: rgba(224, 20, 44, 0.4);
-        }
-
-        a {
-          text-decoration: none;
-        }
-
+        /* Sección de redes sociales (Mantenemos los colores y píldoras exactos pedidos) */
         .ct-redes {
           margin-bottom: 2rem;
         }
 
         .ct-redes-titulo {
           text-align: center;
-          font-size: 0.9rem;
-          color: rgba(255, 255, 255, 0.75);
+          font-size: 0.88rem;
+          color: #999999;
           margin-bottom: 1rem;
           line-height: 1.5;
         }
@@ -264,14 +92,16 @@ export function Contact() {
           border-radius: 40px;
           font-size: 0.9rem;
           font-weight: 600;
-          transition: all 0.25s ease;
+          transition: transform 0.2s ease, background 0.2s ease;
           box-sizing: border-box;
+          text-decoration: none;
         }
 
         .ct-red i {
           font-size: 1.3rem;
         }
 
+        /* Colores exactos de Facebook e Instagram preservados al 100% */
         .ct-red.fb {
           background: rgba(24, 119, 242, 0.12);
           border: 1px solid rgba(24, 119, 242, 0.35);
@@ -294,88 +124,178 @@ export function Contact() {
           transform: translateY(-2px);
         }
 
+        /* Cuadrícula de tarjetas */
+        .ct-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+
+        .ct-card {
+          background: #121212;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .ct-card-header {
+          background: linear-gradient(135deg, rgba(224, 20, 44, 0.12), rgba(224, 20, 44, 0.02));
+          padding: 1.25rem 1.5rem;
+          text-align: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .ct-card-header p {
+          font-family: 'Sora', sans-serif;
+          font-size: 0.82rem;
+          color: #ffffff;
+          letter-spacing: 0.08em;
+          font-weight: 700;
+          text-transform: uppercase;
+          margin: 0;
+        }
+
+        .ct-items {
+          padding: 1.5rem;
+        }
+
+        /* Items de contacto */
+        .ct-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          background: #161616;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 0.85rem 1rem;
+          margin-bottom: 0.85rem;
+          transition: border-color 0.15s ease;
+          text-decoration: none;
+        }
+
+        .ct-item:hover {
+          border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        .ct-item-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: #1c1c20;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .ct-item-label {
+          font-size: 0.68rem;
+          color: #888888;
+          margin-bottom: 0.2rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          font-weight: 600;
+        }
+
+        .ct-item-value {
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: #ffffff;
+          line-height: 1.4;
+          overflow-wrap: anywhere;
+        }
+
+        .ct-wa-btn {
+          color: #25d366;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.4rem 0.6rem;
+        }
+
+        .ct-wa-btn:hover {
+          color: #4ade80;
+        }
+
         .ct-email-link {
-          color: #fff;
+          color: #ffffff;
+          text-decoration: none;
         }
 
         .ct-email-link:hover {
-          color: #fff;
+          color: #e0142c;
         }
 
-        /* Optimización para móvil */
+        /* Mapa y botones de navegación */
+        .ct-iframe {
+          border-radius: 14px;
+          overflow: hidden;
+          margin-bottom: 1rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ct-iframe iframe {
+          display: block;
+          width: 100%;
+          height: 200px;
+          border: 0;
+        }
+
+        .ct-maps-btn {
+          width: 100%;
+          box-sizing: border-box;
+          text-decoration: none;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          font-size: 0.86rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          transition: all 0.15s ease;
+          font-family: 'DM Sans', sans-serif;
+          border: 1px solid transparent;
+        }
+
+        .ct-maps-btn:hover {
+          transform: translateY(-1px);
+        }
+
+        /* Adaptación móvil */
         @media (max-width: 768px) {
           .ct-root {
-            padding: 1.5rem 1rem;
+            padding: 1.25rem 0.85rem 3rem;
           }
           .ct-grid {
             grid-template-columns: 1fr;
             gap: 1rem;
           }
           .ct-title {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
           }
           .ct-icon-circle {
-            width: 65px;
-            height: 65px;
+            width: 58px;
+            height: 58px;
           }
           .ct-icon-circle svg {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
           }
-          .ct-item {
-            padding: 0.9rem;
-            gap: 0.85rem;
-            margin-bottom: 0.85rem;
-          }
-          .ct-item-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-          }
-          
-          .ct-card {
-            backdrop-filter: none !important;
-            background: rgba(25, 25, 25, 0.7) !important;
-          }
-          
-          .ct-card:hover {
-            transform: none;
-          }
-          
-          .ct-item:hover {
-            transform: translateX(2px);
-          }
-          
-          .ct-maps-btn:hover {
-            transform: none;
-          }
-        }
-
-        @media (max-width: 480px) {
           .ct-items {
-            padding: 1rem;
+            padding: 1.15rem 1rem;
           }
           .ct-item {
-            padding: 0.6rem;
-            gap: 0.8rem;
+            padding: 0.75rem 0.85rem;
+            gap: 0.75rem;
           }
           .ct-item-icon {
             width: 36px;
             height: 36px;
-            font-size: 18px;
-          }
-          .ct-item-label {
-            font-size: 0.6rem;
-          }
-          .ct-item-value {
-            font-size: 0.75rem;
-          }
-          .ct-maps-btn {
-            padding: 0.6rem;
-            font-size: 0.75rem;
-          }
-          .ct-iframe iframe {
-            height: 160px;
           }
         }
       `}</style>
@@ -392,6 +312,7 @@ export function Contact() {
             <p className="ct-sub">Estamos aquí para ayudarle</p>
           </div>
 
+          {/* Redes sociales con colores intactos */}
           <div className="ct-redes">
             <p className="ct-redes-titulo">
               Podés encontrarnos en nuestras redes sociales
@@ -409,16 +330,16 @@ export function Contact() {
           </div>
 
           <div className="ct-grid">
+            {/* Tarjeta 1: Información de contacto */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>INFORMACIÓN DE CONTACTO</p>
               </div>
               <div className="ct-items">
-                <a className="ct-item" href={googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer">
+                {/* Dirección intacta */}
+                <a className="ct-item" href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
                   <div className="ct-item-icon">
-                    <Icono nombre="mapa" size={22} color="#e0142c" />
+                    <Icono nombre="mapa" size={20} color="#e0142c" />
                   </div>
                   <div>
                     <div className="ct-item-label">DIRECCIÓN</div>
@@ -426,9 +347,10 @@ export function Contact() {
                   </div>
                 </a>
 
+                {/* WhatsApp */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <Icono nombre="whatsapp" size={26} color="#25D366" />
+                    <Icono nombre="whatsapp" size={22} color="#25D366" />
                   </div>
                   <div>
                     <div className="ct-item-label">WHATSAPP</div>
@@ -440,9 +362,10 @@ export function Contact() {
                   </div>
                 </div>
 
+                {/* Correo */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <Icono nombre="sobre" size={22} color="#EA4335" />
+                    <Icono nombre="sobre" size={20} color="#EA4335" />
                   </div>
                   <div>
                     <div className="ct-item-label">CORREO</div>
@@ -454,9 +377,10 @@ export function Contact() {
                   </div>
                 </div>
 
+                {/* Horario */}
                 <div className="ct-item">
                   <div className="ct-item-icon">
-                    <Icono nombre="reloj" size={22} color="#e0142c" />
+                    <Icono nombre="reloj" size={20} color="#e0142c" />
                   </div>
                   <div>
                     <div className="ct-item-label">HORARIO</div>
@@ -466,6 +390,7 @@ export function Contact() {
               </div>
             </div>
 
+            {/* Tarjeta 2: Ubicación */}
             <div className="ct-card">
               <div className="ct-card-header">
                 <p>UBICACIÓN</p>
@@ -476,19 +401,19 @@ export function Contact() {
                     src={googleMapsEmbedUrl}
                     width="100%"
                     height="200"
-                    style={{ border: 0, borderRadius: '16px' }}
+                    style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                     title="Google Maps - Autolavado Camaro Fraterno, Bagaces"
                   />
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                   <a
                     className="ct-maps-btn"
                     href={googleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{ background: 'rgba(219, 68, 55, 0.12)', borderColor: 'rgba(219, 68, 55, 0.25)', color: '#DB4437' }}
                   >
                     <Icono nombre="google" size={17} />
@@ -498,8 +423,8 @@ export function Contact() {
                   <a
                     className="ct-maps-btn"
                     href={wazeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{ background: 'rgba(0, 179, 255, 0.12)', borderColor: 'rgba(0, 179, 255, 0.25)', color: '#00B3FF' }}
                   >
                     <Icono nombre="waze" size={17} />
@@ -509,9 +434,9 @@ export function Contact() {
                   <a
                     className="ct-maps-btn"
                     href={appleMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    style={{ background: 'rgba(0, 0, 0, 0.2)', borderColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ background: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 255, 255, 0.15)', color: '#ffffff' }}
                   >
                     <Icono nombre="apple" size={17} />
                     Apple Maps
