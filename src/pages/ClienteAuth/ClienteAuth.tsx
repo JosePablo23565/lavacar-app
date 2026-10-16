@@ -179,11 +179,22 @@ export function ClienteAuth() {
         { id: data.user.id, nombre: nombreSanitized, telefono: telefonoSanitized, email: emailSanitized }
       ])
 
-      // Si Supabase requiere confirmación por email, data.session viene null
+      // Intentar iniciar sesión automáticamente con las credenciales que acaba de crear
+      const { data: loginData, error: autoLoginError } = await supabase.auth.signInWithPassword({
+        email: emailSanitized,
+        password: regPassword
+      })
+
+      if (!autoLoginError && loginData.session) {
+        navigate('/')
+        return
+      }
+
+      // Si la base de datos requiere confirmación por email
       if (!data.session) {
         setSuccessMessage('✅ Cuenta creada exitosamente. Hemos enviado un enlace de confirmación a tu correo (revisa tu bandeja de entrada o Spam). Confirma tu cuenta para poder ingresar.')
         setLoginEmail(emailSanitized)
-        setLoginPassword('')
+        setLoginPassword(regPassword)
         setIsLogin(true)
       } else {
         // Sesión activa directa
@@ -203,8 +214,7 @@ export function ClienteAuth() {
       options: {
         redirectTo: `${window.location.origin}/completar-perfil`,
         queryParams: {
-          prompt: 'select_account',
-          access_type: 'offline'
+          prompt: 'select_account'
         }
       }
     })
