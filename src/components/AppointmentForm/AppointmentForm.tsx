@@ -153,12 +153,19 @@ export function AppointmentForm() {
           .single()
         
         if (data) {
+          if (!data.nombre?.trim() || !data.telefono?.trim()) {
+            navigate('/completar-perfil')
+            return
+          }
           setPerfil(data)
           setFormData(prev => ({
             ...prev,
             customer_name: data.nombre || '',
             customer_phone: data.telefono || ''
           }))
+        } else {
+          navigate('/completar-perfil')
+          return
         }
       }
     }
@@ -553,6 +560,13 @@ export function AppointmentForm() {
           'Solo se puede tener una cita a la vez. Vas a poder agendar otra 2 horas después de la que ya tenés.'
         )
         await cargarCitaActiva()
+      } else if (motivo.includes('PERFIL_INCOMPLETO') || motivo.includes('TELEFONO_REQUERIDO')) {
+        await swalAviso(
+          'Perfil incompleto',
+          'Debes registrar tu nombre y número de teléfono antes de agendar tu cita.'
+        )
+        navigate('/completar-perfil')
+        return
       } else {
         await swalError('No se pudo agendar', motivo)
       }

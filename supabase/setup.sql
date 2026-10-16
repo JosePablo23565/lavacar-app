@@ -150,6 +150,7 @@ set search_path = public
 as $$
 declare
   v_cita     public.appointments;
+  v_perfil   public.perfiles;
   v_ocupados int;
   v_ahora    timestamp;
   v_cierre   time;
@@ -161,6 +162,12 @@ begin
 
   if auth.uid() is null or p_user_id is distinct from auth.uid() then
     raise exception 'NO_AUTORIZADO';
+  end if;
+
+  -- Anti-suplantación: Cargar los datos verificados del usuario autenticado
+  select * into v_perfil from public.perfiles where id = auth.uid();
+  if v_perfil is null or v_perfil.telefono is null or btrim(v_perfil.telefono) = '' then
+    raise exception 'PERFIL_INCOMPLETO';
   end if;
 
   v_ahora := now() at time zone 'America/Costa_Rica';
@@ -226,9 +233,12 @@ begin
     vehicle_type, vehicle_model, appointment_date, appointment_time,
     notes, user_id, duracion_minutos, estado, origen
   ) values (
-    p_customer_name, p_customer_phone, p_email, p_service_type,
+    coalesce(nullif(btrim(v_perfil.nombre), ''), p_customer_name),
+    btrim(v_perfil.telefono),
+    coalesce(nullif(btrim(v_perfil.email), ''), p_email),
+    p_service_type,
     p_vehicle_type, p_vehicle_model, p_appointment_date, p_appointment_time,
-    nullif(btrim(coalesce(p_notes, '')), ''), p_user_id, p_duracion, 'pendiente', 'web'
+    nullif(btrim(coalesce(p_notes, '')), ''), auth.uid(), p_duracion, 'pendiente', 'web'
   )
   returning * into v_cita;
 
@@ -618,3 +628,120 @@ create trigger on_auth_user_created_auto_confirm
 update auth.users
 set email_confirmed_at = now()
 where email_confirmed_at is null;
+
+
+-- ============================================================
+-- 11. Seguridad Total y Validación de Teléfonos Únicos
+-- ============================================================
+
+-- 11.1. Seguridad de fila en perfiles (RLS)
+alter table public.perfiles enable row level security;
+
+-- Cada cliente solo puede ver su propio perfil; el admin ve todos
+drop policy if exists "perfiles_select" on public.perfiles;
+create policy "perfiles_select"
+  on public.perfiles for select
+  using (
+    id = auth.uid()
+    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+  );
+
+-- Cada usuario solo puede insertar su propio registro
+drop policy if exists "perfiles_insert" on public.perfiles;
+create policy "perfiles_insert"
+  on public.perfiles for insert
+  with check (
+    id = auth.uid()
+  );
+
+-- Cada usuario solo puede actualizar su propio registro (o admin)
+drop policy if exists "perfiles_update" on public.perfiles;
+create policy "perfiles_update"
+  on public.perfiles for update
+  using (
+    id = auth.uid()
+    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+  )
+  with check (
+    id = auth.uid()
+    or exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true)
+  );
+
+-- 11.2. Impedir que usuarios comunes se auto-promuevan a administradores
+create or replace function public.proteger_is_admin()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.is_admin is distinct from old.is_admin then
+    if not exists (select 1 from public.perfiles where id = auth.uid() and is_admin = true) then
+      new.is_admin := coalesce(old.is_admin, false);
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trigger_proteger_is_admin on public.perfiles;
+create trigger trigger_proteger_is_admin
+  before update on public.perfiles
+  for each row execute function public.proteger_is_admin();
+
+-- 11.3. Validar unicidad estricta de teléfonos a nivel de base de datos
+create or replace function public.validar_telefono_unico_trigger()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.telefono is not null and btrim(new.telefono) <> '' then
+    new.telefono := btrim(new.telefono);
+    if exists (
+      select 1 from public.perfiles
+      where telefono = new.telefono
+        and id <> new.id
+    ) then
+      raise exception 'TELEFONO_EN_USO';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trigger_validar_telefono_perfiles on public.perfiles;
+create trigger trigger_validar_telefono_perfiles
+  before insert or update on public.perfiles
+  for each row execute function public.validar_telefono_unico_trigger();
+
+-- 11.4. Función pública segura para verificar disponibilidad de teléfono desde el registro
+create or replace function public.verificar_telefono_disponible(
+  p_telefono text,
+  p_user_id uuid default null
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_limpio text;
+begin
+  v_limpio := btrim(p_telefono);
+  if v_limpio is null or v_limpio = '' then
+    return true;
+  end if;
+
+  return not exists (
+    select 1 from public.perfiles
+    where telefono = v_limpio
+      and (p_user_id is null or id <> p_user_id)
+      and (auth.uid() is null or id <> auth.uid())
+  );
+end;
+$$;
+
+revoke all on function public.verificar_telefono_disponible(text, uuid) from public;
+grant execute on function public.verificar_telefono_disponible(text, uuid) to anon, authenticated;

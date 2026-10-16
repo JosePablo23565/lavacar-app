@@ -69,8 +69,8 @@ export function CompletarPerfil() {
       return
     }
     
-    if (formData.telefono.length < 8) {
-      setError('El teléfono debe tener al menos 8 dígitos')
+    if (formData.telefono.length !== 8) {
+      setError('El teléfono debe tener exactamente 8 dígitos')
       return
     }
     
@@ -80,18 +80,34 @@ export function CompletarPerfil() {
     }
     
     setLoading(true)
+
+    // Verificar si el teléfono ya está registrado por otro usuario
+    const { data: telDisponible } = await supabase.rpc('verificar_telefono_disponible', {
+      p_telefono: formData.telefono.trim(),
+      p_user_id: userId
+    })
+
+    if (telDisponible === false) {
+      setError('❌ Este número de teléfono ya está registrado por otro usuario. Por favor ingresa otro número.')
+      setLoading(false)
+      return
+    }
     
     const { error: dbError } = await supabase
       .from('perfiles')
       .upsert({
         id: userId,
         nombre: formData.nombre.trim(),
-        telefono: formData.telefono,
+        telefono: formData.telefono.trim(),
         email: userEmail
       })
 
     if (dbError) {
-      setError('Error al guardar: ' + dbError.message)
+      if (dbError.message.includes('TELEFONO_EN_USO') || dbError.message.includes('perfiles_telefono_unico')) {
+        setError('❌ Este número de teléfono ya está registrado por otro usuario.')
+      } else {
+        setError('Error al guardar: ' + dbError.message)
+      }
       setLoading(false)
       return
     }

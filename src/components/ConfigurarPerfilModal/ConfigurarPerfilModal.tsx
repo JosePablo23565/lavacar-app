@@ -85,6 +85,18 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
 
     setLoading(true)
 
+    // Validar si el nuevo teléfono ya está usado por otro usuario
+    const { data: telDisponible } = await supabase.rpc('verificar_telefono_disponible', {
+      p_telefono: telefono.trim(),
+      p_user_id: user?.id
+    })
+
+    if (telDisponible === false) {
+      setToast({ show: true, message: '❌ Este número de teléfono ya está registrado por otro usuario', type: 'error' })
+      setLoading(false)
+      return
+    }
+
     const { error } = await supabase
       .from('perfiles')
       .update({
@@ -94,7 +106,11 @@ export function ConfigurarPerfilModal({ onClose }: { onClose: () => void }) {
       .eq('id', user?.id)
 
     if (error) {
-      setToast({ show: true, message: 'Error: ' + error.message, type: 'error' })
+      if (error.message.includes('TELEFONO_EN_USO') || error.message.includes('perfiles_telefono_unico')) {
+        setToast({ show: true, message: '❌ Este número de teléfono ya está registrado por otro usuario', type: 'error' })
+      } else {
+        setToast({ show: true, message: 'Error: ' + error.message, type: 'error' })
+      }
     } else {
       setToast({ show: true, message: 'Perfil actualizado correctamente', type: 'success' })
       setTimeout(() => {

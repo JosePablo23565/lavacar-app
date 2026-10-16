@@ -147,12 +147,23 @@ export function ClienteAuth() {
       return
     }
 
-    if (telefonoSanitized && telefonoSanitized.length !== 8) {
-      setError('El teléfono debe tener exactamente 8 dígitos')
+    if (!telefonoSanitized || telefonoSanitized.length !== 8) {
+      setError('El teléfono es obligatorio y debe tener exactamente 8 dígitos')
       return
     }
 
     setLoading(true)
+
+    // Validar que el teléfono no esté registrado por otra persona
+    const { data: telDisponible, error: telError } = await supabase.rpc('verificar_telefono_disponible', {
+      p_telefono: telefonoSanitized
+    })
+
+    if (!telError && telDisponible === false) {
+      setError('❌ Este número de teléfono ya está registrado con otra cuenta. Si ya tienes cuenta, inicia sesión.')
+      setLoading(false)
+      return
+    }
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: emailSanitized,
@@ -175,9 +186,19 @@ export function ClienteAuth() {
         return
       }
 
-      await supabase.from('perfiles').upsert([
+      const { error: perfilErr } = await supabase.from('perfiles').upsert([
         { id: data.user.id, nombre: nombreSanitized, telefono: telefonoSanitized, email: emailSanitized }
       ])
+
+      if (perfilErr) {
+        if (perfilErr.message.includes('TELEFONO_EN_USO') || perfilErr.message.includes('perfiles_telefono_unico')) {
+          setError('❌ Este número de teléfono ya está registrado por otro usuario.')
+        } else {
+          setError(`Error al guardar el perfil: ${perfilErr.message}`)
+        }
+        setLoading(false)
+        return
+      }
 
       // Intentar iniciar sesión automáticamente con las credenciales que acaba de crear
       const { data: loginData, error: autoLoginError } = await supabase.auth.signInWithPassword({
@@ -392,9 +413,10 @@ export function ClienteAuth() {
                     value={regTelefono}
                     onChange={handleTelefonoChange}
                     maxLength={8}
+                    required
                   />
                   <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.2rem' }}>
-                    Solo números, 8 dígitos (opcional)
+                    Solo números, 8 dígitos (obligatorio)
                   </div>
                 </div>
 
