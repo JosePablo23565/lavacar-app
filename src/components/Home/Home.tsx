@@ -753,7 +753,7 @@ export function Home() {
             playsInline
             poster="/fondo-hero.jpg"
           >
-            <source src="/video2.mp4" type="video/mp4" />
+            <source src="/video3.mp4" type="video/mp4" />
           </video>
           <div className="hero-overlay"></div>
           <div className="lc-glow" />
